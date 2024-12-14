@@ -1,0 +1,78 @@
+<div class="todo-container">
+
+  <div class="background-image">
+    <img src="sin_fondo.png" alt="Logo" onclick="window.location.href='/'">
+    <h1>Tareas de la casa</h1>
+  </div>
+
+  <form [formGroup]="taskForm" (ngSubmit)="onSubmit()" class="task-form">
+    <input
+      formControlName="title"
+      placeholder="Título de la tarea"
+      required
+    >
+    <textarea
+      formControlName="description"
+      placeholder="Descripción (opcional)"
+      maxlength="200"
+      rows="4"
+      cols="50"
+    ></textarea>
+
+    <button type="submit" class="btn-primary">
+      {{ editingTask ? 'Actualizar Tarea' : 'Crear Tarea' }}
+    </button>
+
+    <button
+      *ngIf="editingTask"
+      type="button"
+      class="btn-secondary"
+      (click)="cancelEditing()"
+    >
+      Cancelar
+    </button>
+  </form>
+
+  <div class="tasks-list">
+    <div
+      *ngFor="let task of tasks$ | async"
+      class="task-card"
+      [@taskAnimation]
+      [class.completed]="task.completed"
+    >
+      <div class="task-header">
+        <h3>{{ task.title }}</h3>
+        <div class="task-actions">
+          <button
+            (click)="startEditing(task)"
+            class="edit-btn"
+          >
+            ✏️
+          </button>
+          <button
+            (click)="deleteTask(task.id!)"
+            class="delete-btn"
+          >
+            🗑️
+          </button>
+        </div>
+      </div>
+
+      <p>{{ task.description }}</p>
+
+      <div class="task-footer">
+        <span class="date">
+          {{ task.created_at | date:'medium' }}
+        </span>
+        <label class="checkbox-container">
+          <input
+            type="checkbox"
+            [checked]="task.completed"
+            (change)="toggleTaskCompletion(task.id!)"
+          >
+          <span class="checkmark"></span>
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
