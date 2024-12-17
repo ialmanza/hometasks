@@ -6,25 +6,26 @@ import { Task, TasksService } from '../../services/tasks.service';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NotificationService } from '../../services/notifications.service';
+import { PushSubscriptionService } from '../../services/push-subscription.service';
+
 
 @Component({
-  selector: 'app-home-tasks',
-  standalone: true,
-  imports: [ CommonModule, ReactiveFormsModule ],
-  providers: [TasksService, NotificationService],
-  templateUrl: './home-tasks.component.html',
-  styleUrl: './home-tasks.component.css',
-  animations: [
-    trigger('taskAnimation', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateY(-20px)' }),
-        animate('300ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
-      ]),
-      transition(':leave', [
-        animate('300ms ease-in', style({ opacity: 0, transform: 'translateX(100%)' }))
-      ])
-    ])
-  ]
+    selector: 'app-home-tasks',
+    imports: [CommonModule, ReactiveFormsModule],
+    providers: [TasksService, NotificationService],
+    templateUrl: './home-tasks.component.html',
+    styleUrl: './home-tasks.component.css',
+    animations: [
+        trigger('taskAnimation', [
+            transition(':enter', [
+                style({ opacity: 0, transform: 'translateY(-20px)' }),
+                animate('300ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+            ]),
+            transition(':leave', [
+                animate('300ms ease-in', style({ opacity: 0, transform: 'translateX(100%)' }))
+            ])
+        ])
+    ]
 })
 export class HomeTasksComponent implements OnInit {
   taskForm: FormGroup;
@@ -34,7 +35,8 @@ export class HomeTasksComponent implements OnInit {
   constructor(
     private todoService: TasksService,
     private notificationService: NotificationService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private pushSubscriptionService: PushSubscriptionService
   ) {
     this.tasks$ = this.todoService.tasks$;
     this.taskForm = this.fb.group({
@@ -45,6 +47,12 @@ export class HomeTasksComponent implements OnInit {
 
   ngOnInit() {
     this.notificationService.requestNotificationPermission();
+
+    this.notificationService.getSubscription().then(subscription => {
+      if (subscription) {
+        this.notificationService.saveSubscription(subscription);
+      }
+    });
   }
 
   ngOnDestroy() {
