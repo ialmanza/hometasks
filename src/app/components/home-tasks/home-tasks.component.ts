@@ -76,7 +76,7 @@ export class HomeTasksComponent implements OnInit {
         this.cancelEditing();
       } else {
         // Crear nueva tarea
-        this.todoService.addTask(taskData);
+        //this.todoService.addTask(taskData);
         this.notificationService.sendTaskNotification({
           title: taskData.title,
           description: taskData.description,
