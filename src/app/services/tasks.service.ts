@@ -60,6 +60,7 @@ export class TasksService {
         const currentTasks = this._tasks.value;
         this._tasks.next([data[0], ...currentTasks]);
         this.playNotificationSound();
+        this.loadTasks();
       }
     } catch (error) {
       console.error('Error agregando tarea:', error);
