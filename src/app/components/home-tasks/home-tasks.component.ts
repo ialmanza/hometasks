@@ -46,6 +46,7 @@ export class HomeTasksComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.todoService.loadTasks();
     this.notificationService.requestNotificationPermission();
 
     this.notificationService.getSubscription().then(subscription => {
