@@ -1,0 +1,115 @@
+<app-app-navigation></app-app-navigation>
+<div class="saltos">
+  <br><br><br><br><br><br>
+</div>
+
+<div class="shopping-list-container">
+  <h1>Lista de compras</h1>
+
+  <!-- Productos Predefinidos -->
+  <div class="quick-add-section">
+    <h3>Añadir Rápido</h3>
+    <div class="quick-add-products">
+      <button
+        *ngFor="let product of quickAddProducts"
+        class="quick-add-btn"
+        (click)="quickAddProduct(product)"
+      >
+        {{ product.name }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Add/Edit Form -->
+  <form [formGroup]="itemForm" (ngSubmit)="onSubmit()" class="shopping-form">
+    <div class="form-row">
+      <input
+        formControlName="name"
+        placeholder="Nombre del producto"
+        class="form-control"
+        required
+      >
+      <select formControlName="category" class="form-control">
+        <option value="frutas">Frutas</option>
+        <option value="vegetales">Vegetales</option>
+        <option value="carnes">Carnes</option>
+        <option value="otros">Otros</option>
+      </select>
+    </div>
+
+    <div class="form-row">
+      <input
+        type="number"
+        formControlName="quantity"
+        placeholder="Cantidad"
+        class="form-control"
+        min="1"
+      >
+      <input
+        formControlName="unit"
+        placeholder="Unidad (kg, pcs)"
+        class="form-control"
+      >
+    </div>
+
+    <div class="form-actions">
+      <button
+        type="submit"
+        class="btn-primary"
+        [disabled]="!itemForm.valid"
+      >
+        {{ editingItem ? 'Editar' : 'Adicionar' }} Producto
+      </button>
+
+      <!-- Botón de Cancelar (solo visible durante edición) -->
+      <button
+        *ngIf="editingItem"
+        type="button"
+        class="btn-cancel"
+        (click)="cancelEdit()"
+      >
+        Cancelar
+      </button>
+    </div>
+  </form>
+
+  <!-- Shopping List -->
+  <div class="list-container">
+    <div
+      *ngFor="let item of shoppingItems"
+      class="list-item"
+      [class.purchased]="item.is_purchased"
+    >
+      <div class="item-details">
+        <span class="item-name">{{ item.name }}</span>
+        <span class="item-meta">
+          {{ item.quantity }} {{ item.unit }} - {{ item.category }}
+        </span>
+      </div>
+
+      <div class="item-actions">
+        <button
+          class="btn-toggle"
+          (click)="togglePurchased(item)"
+          [attr.aria-label]="item.is_purchased ? 'Mark as not purchased' : 'Mark as purchased'"
+        >
+          {{ item.is_purchased ? '↩' : '✓' }}
+        </button>
+        <button
+          class="btn-edit"
+          (click)="editItem(item)"
+          aria-label="Editar producto"
+        >
+          ✎
+        </button>
+        <button
+          class="btn-delete"
+          (click)="deleteItem(item.id!)"
+          aria-label="Eliminar producto"
+        >
+          ✖
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

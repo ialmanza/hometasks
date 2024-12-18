@@ -3,6 +3,7 @@
   <br><br><br><br><br><br><br><br><br><br>
 </div>
 <div class="meals-container">
+  <h1>Planificador de actividades</h1>
   <div class="days-selector">
     <button
       *ngFor="let day of weekDays"
@@ -17,7 +18,7 @@
     <div *ngFor="let acitvity of activities" class="meal-item">
       <div *ngIf="editingActivity?.id !== acitvity.id" class="meal-display">
         <div class="meal-info">
-          <strong>{{ acitvity.title| titlecase }}</strong>
+          <strong>{{ acitvity.title| titlecase }}<p>{{ acitvity.time }}</p></strong>
           <p>{{ acitvity.description }}</p>
         </div>
         <div class="meal-actions">

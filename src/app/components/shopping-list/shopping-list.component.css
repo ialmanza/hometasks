@@ -1,0 +1,235 @@
+/* shopping-list.component.scss */
+:host {
+  --primary-color: #3867d6;
+  --secondary-color: #fa8231;
+  --background-color: #f8f9fa;
+  --text-color: #2c3e50;
+  --border-color: #e0e4e8;
+  --completed-color: #2ecc71;
+
+  display: block;
+  width: 100%;
+}
+
+.shopping-list-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 1rem;
+  background-color: var(--background-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  color: var(--primary-color);
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.shopping-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+
+  .form-row {
+    display: flex;
+    gap: 1rem;
+
+    @media (max-width: 480px) {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+  }
+
+  .form-control {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    color: var(--text-color);
+  }
+
+  .btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.75rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: darken(#3867d6, 10%);
+    }
+
+    &:disabled {
+      background-color: lighten(#3867d6, 30%);
+      cursor: not-allowed;
+    }
+  }
+}
+
+.list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: white;
+  padding: 1rem;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: translateX(5px);
+  }
+
+  &.purchased {
+    opacity: 0.6;
+    text-decoration: line-through;
+    background-color: var(--completed-color);
+    color: white;
+  }
+
+  .item-details {
+    display: flex;
+    flex-direction: column;
+
+    .item-name {
+      font-weight: bold;
+      color: var(--text-color);
+    }
+
+    .item-meta {
+      font-size: 0.8rem;
+      color: darken(#f8f9fa, 40%);
+    }
+  }
+
+  .item-actions {
+    display: flex;
+    gap: 0.5rem;
+
+    button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+
+      &.btn-toggle {
+        color: var(--secondary-color);
+      }
+
+      &.btn-edit {
+        color: var(--primary-color);
+      }
+
+      &.btn-delete {
+        color: red;
+      }
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+      }
+    }
+  }
+}
+
+
+@media (max-width: 480px) {
+  .list-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+
+    .item-actions {
+      width: 100%;
+      justify-content: flex-end;
+    }
+  }
+}
+
+
+/* Estilos adicionales para sección de añadir rápido */
+.quick-add-section {
+  margin-bottom: 1.5rem;
+
+  h3 {
+    color: var(--primary-color);
+    margin-bottom: 0.75rem;
+    text-align: center;
+  }
+
+  .quick-add-products {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+
+    .quick-add-btn {
+      background-color: var(--secondary-color);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+
+      &:hover {
+        background-color: darken(#fa8231, 10%);
+      }
+    }
+  }
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+
+  .btn-cancel {
+    background-color: var(--border-color);
+    color: var(--text-color);
+    border: none;
+    padding: 0.75rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: darken(#e0e4e8, 10%);
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .quick-add-products {
+    flex-direction: column;
+    align-items: stretch;
+
+    .quick-add-btn {
+      width: 100%;
+    }
+  }
+
+  .form-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+
+    .btn-cancel, .btn-primary {
+      width: 100%;
+    }
+  }
+
+  .saltos {
+    display: none;
+  }
+}

@@ -1,3 +1,12 @@
+:host {
+  --primary-color: #3867d6;
+  --secondary-color: #fa8231;
+  --background-color: #f8f9fa;
+  --text-color: #2c3e50;
+  --border-color: #e0e4e8;
+  --completed-color: #2ecc71;
+}
+
                                                                                                                                               .meals-container {
                                                                                                                                                 max-width: 800px;
                                                                                                                                                 margin: 0 auto;
@@ -83,6 +92,14 @@
                                                                                                                                                 gap: 10px;
                                                                                                                                               }
 
+                                                                                                                                              h1 {
+                                                                                                                                                color: var(--primary-color);
+                                                                                                                                                font-weight: 600;
+                                                                                                                                                margin-top: 15px;
+                                                                                                                                                text-align: center;
+                                                                                                                                                font-size: 1.8rem;
+                                                                                                                                              }
+
                                                                                                                                               @media (max-width: 600px) {
                                                                                                                                                 .days-selector {
                                                                                                                                                   flex-direction: column;
@@ -92,6 +109,10 @@
                                                                                                                                                 .days-selector button {
                                                                                                                                                   width: 100%;
                                                                                                                                                   margin-bottom: 10px;
+                                                                                                                                                }
+
+                                                                                                                                                h1 {
+                                                                                                                                                  font-size: 1.5rem;
                                                                                                                                                 }
 
                                                                                                                                                 .saltos {

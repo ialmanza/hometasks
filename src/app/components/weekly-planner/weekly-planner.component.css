@@ -1,7 +1,24 @@
+:host {
+  --primary-color: #3867d6;
+  --secondary-color: #fa8231;
+  --background-color: #f8f9fa;
+  --text-color: #2c3e50;
+  --border-color: #e0e4e8;
+  --completed-color: #2ecc71;
+}
+
 .weekly-planner-container {
   max-width: 800px;
   margin: 0 auto;
   padding: 20px;
+}
+
+h1 {
+  color: var(--primary-color);
+  font-weight: 600;
+  margin-top: 15px;
+  text-align: center;
+  font-size: 1.8rem;
 }
 
 .days-selector {
@@ -80,6 +97,10 @@ form button {
 
   .days-selector button {
     margin: 5px 0;
+  }
+
+  h1 {
+    font-size: 1.5rem;
   }
 
   .saltos {

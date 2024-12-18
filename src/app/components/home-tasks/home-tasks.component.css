@@ -242,4 +242,8 @@
   .task-form textarea {
     font-size: 0.85rem;
   }
+
+  .saltos {
+    display: none;
+  }
 }
