@@ -1,0 +1,59 @@
+<app-app-navigation></app-app-navigation>
+<div class="saltos">
+  <br><br><br><br><br><br><br><br><br><br>
+</div>
+<div class="weekly-planner-container">
+  <h1>Planificador Semanal</h1>
+
+  <div class="days-selector">
+    <button
+      *ngFor="let day of weekDays"
+      (click)="selectDay(day)"
+      [class.active]="selectedDay === day"
+    >
+      {{ day }}
+    </button>
+  </div>
+
+  <div *ngIf="selectedDay" class="day-details">
+    <h2>{{ selectedDay }}</h2>
+
+    <div class="meals-section">
+      <h3>Comidas</h3>
+      <form [formGroup]="mealForm" (ngSubmit)="addMeal()">
+        <select formControlName="mealType">
+          <option value="">Seleccionar Tipo de Comida</option>
+          <option value="Desayuno">Desayuno</option>
+          <option value="Almuerzo">Almuerzo</option>
+          <option value="Cena">Cena</option>
+        </select>
+        <textarea formControlName="description" placeholder="Descripción de la comida"></textarea>
+        <button type="submit" [disabled]="!mealForm.valid">Agregar Comida</button>
+      </form>
+
+      <div class="meals-list">
+        <div *ngFor="let meal of meals" class="meal-item">
+          <strong>{{ meal.meal_type | titlecase }}</strong>
+          <p>{{ meal.description }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="activities-section">
+      <h3>Actividades</h3>
+      <form [formGroup]="activityForm" (ngSubmit)="addActivity()">
+        <input formControlName="title" placeholder="Título de la Actividad" />
+        <input type="time" formControlName="time" />
+        <textarea formControlName="description" placeholder="Descripción de la actividad"></textarea>
+        <button type="submit" [disabled]="!activityForm.valid">Agregar Actividad</button>
+      </form>
+
+      <div class="activities-list">
+        <div *ngFor="let activity of activities" class="activity-item">
+          <strong>{{ activity.title }}</strong>
+          <p>{{ activity.time }} - {{ activity.description }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

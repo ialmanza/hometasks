@@ -1,0 +1,88 @@
+.weekly-planner-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.days-selector {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.days-selector button {
+  flex: 1;
+  padding: 10px;
+  margin: 0 5px;
+  background-color: #f4f4f4;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.days-selector button.active {
+  background-color: #4a90e2;
+  color: white;
+}
+
+.day-details {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.meals-section, .activities-section {
+  margin-top: 20px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+form input,
+form select,
+form textarea {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+form button {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.meals-list, .activities-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.meal-item, .activity-item {
+  background-color: #f4f4f4;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+@media (max-width: 600px) {
+  .days-selector {
+    flex-direction: column;
+  }
+
+  .days-selector button {
+    margin: 5px 0;
+  }
+
+  .saltos {
+    display: none;
+  }
+}

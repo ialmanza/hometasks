@@ -7,11 +7,12 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NotificationService } from '../../services/notifications.service';
 import { PushSubscriptionService } from '../../services/push-subscription.service';
+import { AppNavigationComponent } from "../app-navigation/app-navigation.component";
 
 
 @Component({
     selector: 'app-home-tasks',
-    imports: [CommonModule, ReactiveFormsModule],
+    imports: [CommonModule, ReactiveFormsModule, AppNavigationComponent],
     providers: [TasksService, NotificationService],
     templateUrl: './home-tasks.component.html',
     styleUrl: './home-tasks.component.css',
@@ -49,11 +50,16 @@ export class HomeTasksComponent implements OnInit {
     this.todoService.loadTasks();
     this.notificationService.requestNotificationPermission();
 
-    this.notificationService.getSubscription().then(subscription => {
-      if (subscription) {
-        this.notificationService.saveSubscription(subscription);
-      }
-    });
+    // Solicitar permiso de notificaciones
+    if ('Notification' in window) {
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+          console.log('Notificaciones habilitadas');
+          // Iniciar suscripción de push
+          this.pushSubscriptionService.checkAndSubscribe();
+        }
+      });
+    }
   }
 
   ngOnDestroy() {
@@ -65,7 +71,8 @@ export class HomeTasksComponent implements OnInit {
       const taskData = {
         title: this.taskForm.get('title')?.value,
         description: this.taskForm.get('description')?.value,
-        completed: false
+        completed: false,
+        created_at: new Date()
       };
 
       if (this.editingTask) {
@@ -76,14 +83,9 @@ export class HomeTasksComponent implements OnInit {
         });
         this.cancelEditing();
       } else {
-        // Crear nueva tarea
+        // Crear nueva tarea y enviar notificación
         //this.todoService.addTask(taskData);
-        this.notificationService.sendTaskNotification({
-          title: taskData.title,
-          description: taskData.description,
-          completed: false,
-          created_at: new Date()
-        });
+        this.notificationService.sendTaskNotification(taskData);
       }
 
       this.taskForm.reset();

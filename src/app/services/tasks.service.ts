@@ -60,8 +60,8 @@ export class TasksService {
         const currentTasks = this._tasks.value;
         this._tasks.next([data[0], ...currentTasks]);
         this.playNotificationSound();
-        this.loadTasks();
       }
+      this.loadTasks();
     } catch (error) {
       console.error('Error agregando tarea:', error);
     }
@@ -86,6 +86,7 @@ export class TasksService {
         task.id === updatedTask.id ? data[0] : task
       );
       this._tasks.next(updatedTasks);
+      this.loadTasks();
     } catch (error) {
       console.error('Error actualizando tarea:', error);
     }
@@ -103,6 +104,7 @@ export class TasksService {
       const currentTasks = this._tasks.value;
       const updatedTasks = currentTasks.filter(task => task.id !== taskId);
       this._tasks.next(updatedTasks);
+      this.loadTasks();
     } catch (error) {
       console.error('Error eliminando tarea:', error);
     }

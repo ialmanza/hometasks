@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '../../environments/environments';
-import { Task } from './tasks.service';
+import { Task, TasksService } from './tasks.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +11,7 @@ export class NotificationService {
   private tasksChannel: any;
   private swRegistration: ServiceWorkerRegistration | null = null;
 
-  constructor() {
+  constructor(private todoService: TasksService) {
     // Inicializar Supabase con tus credenciales
     this.supabase = createClient(
       environment.supabaseUrl,
@@ -36,21 +36,67 @@ export class NotificationService {
   // Método para enviar notificación de nueva tarea
   async sendTaskNotification(task: Task) {
     try {
-      const { error } = await this.supabase
+      // Insertar la tarea en Supabase
+      const { data, error } = await this.supabase
         .from('task_notifications')
         .insert({
           title: task.title,
           description: task.description,
           created_at: new Date().toISOString()
-        });
+        })
+        .select();
 
       if (error) {
         console.error('Error enviando notificación:', error);
+        return;
       }
-      // Enviar notificación push
-      await this.sendPushNotification(task);
+
+      // Enviar notificación push a todas las suscripciones guardadas
+      await this.sendPushNotificationToAllSubscriptions(task);
+      this.todoService.loadTasks();
     } catch (err) {
       console.error('Excepción al enviar notificación:', err);
+    }
+  }
+
+  private async sendPushNotificationToAllSubscriptions(task: Task) {
+    try {
+      // Recuperar todas las suscripciones guardadas
+      const { data: subscriptions, error } = await this.supabase
+        .from('push_subscriptions')
+        .select('*');
+
+      if (error) {
+        console.error('Error recuperando suscripciones:', error);
+        return;
+      }
+
+      // Enviar notificación a cada suscripción
+      for (const subscription of subscriptions) {
+        try {
+          await fetch('/api/send-push-notification', {
+            method: 'POST',
+            body: JSON.stringify({
+              subscription: {
+                endpoint: subscription.endpoint,
+                keys: subscription.keys
+              },
+              data: {
+                title: 'Nueva Tarea',
+                body: `Se ha creado la tarea: ${task.title}`,
+                icon: '/sin_fondo.png'
+              }
+            }),
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+        } catch (subscriptionError) {
+          console.error('Error enviando notificación a suscripción:', subscriptionError);
+        }
+      }
+    } catch (error) {
+      console.error('Error enviando notificaciones push:', error);
     }
   }
 

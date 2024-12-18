@@ -28,23 +28,23 @@ export class PushSubscriptionService {
     }
   }
 
-  private async checkAndSubscribe() {
-    // Verifica si las notificaciones están soportadas
-    if (!('PushManager' in window)) {
-      console.warn('Push no soportado');
-      return;
-    }
+//  async checkAndSubscribe() {
+//     // Verifica si las notificaciones están soportadas
+//     if (!('PushManager' in window)) {
+//       console.warn('Push no soportado');
+//       return;
+//     }
 
-    // Solicitar permiso
-    const permission = await Notification.requestPermission();
-    if (permission !== 'granted') {
-      console.warn('Permiso de notificación denegado');
-      return;
-    }
+//     // Solicitar permiso
+//     const permission = await Notification.requestPermission();
+//     if (permission !== 'granted') {
+//       console.warn('Permiso de notificación denegado');
+//       return;
+//     }
 
-    // Obtener o crear suscripción
-    await this.subscribeUser();
-  }
+//     // Obtener o crear suscripción
+//     await this.subscribeUser();
+//   }
 
   private async subscribeUser() {
     if (!this.swRegistration) return;
@@ -149,5 +149,23 @@ export class PushSubscriptionService {
       console.error('Excepción al recuperar suscripciones:', error);
       return [];
     }
+  }
+
+  async checkAndSubscribe() {
+    // Verifica si las notificaciones están soportadas
+    if (!('PushManager' in window)) {
+      console.warn('Push no soportado');
+      return;
+    }
+
+    // Solicitar permiso
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') {
+      console.warn('Permiso de notificación denegado');
+      return;
+    }
+
+    // Obtener o crear suscripción
+    await this.subscribeUser();
   }
 }
