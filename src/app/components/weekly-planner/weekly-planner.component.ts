@@ -126,22 +126,29 @@ import { MealsService } from '../../services/meal.service';
 import { ActivitiesService } from '../../services/activities.service';
 import { AppNavigationComponent } from "../app-navigation/app-navigation.component";
 import { from } from 'rxjs';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faEdit, faTrash, faPlus } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-weekly-planner',
-  imports: [CommonModule, ReactiveFormsModule, AppNavigationComponent],
+  imports: [CommonModule, ReactiveFormsModule, AppNavigationComponent, FontAwesomeModule],
   templateUrl: './weekly-planner.component.html',
   styleUrl: './weekly-planner.component.css'
 })
 export class WeeklyPlannerComponent implements OnInit {
+  // Icons
+    faEdit = faEdit;
+    faTrash = faTrash;
+    faPlus = faPlus;
+
   weekDays = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
   selectedDay: string | null = null;
-
+  editingMeal: Meal | null = null;
   mealForm: FormGroup;
   activityForm: FormGroup;
-
   meals: Meal[] = [];
   activities: DailyActivity[] = [];
+  editingActivity: DailyActivity | null = null;
 
   constructor(
     private mealsService: MealsService,
@@ -208,4 +215,100 @@ export class WeeklyPlannerComponent implements OnInit {
       }
     }
   }
+
+  startEditing(meal: Meal) {
+    this.editingMeal = { ...meal };
+    this.mealForm.patchValue({
+      mealType: meal.meal_type,
+      description: meal.description
+    });
+  }
+
+  cancelEditing() {
+    this.editingMeal = null;
+    this.mealForm.reset();
+  }
+
+  async deleteMeal(mealId: number) {
+    const confirmed = window.confirm('¿Estás seguro de eliminar esta comida?');
+    if (confirmed) {
+      const success = await this.mealsService.deleteMeal(mealId);
+      if (success) {
+        this.meals = this.meals.filter(m => m.id !== mealId);
+      }
+    }
+  }
+
+  async updateMeal() {
+    if (this.mealForm.valid && this.editingMeal) {
+      const updatedMeal: Meal = {
+        ...this.editingMeal,
+        meal_type: this.mealForm.get('mealType')?.value,
+        description: this.mealForm.get('description')?.value
+      };
+
+      const result = await this.mealsService.updateMeal(updatedMeal.id!, updatedMeal);
+      if (result) {
+        const index = this.meals.findIndex(m => m.id === updatedMeal.id);
+        if (index !== -1) {
+          this.meals[index] = result;
+        }
+        this.cancelEditing();
+      }
+    }
+  }
+
+
+
+
+
+
+
+
+
+  startEditingActivity(activity: DailyActivity) {
+    this.editingActivity = { ...activity };
+    this.activityForm.patchValue({
+      title: activity.title,
+      time: activity.time,
+      description: activity.description
+    });
+  }
+
+  cancelEditingActivity() {
+    this.editingActivity = null;
+    this.activityForm.reset();
+  }
+
+  async updateActivity() {
+    if (this.activityForm.valid && this.editingActivity) {
+      const updatedActivity: DailyActivity = {
+        ...this.editingActivity,
+        title: this.activityForm.get('title')?.value,
+        time: this.activityForm.get('time')?.value,
+        description: this.activityForm.get('description')?.value
+      };
+
+      const result = await this.activitiesService.updateActivity(updatedActivity.id!, updatedActivity);
+      if (result) {
+        const index = this.activities.findIndex(a => a.id === updatedActivity.id);
+        if (index !== -1) {
+          this.activities[index] = result;
+        }
+        this.cancelEditingActivity();
+      }
+    }
+  }
+
+  async deleteActivity(activityId: number) {
+    const confirmed = window.confirm('¿Estás seguro de eliminar esta actividad?');
+    if (confirmed) {
+      const success = await this.activitiesService.deleteActivity(activityId);
+      if (success) {
+        this.activities = this.activities.filter(a => a.id !== activityId);
+      }
+    }
+  }
+
+
 }

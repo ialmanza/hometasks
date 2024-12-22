@@ -92,3 +92,52 @@
     font-size: 1.2rem;
   }
 }
+
+
+
+
+
+
+.nav-mobile {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  background-color: #f8f9fa;
+}
+
+.nav-mobile a {
+  text-align: center;
+  flex: 1;
+  text-decoration: none;
+  color: #000;
+}
+
+.nav-mobile .mobile-logo {
+  flex: 1;
+  text-align: center;
+}
+
+.nav-mobile .mobile-logo img {
+  width: 40px; /* Tamaño del logo */
+  height: auto;
+}
+
+/* Desktop Styles */
+.nav-desktop {
+  display: none; /* Ocultar en móvil */
+}
+
+/* Mobile Responsive Styles */
+@media (min-width: 768px) {
+  .nav-mobile {
+    display: none; /* Ocultar en escritorio */
+  }
+
+  .nav-desktop {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+  }
+}

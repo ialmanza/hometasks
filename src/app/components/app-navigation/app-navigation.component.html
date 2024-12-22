@@ -6,6 +6,12 @@
     </div>
     <ul class="nav-links">
       <li>
+        <a routerLink="/inicio" routerLinkActive="active">
+          <i class="icon-tasks"></i>
+          Inicio
+        </a>
+      </li>
+      <li>
         <a routerLink="/tasks" routerLinkActive="active">
           <i class="icon-tasks"></i>
           Tareas
@@ -17,7 +23,7 @@
           Planificador Semanal
         </a>
       </li>
-      <li>
+      <!-- <li>
         <a routerLink="/meals" routerLinkActive="active">
           <i class="icon-meals"></i>
           Comidas
@@ -28,7 +34,7 @@
           <i class="icon-family"></i>
           Actividades
         </a>
-      </li>
+      </li> -->
       <li>
         <a routerLink="/shopping-list" routerLinkActive="active">
           <i class="icon-family"></i>
@@ -38,27 +44,26 @@
     </ul>
   </div>
 
-<!-- VERSION MOVIL -->
-  <div class="nav-mobile">
-    <a routerLink="/tasks" routerLinkActive="active">
-      <i class="icon-tasks"></i>
-      <span>Tareas</span>
-    </a>
-    <a routerLink="/weekly-planner" routerLinkActive="active">
-      <i class="icon-calendar"></i>
-      <span>Planificador</span>
-    </a>
-    <a routerLink="/meals" routerLinkActive="active">
-      <i class="icon-meals"></i>
-      <span>Comidas</span>
-    </a>
-    <a routerLink="/activities" routerLinkActive="active">
-      <i class="icon-family"></i>
-      <span>Actividades</span>
-    </a>
-    <a routerLink="/shopping-list" routerLinkActive="active">
-      <i class="icon-family"></i>
-      <span>Shooping</span>
-    </a>
+ <!-- VERSION MOVIL -->
+ <div class="nav-mobile">
+  <a routerLink="/inicio" routerLinkActive="active">
+    <i class="icon-tasks"></i>
+    <span>Inicio</span>
+  </a>
+  <a routerLink="/tasks" routerLinkActive="active">
+    <i class="icon-tasks"></i>
+    <span>Tareas</span>
+  </a>
+  <div class="mobile-logo">
+    <img src="sin_fondo.png" alt="Family Planner Logo"  routerLink="/tasks" routerLinkActive="active">
   </div>
+  <a routerLink="/weekly-planner" routerLinkActive="active">
+    <i class="icon-calendar"></i>
+    <span>Planificador</span>
+  </a>
+  <a routerLink="/shopping-list" routerLinkActive="active">
+    <i class="icon-family"></i>
+    <span>Shooping</span>
+  </a>
+</div>
 </nav>

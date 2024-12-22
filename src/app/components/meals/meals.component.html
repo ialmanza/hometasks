@@ -34,9 +34,9 @@
 
       <form *ngIf="editingMeal?.id === meal.id" [formGroup]="mealForm" (ngSubmit)="updateMeal()" class="edit-form">
         <select formControlName="mealType">
-          <option value="Desayuno">Desayuno</option>
-          <option value="Almuerzo">Almuerzo</option>
-          <option value="Cena">Cena</option>
+          <option value="breakfast">Desayuno</option>
+          <option value="lunch">Almuerzo</option>
+          <option value="dinner">Cena</option>
         </select>
         <textarea formControlName="description" placeholder="Descripción de la comida"></textarea>
         <div class="form-actions">

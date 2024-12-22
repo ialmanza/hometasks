@@ -23,18 +23,49 @@
       <form [formGroup]="mealForm" (ngSubmit)="addMeal()">
         <select formControlName="mealType">
           <option value="">Seleccionar Tipo de Comida</option>
-          <option value="Desayuno">Desayuno</option>
-          <option value="Almuerzo">Almuerzo</option>
-          <option value="Cena">Cena</option>
+          <option value="breakfast">Desayuno</option>
+          <option value="lunch">Almuerzo</option>
+          <option value="dinner">Cena</option>
         </select>
         <textarea formControlName="description" placeholder="Descripción de la comida"></textarea>
         <button type="submit" [disabled]="!mealForm.valid">Agregar Comida</button>
       </form>
 
-      <div class="meals-list">
+      <!-- <div class="meals-list">
         <div *ngFor="let meal of meals" class="meal-item">
           <strong>{{ meal.meal_type | titlecase }}</strong>
           <p>{{ meal.description }}</p>
+        </div>
+      </div> -->
+      <div class="meals-list">
+        <div *ngFor="let meal of meals" class="meal-item">
+          <div *ngIf="editingMeal?.id !== meal.id" class="meal-display">
+            <div class="meal-info">
+              <strong>{{ meal.meal_type | titlecase }}</strong>
+              <p>{{ meal.description }}</p>
+            </div>
+            <div class="meal-actions">
+              <button (click)="startEditing(meal)" class="edit-btn">
+                <fa-icon [icon]="faEdit"></fa-icon>
+              </button>
+              <button (click)="deleteMeal(meal.id!)" class="delete-btn">
+                <fa-icon [icon]="faTrash"></fa-icon>
+              </button>
+            </div>
+          </div>
+
+          <form *ngIf="editingMeal?.id === meal.id" [formGroup]="mealForm" (ngSubmit)="updateMeal()" class="edit-form">
+            <select formControlName="mealType">
+              <option value="breakfast">Desayuno</option>
+              <option value="lunch">Almuerzo</option>
+              <option value="dinner">Cena</option>
+            </select>
+            <textarea formControlName="description" placeholder="Descripción de la comida"></textarea>
+            <div class="form-actions">
+              <button type="submit"  [disabled]="!mealForm.valid">Guardar</button>
+              <button type="button"  (click)="cancelEditing()">Cancelar</button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
@@ -48,10 +79,36 @@
         <button type="submit" [disabled]="!activityForm.valid">Agregar Actividad</button>
       </form>
 
-      <div class="activities-list">
+      <!-- <div class="activities-list">
         <div *ngFor="let activity of activities" class="activity-item">
           <strong>{{ activity.title }}</strong>
           <p>{{ activity.time }} - {{ activity.description }}</p>
+        </div>
+      </div> -->
+      <div class="meals-list">
+        <div *ngFor="let acitvity of activities" class="meal-item">
+          <div *ngIf="editingActivity?.id !== acitvity.id" class="meal-display">
+            <div class="meal-info">
+              <strong>{{ acitvity.title| titlecase }}<p>{{ acitvity.time }}</p></strong>
+              <p>{{ acitvity.description }}</p>
+            </div>
+            <div class="meal-actions">
+              <button (click)="startEditingActivity(acitvity)" class="edit-btn">
+                <fa-icon [icon]="faEdit"></fa-icon>
+              </button>
+              <button (click)="deleteActivity(acitvity.id!)" class="delete-btn">
+                <fa-icon [icon]="faTrash"></fa-icon>
+              </button>
+            </div>
+          </div>
+
+          <form *ngIf="editingActivity?.id === acitvity.id" [formGroup]="activityForm" (ngSubmit)="updateActivity()" class="edit-form">
+            <!-- <textarea formControlName="description" placeholder="Descripción de la actividad"></textarea> -->
+            <div class="form-actions">
+              <button type="submit" [disabled]="!activityForm.valid" (click)="updateActivity()">Guardar</button>
+              <button type="button" (click)="cancelEditingActivity()">Cancelar</button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
