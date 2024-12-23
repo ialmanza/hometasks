@@ -181,6 +181,10 @@
   .tips-grid {
     grid-template-columns: 1fr;
   }
+
+  .saltos {
+    display: none;
+  }
 }
 
 @media (max-width: 480px) {
@@ -205,5 +209,9 @@
   .feature-card,
   .tip-card {
     padding: 1rem;
+  }
+
+  .saltos {
+    display: none;
   }
 }
