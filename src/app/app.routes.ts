@@ -7,12 +7,12 @@ import { ShoppingListComponent } from './components/shopping-list/shopping-list.
 import { InicioComponent } from './components/inicio/inicio.component';
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/tasks', pathMatch: 'full' },
+  { path: '', redirectTo: '/inicio', pathMatch: 'full' },
   { path: 'tasks', component: HomeTasksComponent},
   { path: 'weekly-planner',component: WeeklyPlannerComponent },
   { path: 'meals', component: MealsComponent },
   { path: 'activities', component: DailyActivitiesListComponent },
   { path: 'shopping-list', component: ShoppingListComponent },
   { path: 'inicio', component: InicioComponent },
-  { path: '**', redirectTo: '/tasks' }
+  { path: '**', redirectTo: '/inicio' }
 ];

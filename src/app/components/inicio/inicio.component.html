@@ -1,54 +1,97 @@
+<!-- inicio.component.html -->
 <app-app-navigation></app-app-navigation>
 
-<div class="bg-gray-100 min-h-screen p-8">
-  <!-- Logo -->
-  <div class="background-image">
-    <img src="sin_fondo.png" alt="Logo" >
-    <h1 class="text-2xl font-bold mt-4">Home Tasks Dashboard</h1>
-  </div>
+<div class="dashboard-container">
+  <!-- Banner Section -->
+  <section class="banner">
+    <div class="banner-content">
+      <h1>Family Tasks</h1>
+      <p>Organiza tus tareas diarias de forma eficiente</p>
 
-  <!-- Últimas tareas -->
-  <section class="mb-8">
-    <h2 class="text-xl font-semibold mb-4">Últimas Tareas</h2>
-    <ul *ngIf="latestActivities.length; else noActivities">
-      <li *ngFor="let activity of latestActivities" class="bg-white p-4 shadow rounded mb-2">
-        <h3 class="font-semibold">{{ activity.title }}</h3>
-        <p class="text-sm text-gray-500">Hora: {{ activity.time }}</p>
-      </li>
-    </ul>
-    <ng-template #noActivities>
-      <p class="text-gray-500">No hay tareas registradas para hoy.</p>
-    </ng-template>
+      <!-- Quick Stats Cards -->
+      <div class="quick-stats" routerLink="/activities">
+        <div class="stat-card">
+          <div class="card-content">
+            <h3>Últimas Actividades</h3>
+            <ul *ngIf="latestActivities.length; else noActivities">
+              <li *ngFor="let activity of latestActivities">
+                <span class="activity-title">{{ activity.title }}</span>
+                <span class="activity-time">{{ activity.time }}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="stat-card" routerLink="/meals">
+          <div class="card-content">
+            <h3>Comidas del Día</h3>
+            <ul *ngIf="latestMeals.length; else noMeals">
+              <li *ngFor="let meal of latestMeals">
+                <span class="meal-type">{{ meal.meal_type }}</span>
+                <span class="meal-desc">{{ meal.description }}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="stat-card" routerLink="/shopping-list">
+          <div class="card-content">
+            <h3>Lista de Compras</h3>
+            <ul *ngIf="shoppingList.length; else noItems">
+              <li *ngFor="let item of shoppingList">
+                <span class="item-name">{{ item.name }}</span>
+                <span class="item-quantity">{{ item.quantity }} {{ item.unit }}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 
-  <!-- Últimas comidas -->
-  <section class="mb-8">
-    <h2 class="text-xl font-semibold mb-4">Últimas Comidas</h2>
-    <ul *ngIf="latestMeals.length; else noMeals">
-      <li *ngFor="let meal of latestMeals" class="bg-white p-4 shadow rounded mb-2">
-        <h3 class="font-semibold">{{ meal.meal_type }}</h3>
-        <p class="text-sm text-gray-500">Categoría: {{ meal.description }}</p>
-      </li>
-    </ul>
-    <ng-template #noMeals>
-      <p class="text-gray-500">No hay comidas registradas para hoy.</p>
-    </ng-template>
-  </section>
+  <!-- Main Content Sections -->
+  <main class="main-content">
+    <!-- Actividades Destacadas Section -->
+    <section class="featured-section">
+      <h2>Actividades Destacadas</h2>
+      <div class="featured-grid">
+        <div class="feature-card">
+          <h3>Estadísticas Semanales</h3>
+          <p>Visualiza el progreso de tus tareas completadas</p>
+        </div>
+        <div class="feature-card" routerLink="/weekly-planner">
+          <h3>Planificación de Comidas</h3>
+          <p>Organiza tu menú semanal</p>
+        </div>
+      </div>
+    </section>
 
-  <!-- Lista de compras -->
-  <section>
-    <h2 class="text-xl font-semibold mb-4">Lista de Compras</h2>
-    <ul *ngIf="shoppingList.length; else noItems">
-      <li *ngFor="let item of shoppingList" class="bg-white p-4 shadow rounded mb-2">
-        <h3 class="font-semibold">{{ item.name }}</h3>
-        <p class="text-sm text-gray-500">
-          Cantidad: {{ item.quantity }} {{ item.unit }}
-        </p>
-      </li>
-    </ul>
-    <ng-template #noItems>
-      <p class="text-gray-500">No hay elementos en la lista de compras.</p>
-    </ng-template>
-  </section>
+    <!-- Tips y Consejos Section -->
+    <section class="tips-section">
+      <h2>Tips y Consejos</h2>
+      <div class="tips-grid">
+        <div class="tip-card">
+          <h3>Organización del Hogar</h3>
+          <p>Descubre consejos para mantener tu hogar ordenado</p>
+        </div>
+        <div class="tip-card">
+          <h3>Alimentación Saludable</h3>
+          <p>Aprende sobre hábitos alimenticios saludables</p>
+        </div>
+      </div>
+    </section>
+  </main>
 </div>
 
+<!-- Templates for empty states -->
+<ng-template #noActivities>
+  <p class="empty-state">No hay actividades pendientes</p>
+</ng-template>
+
+<ng-template #noMeals>
+  <p class="empty-state">No hay comidas registradas</p>
+</ng-template>
+
+<ng-template #noItems>
+  <p class="empty-state">Lista de compras vacía</p>
+</ng-template>

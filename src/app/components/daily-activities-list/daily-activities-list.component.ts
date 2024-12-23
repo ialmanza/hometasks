@@ -14,7 +14,7 @@ import { faEdit, faTrash, faCalendar, faTimes, faPlus } from '@fortawesome/free-
   styleUrl: './daily-activities-list.component.css'
 })
 export class DailyActivitiesListComponent {
-  weekDays = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+  weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   selectedDay: string | null = null;
   activities: DailyActivity[] = [];
 
