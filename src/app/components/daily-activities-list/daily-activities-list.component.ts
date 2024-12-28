@@ -93,4 +93,21 @@ export class DailyActivitiesListComponent {
       }
     }
   }
+
+  async addActivity() {
+    if (this.activityForm.valid && this.selectedDay) {
+      const newActivity: DailyActivity = {
+        day_of_week: this.selectedDay,
+        title: this.activityForm.get('title')?.value,
+        description: this.activityForm.get('description')?.value,
+        time: this.activityForm.get('time')?.value
+      };
+
+      const createdActivity = await this.activitiesService.createActivity(newActivity);
+      if (createdActivity) {
+        this.activities.push(createdActivity);
+        this.activityForm.reset();
+      }
+    }
+  }
 }

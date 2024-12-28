@@ -18,6 +18,7 @@
   background-color: var(--background-color);
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 50px;
 }
 
 h1 {
@@ -70,13 +71,24 @@ h1 {
   }
 }
 
+h3 {
+  color: var(--primary-color);
+  margin-bottom: 0.75rem;
+  text-align: center;
+}
+
 .list-container {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
+
 .list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -97,56 +109,58 @@ h1 {
     color: white;
   }
 
-  .item-details {
-    display: flex;
-    flex-direction: column;
+  button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    transition: background-color 0.2s;
 
-    .item-name {
-      font-weight: bold;
-      color: var(--text-color);
+    &.btn-toggle {
+      color: var(--secondary-color);
     }
 
-    .item-meta {
-      font-size: 0.8rem;
-      color: darken(#f8f9fa, 40%);
+    &.btn-edit {
+      color: var(--primary-color);
+    }
+
+    &.btn-delete {
+      color: red;
+    }
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.1);
     }
   }
 
-  .item-actions {
-    display: flex;
-    gap: 0.5rem;
+}
 
-    button {
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 1rem;
-      padding: 0.25rem 0.5rem;
-      border-radius: 4px;
-      transition: background-color 0.2s;
+.item-actions {
+  /* Si quieres reducir el ancho de los botones */
+  width: 100px;
+  display: flex; /* Para alinear los botones horizontalmente */
+  justify-content: space-around; /* Distribuye los botones uniformemente */
+}
 
-      &.btn-toggle {
-        color: var(--secondary-color);
-      }
+.item-details {
+  display: flex;
+  flex-direction: column;
 
-      &.btn-edit {
-        color: var(--primary-color);
-      }
+  .item-name {
+    font-weight: bold;
+    color: var(--text-color);
+  }
 
-      &.btn-delete {
-        color: red;
-      }
-
-      &:hover {
-        background-color: rgba(0, 0, 0, 0.1);
-      }
-    }
+  .item-meta {
+    font-size: 0.8rem;
+    color: darken(#f8f9fa, 40%);
   }
 }
 
-
 @media (max-width: 480px) {
-  .list-item {
+  /* .list-item {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
@@ -155,19 +169,13 @@ h1 {
       width: 100%;
       justify-content: flex-end;
     }
-  }
+  } */
 }
 
 
 /* Estilos adicionales para sección de añadir rápido */
 .quick-add-section {
   margin-bottom: 1.5rem;
-
-  h3 {
-    color: var(--primary-color);
-    margin-bottom: 0.75rem;
-    text-align: center;
-  }
 
   .quick-add-products {
     display: flex;

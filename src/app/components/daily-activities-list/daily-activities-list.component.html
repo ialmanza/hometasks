@@ -14,112 +14,43 @@
     </button>
   </div>
 
-  <div class="meals-list">
-    <div *ngFor="let acitvity of activities" class="meal-item">
-      <div *ngIf="editingActivity?.id !== acitvity.id" class="meal-display">
-        <div class="meal-info">
-          <strong>{{ acitvity.title| titlecase }}<p>{{ acitvity.time }}</p></strong>
-          <p>{{ acitvity.description }}</p>
-        </div>
-        <div class="meal-actions">
-          <button (click)="startEditing(acitvity)" class="edit-btn">
-            <fa-icon [icon]="faEdit"></fa-icon>
-          </button>
-          <button (click)="deleteActivity(acitvity.id!)" class="delete-btn">
-            <fa-icon [icon]="faTrash"></fa-icon>
-          </button>
-        </div>
-      </div>
+  <div class="activities-section">
+    <h3>Actividades</h3>
+    <form [formGroup]="activityForm" (ngSubmit)="addActivity()">
+      <input formControlName="title" placeholder="Título de la Actividad" />
+      <input type="time" formControlName="time" />
+      <textarea formControlName="description" placeholder="Descripción de la actividad"></textarea>
+      <button type="submit" [disabled]="!activityForm.valid">Agregar Actividad</button>
+    </form>
 
-      <form *ngIf="editingActivity?.id === acitvity.id" [formGroup]="activityForm" (ngSubmit)="updateActivity()" class="edit-form">
-        <textarea formControlName="description" placeholder="Descripción de la actividad"></textarea>
-        <div class="form-actions">
-          <button type="submit" [disabled]="!activityForm.valid">Guardar</button>
-          <button type="button" (click)="cancelEditing()">Cancelar</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-
-
-
-
-
-
- <!-- <div class="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 py-8 px-4">
-  <div class="container mx-auto max-w-4xl">
-
-    <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg mb-6 p-4 shadow-lg">
-      <h1 class="text-2xl font-bold text-white text-center">Planificador de Actividades</h1>
-    </div>
-
-
-    <div class="flex flex-wrap justify-center gap-3 mb-6">
-      <button
-        *ngFor="let day of weekDays"
-        (click)="selectDay(day)"
-        class="px-4 py-2 rounded-full transition-all duration-300
-               {{ selectedDay === day
-                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg'
-                  : 'bg-white text-gray-700 hover:bg-blue-100 shadow-md' }}"
-      >
-        {{ day }}
-      </button>
-    </div>
-
-
-    <div class="space-y-4">
-      <div
-        *ngFor="let activity of activities"
-        class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden"
-      >
-
-        <div
-          *ngIf="editingActivity?.id !== activity.id"
-          class="p-6 flex items-center justify-between"
-        >
-          <div>
-            <h3 class="text-lg font-semibold text-gray-800">
-              {{ activity.title | titlecase }}
-            </h3>
-            <p class="text-gray-600">{{ activity.description }}</p>
+    <div class="meals-list">
+      <div *ngFor="let acitvity of activities" class="meal-item">
+        <div *ngIf="editingActivity?.id !== acitvity.id" class="meal-display">
+          <div class="meal-info">
+            <strong>{{ acitvity.title| titlecase }}<p>{{ acitvity.time }}</p></strong>
+            <p>{{ acitvity.description }}</p>
           </div>
-
-        <form
-          *ngIf="editingActivity?.id === activity.id"
-          [formGroup]="activityForm"
-          (ngSubmit)="updateActivity()"
-          class="p-6 bg-gray-50"
-        >
-          <textarea
-            formControlName="description"
-            placeholder="Descripción de la actividad"
-            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all"
-            rows="4"
-          ></textarea>
-
-          <div class="flex justify-end space-x-3 mt-4">
-            <button
-              type="button"
-              (click)="cancelEditing()"
-              class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
-            >
-              Cancelar
+          <div class="meal-actions">
+            <button (click)="startEditing(acitvity)" class="edit-btn">
+              <fa-icon [icon]="faEdit"></fa-icon>
             </button>
-            <button
-              type="submit"
-              [disabled]="!activityForm.valid"
-              class="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg
-                     hover:from-blue-600 hover:to-purple-700 transition-all
-                     disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Guardar
+            <button (click)="deleteActivity(acitvity.id!)" class="delete-btn">
+              <fa-icon [icon]="faTrash"></fa-icon>
             </button>
+          </div>
+        </div>
+
+        <form *ngIf="editingActivity?.id === acitvity.id" [formGroup]="activityForm" (ngSubmit)="updateActivity()" class="edit-form">
+
+          <div class="form-actions">
+            <button type="submit" [disabled]="!activityForm.valid" (click)="updateActivity()">Guardar</button>
+            <button type="button" (click)="cancelEditing()">Cancelar</button>
           </div>
         </form>
       </div>
     </div>
   </div>
-</div> -->
+
+
+
+</div>

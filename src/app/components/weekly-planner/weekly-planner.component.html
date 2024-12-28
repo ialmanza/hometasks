@@ -71,13 +71,13 @@
     </div>
 
     <div class="activities-section">
-      <h3>Actividades</h3>
+      <!-- <h3>Actividades</h3>
       <form [formGroup]="activityForm" (ngSubmit)="addActivity()">
         <input formControlName="title" placeholder="Título de la Actividad" />
         <input type="time" formControlName="time" />
         <textarea formControlName="description" placeholder="Descripción de la actividad"></textarea>
         <button type="submit" [disabled]="!activityForm.valid">Agregar Actividad</button>
-      </form>
+      </form> -->
 
       <!-- <div class="activities-list">
         <div *ngFor="let activity of activities" class="activity-item">
@@ -85,7 +85,7 @@
           <p>{{ activity.time }} - {{ activity.description }}</p>
         </div>
       </div> -->
-      <div class="meals-list">
+      <!-- <div class="meals-list">
         <div *ngFor="let acitvity of activities" class="meal-item">
           <div *ngIf="editingActivity?.id !== acitvity.id" class="meal-display">
             <div class="meal-info">
@@ -103,14 +103,14 @@
           </div>
 
           <form *ngIf="editingActivity?.id === acitvity.id" [formGroup]="activityForm" (ngSubmit)="updateActivity()" class="edit-form">
-            <!-- <textarea formControlName="description" placeholder="Descripción de la actividad"></textarea> -->
+
             <div class="form-actions">
               <button type="submit" [disabled]="!activityForm.valid" (click)="updateActivity()">Guardar</button>
               <button type="button" (click)="cancelEditingActivity()">Cancelar</button>
             </div>
           </form>
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
 </div>

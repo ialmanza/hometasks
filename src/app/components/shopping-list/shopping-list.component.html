@@ -6,20 +6,48 @@
 <div class="shopping-list-container">
   <h1>Lista de compras</h1>
 
-  <!-- Productos Predefinidos -->
-  <div class="quick-add-section">
-    <h3>Añadir Rápido</h3>
-    <div class="quick-add-products">
-      <button
-        *ngFor="let product of quickAddProducts"
-        class="quick-add-btn"
-        (click)="quickAddProduct(product)"
-      >
-        {{ product.name }}
-      </button>
+  <!-- Shopping List -->
+  <div class="list-container">
+    <div
+      *ngFor="let item of shoppingItems"
+      class="list-item"
+      [class.purchased]="item.is_purchased"
+     >
+      <div class="item-details">
+        <span class="item-name">{{ item.name }}</span>
+        <span class="item-meta">
+          {{ item.quantity }} {{ item.unit }} - {{ item.category }}
+        </span>
+      </div>
+
+      <div class="item-actions">
+        <button
+          class="btn-toggle"
+          (click)="togglePurchased(item)"
+          [attr.aria-label]="item.is_purchased ? 'Mark as not purchased' : 'Mark as purchased'"
+        >
+          {{ item.is_purchased ? '↩' : '✓' }}
+        </button>
+        <button
+          class="btn-edit"
+          (click)="editItem(item)"
+          aria-label="Editar producto"
+        >
+          ✎
+        </button>
+        <button
+          class="btn-delete"
+          (click)="deleteItem(item.id!)"
+          aria-label="Eliminar producto"
+        >
+          ✖
+        </button>
+      </div>
     </div>
   </div>
+  <br><br>
 
+  <h3>Añadir Producto</h3>
   <!-- Add/Edit Form -->
   <form [formGroup]="itemForm" (ngSubmit)="onSubmit()" class="shopping-form">
     <div class="form-row">
@@ -73,43 +101,18 @@
     </div>
   </form>
 
-  <!-- Shopping List -->
-  <div class="list-container">
-    <div
-      *ngFor="let item of shoppingItems"
-      class="list-item"
-      [class.purchased]="item.is_purchased"
-    >
-      <div class="item-details">
-        <span class="item-name">{{ item.name }}</span>
-        <span class="item-meta">
-          {{ item.quantity }} {{ item.unit }} - {{ item.category }}
-        </span>
-      </div>
-
-      <div class="item-actions">
-        <button
-          class="btn-toggle"
-          (click)="togglePurchased(item)"
-          [attr.aria-label]="item.is_purchased ? 'Mark as not purchased' : 'Mark as purchased'"
-        >
-          {{ item.is_purchased ? '↩' : '✓' }}
-        </button>
-        <button
-          class="btn-edit"
-          (click)="editItem(item)"
-          aria-label="Editar producto"
-        >
-          ✎
-        </button>
-        <button
-          class="btn-delete"
-          (click)="deleteItem(item.id!)"
-          aria-label="Eliminar producto"
-        >
-          ✖
-        </button>
-      </div>
+  <!-- Productos Predefinidos -->
+  <div class="quick-add-section">
+    <h3>Añadir Rápido</h3>
+    <div class="quick-add-products">
+      <button
+        *ngFor="let product of quickAddProducts"
+        class="quick-add-btn"
+        (click)="quickAddProduct(product)"
+      >
+        {{ product.name }}
+      </button>
     </div>
   </div>
+
 </div>

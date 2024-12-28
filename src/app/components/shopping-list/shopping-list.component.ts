@@ -45,19 +45,37 @@ export class ShoppingListComponent {
       unit: 'unidad'
     },
     {
+      name: 'Morrón',
+      category: 'vegetables',
+      quantity: 1,
+      unit: 'unidad'
+    },
+    {
+      name: 'Cebolla',
+      category: 'vegetables',
+      quantity: 1,
+      unit: 'unidad'
+    },
+    {
       name: 'Manzana',
       category: 'fruits',
       quantity: 1,
       unit: 'kg'
     },
     {
-      name: 'Pan',
-      category: 'other',
+      name: 'Banana',
+      category: 'fruits',
       quantity: 1,
-      unit: 'unidad'
+      unit: 'kg'
     },
     {
       name: 'Leche',
+      category: 'other',
+      quantity: 1,
+      unit: 'litro'
+    },
+    {
+      name: 'Huevos',
       category: 'other',
       quantity: 1,
       unit: 'litro'
