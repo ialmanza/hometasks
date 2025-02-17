@@ -25,6 +25,13 @@ export class ShoppingListComponent {
   itemForm: FormGroup;
   editingItem: ShoppingListItem | null = null;
 
+  // Valores por defecto definidos como constantes
+  private DEFAULT_VALUES = {
+    category: 'other',
+    quantity: 1,
+    unit: 'unidad'
+  };
+
   quickAddProducts: QuickAddProduct[] = [
     {
       name: 'Arroz',
@@ -87,11 +94,17 @@ export class ShoppingListComponent {
     private shoppingListService: ShoppingListService,
     private fb: FormBuilder
   ) {
+    // this.itemForm = this.fb.group({
+    //   name: ['', Validators.required],
+    //   category: ['other', Validators.required],
+    //   quantity: [1, [Validators.required, Validators.min(1)]],
+    //   unit: ['', Validators.required]
+    // });
     this.itemForm = this.fb.group({
       name: ['', Validators.required],
-      category: ['other', Validators.required],
-      quantity: [1, [Validators.required, Validators.min(1)]],
-      unit: ['', Validators.required]
+      category: [this.DEFAULT_VALUES.category],
+      quantity: [this.DEFAULT_VALUES.quantity],
+      unit: [this.DEFAULT_VALUES.unit]
     });
   }
 
@@ -110,15 +123,48 @@ export class ShoppingListComponent {
     });
   }
 
+  // onSubmit() {
+  //   if (this.itemForm.valid) {
+  //     const itemData: ShoppingListItem = {
+  //       ...this.itemForm.value,
+  //       is_purchased: false
+  //     };
+
+  //     if (this.editingItem) {
+  //       // Update existing item
+  //       itemData.id = this.editingItem.id;
+  //       this.shoppingListService.updateItem(itemData).subscribe({
+  //         next: () => {
+  //           this.loadItems();
+  //           this.resetForm();
+  //         },
+  //         error: (err) => console.error('Error updating item', err)
+  //       });
+  //     } else {
+  //       // Create new item
+  //       this.shoppingListService.createItem(itemData).subscribe({
+  //         next: () => {
+  //           this.loadItems();
+  //           this.resetForm();
+  //         },
+  //         error: (err) => console.error('Error creating item', err)
+  //       });
+  //     }
+  //   }
+  // }
+
   onSubmit() {
     if (this.itemForm.valid) {
+      const formValues = this.itemForm.value;
       const itemData: ShoppingListItem = {
-        ...this.itemForm.value,
+        name: formValues.name,
+        category: formValues.category || this.DEFAULT_VALUES.category,
+        quantity: formValues.quantity || this.DEFAULT_VALUES.quantity,
+        unit: formValues.unit || this.DEFAULT_VALUES.unit,
         is_purchased: false
       };
 
       if (this.editingItem) {
-        // Update existing item
         itemData.id = this.editingItem.id;
         this.shoppingListService.updateItem(itemData).subscribe({
           next: () => {
@@ -128,7 +174,6 @@ export class ShoppingListComponent {
           error: (err) => console.error('Error updating item', err)
         });
       } else {
-        // Create new item
         this.shoppingListService.createItem(itemData).subscribe({
           next: () => {
             this.loadItems();
@@ -169,12 +214,22 @@ export class ShoppingListComponent {
     });
   }
 
+  // resetForm() {
+  //   this.itemForm.reset({
+  //     name: '',
+  //     category: 'other',
+  //     quantity: 1,
+  //     unit: ''
+  //   });
+  //   this.editingItem = null;
+  // }
+
   resetForm() {
     this.itemForm.reset({
       name: '',
-      category: 'other',
-      quantity: 1,
-      unit: ''
+      category: this.DEFAULT_VALUES.category,
+      quantity: this.DEFAULT_VALUES.quantity,
+      unit: this.DEFAULT_VALUES.unit
     });
     this.editingItem = null;
   }

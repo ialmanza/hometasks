@@ -2,7 +2,15 @@ import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '../../environments/environments';
 import { Task, TasksService } from './tasks.service';
+import { DailyActivity } from '../models/daily_activity';
 
+interface NotificationOptions {
+  body: string;
+  icon: string;
+  badge: string;
+  tag: string;
+  renotify?: boolean;
+}
 @Injectable({
   providedIn: 'root'
 })
@@ -10,6 +18,8 @@ export class NotificationService {
   private supabase: SupabaseClient;
   private tasksChannel: any;
   private swRegistration: ServiceWorkerRegistration | null = null;
+  private scheduledNotifications: Map<number, NodeJS.Timeout> = new Map();
+  private serviceWorkerReady: boolean = false;
 
   constructor(private todoService: TasksService) {
     // Inicializar Supabase con tus credenciales
@@ -26,10 +36,167 @@ export class NotificationService {
     if ('serviceWorker' in navigator) {
       try {
         this.swRegistration = await navigator.serviceWorker.register('/ngsw-worker.js');
-        console.log('Service Worker registrado exitosamente');
+        await navigator.serviceWorker.ready;
+        this.serviceWorkerReady = true;
+
+        // Solicitar permisos inmediatamente después de que el SW esté listo
+        await this.requestNotificationPermission();
+        console.log('Service Worker y permisos inicializados correctamente');
       } catch (error) {
         console.error('Error registrando Service Worker:', error);
       }
+    }
+  }
+
+  async scheduleActivityNotification(activity: DailyActivity) {
+    if (!this.serviceWorkerReady) {
+      console.log('Esperando a que el Service Worker esté listo...');
+      await this.waitForServiceWorker();
+    }
+
+    if (!activity.id || !activity.time || !activity.day_of_week) {
+      console.warn('Actividad inválida para programar notificación:', activity);
+      return;
+    }
+
+    // Cancelar notificación existente si hay una
+    this.cancelScheduledNotification(activity.id);
+
+    const notificationTime = this.calculateNextNotificationTime(activity.day_of_week, activity.time);
+    if (!notificationTime) {
+      console.warn('No se pudo calcular el tiempo de notificación para:', activity);
+      return;
+    }
+
+    const timeUntilNotification = notificationTime.getTime() - new Date().getTime();
+    if (timeUntilNotification <= 0) {
+      console.warn('Tiempo de notificación ya pasó para:', activity);
+      return;
+    }
+
+    console.log(`Programando notificación para ${activity.title}:`);
+    console.log(`Fecha programada: ${notificationTime.toLocaleString()}`);
+    console.log(`Tiempo de espera: ${timeUntilNotification}ms`);
+
+    const timerId = setTimeout(() => {
+      this.sendActivityNotification(activity);
+    }, timeUntilNotification);
+
+    this.scheduledNotifications.set(activity.id, timerId);
+  }
+
+  private async waitForServiceWorker(timeout = 5000): Promise<void> {
+    const startTime = Date.now();
+    while (!this.serviceWorkerReady && Date.now() - startTime < timeout) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    if (!this.serviceWorkerReady) {
+      throw new Error('Service Worker no se inicializó a tiempo');
+    }
+  }
+
+  private calculateNextNotificationTime(dayOfWeek: string, time: string): Date | null {
+    const now = new Date();
+    const [hours, minutes] = time.split(':').map(Number);
+
+    if (isNaN(hours) || isNaN(minutes)) return null;
+
+    const weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const targetDayIndex = weekDays.indexOf(dayOfWeek);
+
+    if (targetDayIndex === -1) return null;
+
+    const targetDate = new Date();
+    targetDate.setHours(hours, minutes, 0, 0);
+
+    // Ajustar al día de la semana correcto
+    const currentDayIndex = now.getDay();
+    let daysToAdd = targetDayIndex - currentDayIndex;
+
+    // Si es el mismo día, verificar si la hora ya pasó
+    if (daysToAdd === 0) {
+      if (now > targetDate) {
+        daysToAdd = 7; // Programar para la próxima semana
+      }
+    } else if (daysToAdd < 0) {
+      daysToAdd += 7;
+    }
+
+    targetDate.setDate(targetDate.getDate() + daysToAdd);
+    return targetDate;
+  }
+
+  private async sendActivityNotification(activity: DailyActivity) {
+    if (!this.serviceWorkerReady || !activity.id) {
+      console.warn('No se puede enviar notificación, Service Worker no está listo');
+      return;
+    }
+
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') {
+        console.warn('Permiso de notificaciones no otorgado');
+        return;
+      }
+
+      await this.showNotification(activity);
+      console.log('Notificación enviada exitosamente para:', activity.title);
+
+      // Registrar la notificación enviada
+      await this.supabase.from('activity_notifications').insert({
+        activity_id: activity.id,
+        title: activity.title,
+        sent_at: new Date().toISOString()
+      });
+
+      // Reprogramar para la próxima semana
+      this.scheduleActivityNotification(activity);
+    } catch (error) {
+      console.error('Error al enviar notificación:', error);
+    }
+  }
+
+
+  private async showNotification(activity: DailyActivity) {
+    if (!this.swRegistration) return;
+
+    const options: NotificationOptions = {
+      body: activity.description || 'Es hora de tu actividad programada',
+      icon: '/assets/icons/notification-icon.png',
+      badge: '/assets/icons/badge-icon.png',
+      tag: `activity-${activity.id}`,
+      renotify: true
+    };
+
+    try {
+      await this.swRegistration.showNotification(activity.title, options);
+    } catch (error) {
+      console.error('Error mostrando notificación:', error);
+    }
+  }
+
+  cancelScheduledNotification(activityId: number) {
+    const timerId = this.scheduledNotifications.get(activityId);
+    if (timerId) {
+      clearTimeout(timerId);
+      this.scheduledNotifications.delete(activityId);
+    }
+  }
+
+  async requestNotificationPermission(): Promise<boolean> {
+    if (!('Notification' in window)) {
+      console.warn('Este navegador no soporta notificaciones');
+      return false;
+    }
+
+    try {
+      const permission = await Notification.requestPermission();
+      const granted = permission === 'granted';
+      console.log('Permiso de notificaciones:', granted ? 'concedido' : 'denegado');
+      return granted;
+    } catch (error) {
+      console.error('Error solicitando permisos de notificación:', error);
+      return false;
     }
   }
 
@@ -146,7 +313,6 @@ export class NotificationService {
           applicationServerKey: this.urlBase64ToUint8Array(environment.vapidPublicKey)
         });
 
-        // Aquí podrías guardar la suscripción en tu backend
         await this.saveSubscription(subscription);
 
         return subscription;
@@ -159,8 +325,6 @@ export class NotificationService {
   }
 
   async saveSubscription(subscription: PushSubscription) {
-    // Implementa el guardado de la suscripción en tu backend
-    // Podrías usar Supabase o tu propio endpoint
     try {
       const response = await fetch('/api/save-subscription', {
         method: 'POST',
@@ -233,21 +397,13 @@ export class NotificationService {
     }
   }
 
-  // Solicitar permiso de notificaciones del sistema
-  requestNotificationPermission() {
-    if ('Notification' in window) {
-      Notification.requestPermission().then(permission => {
-        if (permission === 'granted') {
-          console.log('Notificaciones del sistema habilitadas');
-        }
-      });
-    }
-  }
-
-  // Método para limpiar suscripciones
   cleanup() {
-    if (this.tasksChannel) {
-      this.supabase.removeChannel(this.tasksChannel);
-    }
+    // Limpiar todos los timeouts pendientes
+    this.scheduledNotifications.forEach((timerId, activityId) => {
+      clearTimeout(timerId);
+      console.log(`Limpiando notificación programada para actividad ${activityId}`);
+    });
+    this.scheduledNotifications.clear();
+    this.serviceWorkerReady = false;
   }
 }

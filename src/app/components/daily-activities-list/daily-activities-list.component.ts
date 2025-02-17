@@ -6,6 +6,7 @@ import { DailyActivity } from '../../models/daily_activity';
 import { ActivitiesService } from '../../services/activities.service';
 import { AppNavigationComponent } from "../app-navigation/app-navigation.component";
 import { faEdit, faTrash, faCalendar, faTimes, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { NotificationService } from '../../../app/services/notifications.service';
 
 @Component({
   selector: 'app-daily-activities-list',
@@ -27,6 +28,7 @@ export class DailyActivitiesListComponent {
   faPlus = faPlus;
 
   constructor(
+    private notificationService: NotificationService,
     private activitiesService: ActivitiesService,
     private fb: FormBuilder
   ) {
@@ -41,6 +43,10 @@ export class DailyActivitiesListComponent {
     this.loadActivitiesForDay(this.selectedDay!);
   }
 
+  ngOnDestroy() {
+    this.notificationService.cleanup();
+  }
+
   selectDay(day: string) {
     this.selectedDay = day;
     this.loadActivitiesForDay(day);
@@ -48,6 +54,10 @@ export class DailyActivitiesListComponent {
 
   async loadActivitiesForDay(day: string) {
     this.activities = await this.activitiesService.getActivitiesByDay(day);
+    // Programar notificaciones para todas las actividades cargadas
+    this.activities.forEach(activity => {
+      this.notificationService.scheduleActivityNotification(activity);
+    });
   }
 
   startEditing(activity: DailyActivity) {
@@ -78,6 +88,8 @@ export class DailyActivitiesListComponent {
         const index = this.activities.findIndex(a => a.id === updatedActivity.id);
         if (index !== -1) {
           this.activities[index] = result;
+          // Actualizar la notificación programada
+          this.notificationService.scheduleActivityNotification(result);
         }
         this.cancelEditing();
       }
@@ -89,6 +101,8 @@ export class DailyActivitiesListComponent {
     if (confirmed) {
       const success = await this.activitiesService.deleteActivity(activityId);
       if (success) {
+        // Cancelar la notificación programada
+        this.notificationService.cancelScheduledNotification(activityId);
         this.activities = this.activities.filter(a => a.id !== activityId);
       }
     }
@@ -106,6 +120,8 @@ export class DailyActivitiesListComponent {
       const createdActivity = await this.activitiesService.createActivity(newActivity);
       if (createdActivity) {
         this.activities.push(createdActivity);
+         // Programar notificación para la nueva actividad
+        this.notificationService.scheduleActivityNotification(createdActivity);
         this.activityForm.reset();
       }
     }
