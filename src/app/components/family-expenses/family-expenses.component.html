@@ -4,7 +4,16 @@
   <div>
     <!-- Header -->
     <div class="flex items-center bg-slate-50 p-4 pb-2 justify-between">
-      <h2 class="text-[#0e141b] text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pl-12">Gastos</h2>
+      <div class="flex items-center gap-3">
+        <button
+          routerLink="/expenses-dashboard"
+          class="flex cursor-pointer items-center justify-center rounded-full h-10 w-10 bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors"
+          title="Ver Dashboard"
+        >
+          <fa-icon [icon]="faChartBar" class="text-sm"></fa-icon>
+        </button>
+        <h2 class="text-[#0e141b] text-lg font-bold leading-tight tracking-[-0.015em]">Gastos</h2>
+      </div>
       <div class="flex w-12 items-center justify-end">
         <button
           (click)="addNewExpense()"

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faPlus, faEdit, faTrash, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faEdit, faTrash, faCheck, faTimes, faChartBar } from '@fortawesome/free-solid-svg-icons';
 import { FamilyExpense } from '../../models/family-expense.model';
 import { FamilyMember } from '../../models/family-member.model';
 import { ExpensesService } from '../../services/expenses.service';
@@ -30,6 +30,7 @@ export class FamilyExpensesComponent implements OnInit {
   faTrash = faTrash;
   faCheck = faCheck;
   faTimes = faTimes;
+  faChartBar = faChartBar;
 
   constructor(
     private expensesService: ExpensesService,

@@ -109,6 +109,11 @@
           <fa-icon [icon]="faUtensils"></fa-icon>
           <span>Comidas</span>
         </a>
+
+        <a routerLink="/expenses-dashboard" routerLinkActive="active" (click)="closeMoreMenu()" class="more-menu-item">
+          <fa-icon [icon]="faDollarSign"></fa-icon>
+          <span>Dashboard Gastos</span>
+        </a>
       </div>
     </div>
   </div>

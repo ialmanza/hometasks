@@ -1,0 +1,129 @@
+/* Estilos específicos para el dashboard */
+.group\/design-root {
+  font-family: Inter, "Noto Sans", sans-serif;
+}
+
+/* Estilos para el selector de rango */
+.range-selector {
+  background: #eaedf1;
+  border-radius: 12px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.range-option {
+  transition: all 0.2s ease-in-out;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin: 0 2px;
+}
+
+.range-option.selected {
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  color: #101418;
+  font-weight: 500;
+}
+
+.range-option:not(.selected) {
+  color: #5c718a;
+}
+
+/* Estilos para las tarjetas de estadísticas */
+
+/* Estilos para las tarjetas de estadísticas */
+.stats-card {
+  transition: all 0.2s ease-in-out;
+}
+
+.stats-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para los gráficos */
+canvas {
+  max-height: 300px;
+}
+
+/* Estilos para la tabla de vencimientos */
+.table-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Estilos para estados de vencimiento */
+.due-soon {
+  color: #f59e0b;
+}
+
+.due-overdue {
+  color: #ef4444;
+}
+
+.due-normal {
+  color: #6b7280;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+  
+  .text-\[22px\] {
+    font-size: 1.25rem;
+  }
+  
+  .p-4 {
+    padding: 1rem;
+  }
+
+  /* Asegurar que el contenido no se solape con la navegación */
+  .pb-20 {
+    padding-bottom: 5rem;
+  }
+
+  /* Mejorar espaciado en móviles */
+  .space-y-4 > * + * {
+    margin-top: 1rem;
+  }
+}
+
+/* Asegurar que las tablas sean scrollables en móviles */
+.table-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 1rem;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Estilos para el loading spinner */
+.spinner {
+  border: 2px solid #f3f4f6;
+  border-top: 2px solid #3b82f6;
+  border-radius: 50%;
+  width: 2rem;
+  height: 2rem;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+} 

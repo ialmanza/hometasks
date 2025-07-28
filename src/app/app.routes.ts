@@ -8,6 +8,7 @@ import { InicioComponent } from './components/inicio/inicio.component';
 import { FamilyMembersComponent } from './components/family-members/family-members.component';
 import { AddExpenseFormComponent } from './components/add-expense-form/add-expense-form.component';
 import { FamilyExpensesComponent } from './components/family-expenses/family-expenses.component';
+import { FamilyExpensesDashboardComponent } from './components/family-expenses-dashboard/family-expenses-dashboard.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/inicio', pathMatch: 'full' },
@@ -21,5 +22,6 @@ export const routes: Routes = [
   { path: 'add-expense', component: AddExpenseFormComponent },
   { path: 'edit-expense/:id', component: AddExpenseFormComponent },
   { path: 'expenses', component: FamilyExpensesComponent },
+  { path: 'expenses-dashboard', component: FamilyExpensesDashboardComponent },
   { path: '**', redirectTo: '/inicio' }
 ];
