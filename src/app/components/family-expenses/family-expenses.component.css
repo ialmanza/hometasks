@@ -224,4 +224,24 @@ button:hover:not(:disabled) {
   border-top-color: #1f2937;
   z-index: 10;
   margin-bottom: 0.25rem;
+}
+
+/* Ajustes específicos para móvil */
+@media (max-width: 600px) {
+  .empty-state {
+    padding: 1.5rem;
+    margin: 10px;
+  }
+  
+  /* Ajustar espaciado para navegación móvil */
+  .expense-container {
+    margin-bottom: 80px;
+  }
+}
+
+/* Ajustes específicos para tablet */
+@media (min-width: 601px) and (max-width: 1023px) {
+  .empty-state {
+    padding: 1.75rem;
+  }
 } 

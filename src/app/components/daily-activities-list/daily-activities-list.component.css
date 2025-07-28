@@ -101,46 +101,10 @@ h1 {
   font-size: 1.8rem;
 }
 
-@media (max-width: 600px) {
-  .days-selector {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .days-selector button {
-    width: 100%;
-    margin-bottom: 10px;
-  }
-
-  h1 {
-    font-size: 1.5rem;
-  }
-
-  .saltos {
-    display: none;
-  }
-}
-:host {
-  --primary-color: #3867d6;
-  --secondary-color: #fa8231;
-  --background-color: #f8f9fa;
-  --text-color: #2c3e50;
-  --border-color: #e0e4e8;
-  --completed-color: #2ecc71;
-}
-
 .weekly-planner-container {
   max-width: 800px;
   margin: 0 auto;
   padding: 20px;
-}
-
-h1 {
-  color: var(--primary-color);
-  font-weight: 600;
-  margin-top: 15px;
-  text-align: center;
-  font-size: 1.8rem;
 }
 
 .days-selector {
@@ -215,18 +179,42 @@ form button {
 @media (max-width: 600px) {
   .days-selector {
     flex-direction: column;
+    align-items: center;
   }
 
   .days-selector button {
-    margin: 5px 0;
+    width: 100%;
+    margin-bottom: 10px;
   }
 
   h1 {
     font-size: 1.5rem;
+    margin-top: 10px;
+    margin-bottom: 15px;
   }
 
   .saltos {
     display: none;
+  }
+  
+  .meals-container,
+  .weekly-planner-container {
+    margin: 10px;
+    padding: 15px;
+    margin-bottom: 80px; /* Espacio para navegación móvil */
+  }
+}
+
+/* Ajustes específicos para tablet */
+@media (min-width: 601px) and (max-width: 1023px) {
+  .meals-container,
+  .weekly-planner-container {
+    margin: 15px auto;
+    padding: 20px;
+  }
+  
+  h1 {
+    font-size: 1.6rem;
   }
 }
 

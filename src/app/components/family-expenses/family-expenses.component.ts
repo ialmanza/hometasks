@@ -8,12 +8,13 @@ import { FamilyMember } from '../../models/family-member.model';
 import { ExpensesService } from '../../services/expenses.service';
 import { MembersService } from '../../services/members.service';
 import { AppNavigationComponent } from "../app-navigation/app-navigation.component";
+import { RouterLink } from '@angular/router';
 
 type FilterType = 'all' | 'unpaid' | 'paid';
 
 @Component({
   selector: 'app-family-expenses',
-  imports: [CommonModule, FontAwesomeModule, AppNavigationComponent],
+  imports: [CommonModule, FontAwesomeModule, AppNavigationComponent, RouterLink],
   templateUrl: './family-expenses.component.html',
   styleUrl: './family-expenses.component.css'
 })

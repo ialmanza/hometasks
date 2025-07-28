@@ -71,8 +71,8 @@
       <span>Compras</span>
     </a>
 
-    <!-- Gastos -->
-    <a routerLink="/expenses" routerLinkActive="active" (click)="closeMoreMenu()">
+    <!-- Gastos - Acceso directo al Dashboard -->
+    <a routerLink="/expenses-dashboard" routerLinkActive="active" (click)="closeMoreMenu()">
       <fa-icon [icon]="faDollarSign"></fa-icon>
       <span>Gastos</span>
     </a>
@@ -110,9 +110,9 @@
           <span>Comidas</span>
         </a>
 
-        <a routerLink="/expenses-dashboard" routerLinkActive="active" (click)="closeMoreMenu()" class="more-menu-item">
+        <a routerLink="/expenses" routerLinkActive="active" (click)="closeMoreMenu()" class="more-menu-item">
           <fa-icon [icon]="faDollarSign"></fa-icon>
-          <span>Dashboard Gastos</span>
+          <span>Gastos Detallados</span>
         </a>
       </div>
     </div>

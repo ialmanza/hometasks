@@ -113,9 +113,29 @@ h1 {
 
   h1 {
     font-size: 1.5rem;
+    margin-top: 10px;
+    margin-bottom: 15px;
   }
 
   .saltos {
     display: none;
+  }
+  
+  .meals-container {
+    margin: 10px;
+    padding: 15px;
+    margin-bottom: 80px; /* Espacio para navegación móvil */
+  }
+}
+
+/* Ajustes específicos para tablet */
+@media (min-width: 601px) and (max-width: 1023px) {
+  .meals-container {
+    margin: 15px auto;
+    padding: 20px;
+  }
+  
+  h1 {
+    font-size: 1.6rem;
   }
 }

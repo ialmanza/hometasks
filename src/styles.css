@@ -15,9 +15,74 @@ body {
   margin-top: 80px;
 }
 
-/* Ajuste para móvil */
+/* Ajuste para móvil y tablet */
 @media (max-width: 767px) {
   .has-desktop-nav {
     margin-top: 0; /* Sin margin en móvil */
+  }
+  
+  /* Reducir padding y márgenes en móvil */
+  .todo-container,
+  .shopping-list-container,
+  .meals-container,
+  .weekly-planner-container,
+  .expense-container,
+  .members-container,
+  .dashboard-container {
+    margin-top: 10px !important;
+    margin-bottom: 80px !important; /* Espacio para navegación móvil */
+    padding: 15px !important;
+  }
+  
+  /* Ajustar títulos en móvil */
+  h1 {
+    margin-top: 10px !important;
+    margin-bottom: 15px !important;
+    font-size: 1.5rem !important;
+  }
+  
+  /* Ajustar contenedores principales */
+  .main-content,
+  .banner {
+    margin-bottom: 80px !important;
+  }
+}
+
+/* Ajuste específico para tablet */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .has-desktop-nav {
+    margin-top: 60px; /* Reducir un poco el margin en tablet */
+  }
+  
+  .todo-container,
+  .shopping-list-container,
+  .meals-container,
+  .weekly-planner-container,
+  .expense-container,
+  .members-container,
+  .dashboard-container {
+    margin-top: 15px !important;
+    padding: 20px !important;
+  }
+}
+
+/* Asegurar que los componentes tengan el espaciado correcto */
+@media (max-width: 600px) {
+  /* Reducir aún más el espaciado en móviles pequeños */
+  .todo-container,
+  .shopping-list-container,
+  .meals-container,
+  .weekly-planner-container {
+    margin: 5px !important;
+    padding: 12px !important;
+  }
+  
+  /* Ajustar banners y contenido principal */
+  .banner {
+    padding: 0.75rem !important;
+  }
+  
+  .main-content {
+    padding: 0.75rem !important;
   }
 }
