@@ -6,7 +6,7 @@
 <div class="shopping-list-container">
   <h1>Lista de compras</h1>
 
-  <!-- Shopping List -->
+  <!-- Lista de Compras -->
   <div class="list-container">
     <div
       *ngFor="let item of shoppingItems"
@@ -24,7 +24,7 @@
         <button
           class="btn-toggle"
           (click)="togglePurchased(item)"
-          [attr.aria-label]="item.is_purchased ? 'Mark as not purchased' : 'Mark as purchased'"
+          [attr.aria-label]="item.is_purchased ? 'Marcar como no comprado' : 'Marcar como comprado'"
         >
           {{ item.is_purchased ? '↩' : '✓' }}
         </button>
@@ -48,7 +48,7 @@
   <br><br>
 
   <h3>Añadir Producto</h3>
-  <!-- Add/Edit Form -->
+  <!-- Formulario Agregar/Editar -->
   <form [formGroup]="itemForm" (ngSubmit)="onSubmit()" class="shopping-form">
     <div class="form-row">
       <input

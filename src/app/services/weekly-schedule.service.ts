@@ -203,7 +203,7 @@ export class WeeklyScheduleService {
         }
       }
     } catch (error) {
-      console.error('Error loading current data:', error);
+      console.error('Error cargando datos actuales:', error);
     }
   }
 

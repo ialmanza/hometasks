@@ -1,1 +1,23 @@
 /* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Estilos globales para el body */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', 'Noto Sans', sans-serif;
+}
+
+/* Margin-top para componentes cuando hay navegación desktop */
+.has-desktop-nav {
+  margin-top: 80px;
+}
+
+/* Ajuste para móvil */
+@media (max-width: 767px) {
+  .has-desktop-nav {
+    margin-top: 0; /* Sin margin en móvil */
+  }
+}

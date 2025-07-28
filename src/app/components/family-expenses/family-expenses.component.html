@@ -1,0 +1,163 @@
+<app-app-navigation></app-app-navigation>
+
+<div class="relative flex size-full min-h-screen flex-col bg-slate-50 justify-between group/design-root overflow-x-hidden">
+  <div>
+    <!-- Header -->
+    <div class="flex items-center bg-slate-50 p-4 pb-2 justify-between">
+      <h2 class="text-[#0e141b] text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pl-12">Gastos</h2>
+      <div class="flex w-12 items-center justify-end">
+        <button
+          (click)="addNewExpense()"
+          class="flex cursor-pointer items-center justify-center rounded-full h-12 w-12 bg-[#1978e5] text-white hover:bg-[#1565c0] transition-colors"
+        >
+          <fa-icon [icon]="faPlus" class="text-white"></fa-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="flex gap-3 p-3 overflow-x-hidden">
+      <button 
+        [class]="getFilterButtonClass('all')"
+        (click)="setFilter('all')"
+      >
+        <p class="text-sm font-medium leading-normal">Todos</p>
+        <div class="text-current" data-icon="CaretDown" data-size="20px" data-weight="regular">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+            <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path>
+          </svg>
+        </div>
+      </button>
+      <button 
+        [class]="getFilterButtonClass('unpaid')"
+        (click)="setFilter('unpaid')"
+      >
+        <p class="text-sm font-medium leading-normal">Pendientes</p>
+        <div class="text-current" data-icon="CaretDown" data-size="20px" data-weight="regular">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+            <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path>
+          </svg>
+        </div>
+      </button>
+      <button 
+        [class]="getFilterButtonClass('paid')"
+        (click)="setFilter('paid')"
+      >
+        <p class="text-sm font-medium leading-normal">Pagados</p>
+        <div class="text-current" data-icon="CaretDown" data-size="20px" data-weight="regular">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+            <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path>
+          </svg>
+        </div>
+      </button>
+    </div>
+
+    <!-- Lista de gastos -->
+    <div *ngIf="!loading; else loadingTemplate">
+      <div *ngFor="let expense of filteredExpenses" class="flex items-center gap-4 bg-slate-50 px-4 min-h-[72px] py-2 justify-between">
+        <div class="flex items-center gap-4">
+          <!-- Icono del gasto -->
+          <div class="text-[#0e141b] flex items-center justify-center rounded-lg bg-[#e7edf3] shrink-0 size-12 text-2xl">
+            {{ getExpenseIcon(expense) }}
+          </div>
+          
+          <!-- Información del gasto -->
+          <div class="flex flex-col justify-center">
+            <p class="text-[#0e141b] text-base font-medium leading-normal line-clamp-1">{{ expense.title }}</p>
+            <p class="text-[#4e7097] text-sm font-normal leading-normal line-clamp-2">
+              {{ formatAmount(expense.amount) }} · Vence el {{ formatDate(expense.due_date || '') }}
+              <span *ngIf="expense.responsible_member_id" class="ml-2">
+                · {{ getMemberName(expense.responsible_member_id) }}
+              </span>
+            </p>
+            <p *ngIf="expense.description" class="text-[#4e7097] text-xs font-normal leading-normal line-clamp-1 mt-1">
+              {{ expense.description }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Estado y acciones -->
+        <div class="flex items-center gap-3">
+          <!-- Estado del gasto -->
+          <div class="shrink-0">
+            <p [class]="getExpenseStatusClass(expense.is_paid)">
+              {{ getExpenseStatusText(expense.is_paid) }}
+            </p>
+          </div>
+
+          <!-- Botones de acción -->
+          <div class="flex gap-2">
+            <!-- Toggle de estado pagado -->
+            <button 
+              (click)="togglePaidStatus(expense)"
+              [class]="expense.is_paid ? 'text-green-600 hover:text-green-700' : 'text-orange-600 hover:text-orange-700'"
+              class="p-2 transition-colors"
+              [title]="expense.is_paid ? 'Marcar como no pagado' : 'Marcar como pagado'"
+            >
+              <fa-icon [icon]="expense.is_paid ? faCheck : faTimes"></fa-icon>
+            </button>
+
+            <!-- Editar -->
+            <button 
+              (click)="editExpense(expense)"
+              class="p-2 text-[#4e7097] hover:text-[#0e141b] transition-colors"
+              title="Editar gasto"
+            >
+              <fa-icon [icon]="faEdit"></fa-icon>
+            </button>
+
+            <!-- Eliminar -->
+            <button 
+              (click)="deleteExpense(expense.id!)"
+              class="p-2 text-[#4e7097] hover:text-red-500 transition-colors"
+              title="Eliminar gasto"
+            >
+              <fa-icon [icon]="faTrash"></fa-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Estado vacío -->
+      <div *ngIf="filteredExpenses.length === 0" class="flex flex-col items-center justify-center py-12 px-4">
+        <div class="text-[#4e7097] text-6xl mb-4">💰</div>
+        <h3 class="text-[#0e141b] text-lg font-medium mb-2">
+          {{ currentFilter === 'all' ? 'No hay gastos' : 
+             currentFilter === 'paid' ? 'No hay gastos pagados' : 'No hay gastos pendientes' }}
+        </h3>
+        <p class="text-[#4e7097] text-sm text-center mb-6">
+          {{ currentFilter === 'all' ? 'Agrega gastos para comenzar a organizar tus finanzas familiares' :
+             currentFilter === 'paid' ? 'Todos los gastos están pendientes de pago' : '¡Excelente! Todos los gastos están pagados' }}
+        </p>
+        <button
+          (click)="addNewExpense()"
+          class="flex items-center justify-center gap-2 px-6 py-3 bg-[#1978e5] text-white rounded-lg font-medium hover:bg-[#1565c0] transition-colors"
+        >
+          <fa-icon [icon]="faPlus"></fa-icon>
+          Agregar gasto
+        </button>
+      </div>
+    </div>
+
+    <!-- Template de carga -->
+    <ng-template #loadingTemplate>
+      <div class="flex items-center justify-center py-12">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1978e5]"></div>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Footer con botón de agregar -->
+  <div>
+    <div class="flex justify-end overflow-hidden px-5 pb-20">
+      <button
+        (click)="addNewExpense()"
+        class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-14 px-5 bg-[#1978e5] text-slate-50 text-base font-bold leading-normal tracking-[0.015em] min-w-0 gap-4 pl-4 pr-6"
+      >
+        <fa-icon [icon]="faPlus" class="text-slate-50"></fa-icon>
+        <span class="truncate">Agregar gasto</span>
+      </button>
+    </div>
+    <div class="h-5 bg-slate-50"></div>
+  </div>
+</div> 

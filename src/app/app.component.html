@@ -1,1 +1,4 @@
-<router-outlet />
+<div [class.has-desktop-nav]="isDesktop">
+  <app-app-navigation></app-app-navigation>
+  <router-outlet />
+</div>

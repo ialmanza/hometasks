@@ -1,0 +1,185 @@
+/* Estilos específicos para el formulario de gastos */
+
+/* Animaciones de transición */
+.group\/design-root {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Estilos para los campos del formulario */
+.form-input {
+  transition: all 0.2s ease;
+}
+
+.form-input:focus {
+  box-shadow: 0 0 0 2px rgba(25, 120, 229, 0.2);
+  transform: translateY(-1px);
+}
+
+/* Estilos para el textarea */
+textarea.form-input {
+  resize: none;
+  min-height: 144px; /* 9rem */
+}
+
+/* Estilos para el select */
+select.form-input {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='24px' height='24px' fill='rgb(78,112,151)' viewBox='0 0 256 256'%3e%3cpath d='M181.66,170.34a8,8,0,0,1,0,11.32l-48,48a8,8,0,0,1-11.32,0l-48-48a8,8,0,0,1,11.32-11.32L128,212.69l42.34-42.35A8,8,0,0,1,181.66,170.34Zm-96-84.68L128,43.31l42.34,42.35a8,8,0,0,0,11.32-11.32l-48-48a8,8,0,0,0-11.32,0l-48,48A8,8,0,0,0,85.66,85.66Z'%3e%3c/path%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1.5rem;
+  padding-right: 3rem;
+}
+
+/* Estilos para mensajes de error */
+.error-message {
+  color: #ef4444;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Estilos para el botón de envío */
+button[type="submit"] {
+  transition: all 0.2s ease;
+}
+
+button[type="submit"]:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(25, 120, 229, 0.3);
+}
+
+button[type="submit"]:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Estilos para botones deshabilitados */
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Estilos para el campo de fecha */
+input[type="date"] {
+  position: relative;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  background: transparent;
+  bottom: 0;
+  color: transparent;
+  cursor: pointer;
+  height: auto;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: auto;
+}
+
+/* Estilos para el icono del calendario */
+.calendar-icon {
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .min-h-36 {
+    min-height: 120px;
+  }
+  
+  .h-14 {
+    height: 3rem;
+  }
+  
+  .px-4 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Estilos para el estado de carga */
+.submitting {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Estilos para el placeholder */
+::placeholder {
+  color: #4e7097;
+  opacity: 1;
+}
+
+/* Estilos para el focus en campos */
+.form-input:focus::placeholder {
+  opacity: 0.7;
+}
+
+/* Animación para el botón de volver */
+button:not([type="submit"]):hover {
+  transform: scale(1.05);
+  transition: transform 0.2s ease;
+} 
+
+/* Estilos para el selector de íconos */
+.icon-selector {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+.icon-selector::-webkit-scrollbar {
+  width: 6px;
+}
+
+.icon-selector::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.icon-selector::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.icon-selector::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Animación para el selector de íconos */
+.icon-selector-enter {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.icon-selector-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 200ms ease-out, transform 200ms ease-out;
+}
+
+/* Estilos para los botones de íconos */
+.icon-button {
+  transition: all 0.2s ease-in-out;
+}
+
+.icon-button:hover {
+  transform: scale(1.1);
+  background-color: #e2e8f0;
+}
+
+.icon-button:active {
+  transform: scale(0.95);
+} 

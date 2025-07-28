@@ -1,0 +1,135 @@
+<app-app-navigation></app-app-navigation>
+
+<!-- Vista principal de miembros -->
+<div *ngIf="!showAddForm" class="relative flex size-full min-h-screen flex-col bg-slate-50 justify-between group/design-root overflow-x-hidden">
+  <div>
+    <!-- Header -->
+    <div class="flex items-center bg-slate-50 p-4 pb-2 justify-between">
+      <h2 class="text-[#0e141b] text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pl-12">Miembros</h2>
+      <div class="flex w-12 items-center justify-end">
+        <button
+          (click)="showAddMemberForm()"
+          class="flex cursor-pointer items-center justify-center rounded-full h-12 w-12 bg-[#1978e5] text-white hover:bg-[#1565c0] transition-colors"
+        >
+          <fa-icon [icon]="faPlus" class="text-white"></fa-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Lista de miembros -->
+    <div *ngIf="!loading; else loadingTemplate">
+      <div *ngFor="let member of members" class="flex items-center gap-4 bg-slate-50 px-4 min-h-[72px] py-2">
+        <!-- Avatar con iniciales -->
+        <div class="flex items-center justify-center rounded-full h-14 w-14 text-white font-bold text-lg {{ getRandomAvatarColor() }}">
+          {{ getMemberInitials(member.name) }}
+        </div>
+        
+        <div class="flex flex-col justify-center flex-1">
+          <p class="text-[#0e141b] text-base font-medium leading-normal line-clamp-1">{{ member.name }}</p>
+          <p class="text-[#4e7097] text-sm font-normal leading-normal line-clamp-2">Familia</p>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="flex gap-2">
+          <button 
+            (click)="startEditing(member)"
+            class="p-2 text-[#4e7097] hover:text-[#0e141b] transition-colors"
+          >
+            <fa-icon [icon]="faEdit"></fa-icon>
+          </button>
+          <button 
+            (click)="deleteMember(member.id!)"
+            class="p-2 text-[#4e7097] hover:text-red-500 transition-colors"
+          >
+            <fa-icon [icon]="faTrash"></fa-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- Estado vacío -->
+      <div *ngIf="members.length === 0" class="flex flex-col items-center justify-center py-12 px-4">
+        <div class="text-[#4e7097] text-6xl mb-4">👥</div>
+        <h3 class="text-[#0e141b] text-lg font-medium mb-2">No hay miembros</h3>
+        <p class="text-[#4e7097] text-sm text-center mb-6">Agrega miembros de tu familia para comenzar</p>
+        <button
+          (click)="showAddMemberForm()"
+          class="flex items-center justify-center gap-2 px-6 py-3 bg-[#1978e5] text-white rounded-lg font-medium hover:bg-[#1565c0] transition-colors"
+        >
+          <fa-icon [icon]="faPlus"></fa-icon>
+          Agregar miembro
+        </button>
+      </div>
+    </div>
+
+    <!-- Template de carga -->
+    <ng-template #loadingTemplate>
+      <div class="flex items-center justify-center py-12">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1978e5]"></div>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Footer con botón de agregar -->
+  <div>
+    <div class="flex justify-end overflow-hidden px-5 pb-20">
+      <button
+        (click)="showAddMemberForm()"
+        class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-14 px-5 bg-[#1978e5] text-slate-50 text-base font-bold leading-normal tracking-[0.015em] min-w-0 gap-4 pl-4 pr-6"
+      >
+        <fa-icon [icon]="faPlus" class="text-slate-50"></fa-icon>
+        <span class="truncate">Agregar miembro</span>
+      </button>
+    </div>
+    <div class="h-5 bg-slate-50"></div>
+  </div>
+</div>
+
+<!-- Formulario de agregar/editar miembro -->
+<div *ngIf="showAddForm" class="relative flex size-full min-h-screen flex-col bg-slate-50 justify-between group/design-root overflow-x-hidden">
+  <div>
+    <!-- Header del formulario -->
+    <div class="flex items-center bg-slate-50 p-4 pb-2 justify-between">
+      <button
+        (click)="hideAddForm()"
+        class="flex cursor-pointer items-center justify-center rounded-full h-12 w-12 bg-red-500 text-white hover:bg-red-600 transition-colors"
+        title="Cerrar formulario"
+      >
+        <fa-icon [icon]="faX"></fa-icon>
+      </button>
+      <h2 class="text-[#0e141b] text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-12">
+        {{ editingMember ? 'Editar Miembro' : 'Agregar Miembro' }}
+      </h2>
+    </div>
+
+    <!-- Formulario -->
+    <form [formGroup]="memberForm" (ngSubmit)="onSubmit()" class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
+      <label class="flex flex-col min-w-40 flex-1">
+        <p class="text-[#0e141b] text-base font-medium leading-normal pb-2">Nombre</p>
+        <input
+          formControlName="name"
+          placeholder="Nombre del miembro"
+          class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#0e141b] focus:outline-0 focus:ring-0 border-none bg-[#e7edf3] focus:border-none h-14 placeholder:text-[#4e7097] p-4 text-base font-normal leading-normal"
+        />
+        <div *ngIf="memberForm.get('name')?.invalid && memberForm.get('name')?.touched" class="text-red-500 text-sm mt-1">
+          <span *ngIf="memberForm.get('name')?.errors?.['required']">El nombre es requerido</span>
+          <span *ngIf="memberForm.get('name')?.errors?.['minlength']">El nombre debe tener al menos 2 caracteres</span>
+        </div>
+      </label>
+    </form>
+  </div>
+
+  <!-- Footer del formulario -->
+  <div>
+    <div class="flex px-4 py-3">
+      <button
+        type="submit"
+        [disabled]="memberForm.invalid"
+        (click)="onSubmit()"
+        class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 flex-1 bg-[#1978e5] text-slate-50 text-base font-bold leading-normal tracking-[0.015em] disabled:bg-gray-400 disabled:cursor-not-allowed"
+      >
+        <span class="truncate">{{ editingMember ? 'Actualizar Miembro' : 'Agregar Miembro' }}</span>
+      </button>
+    </div>
+    <div class="h-5 bg-slate-50"></div>
+  </div>
+</div> 

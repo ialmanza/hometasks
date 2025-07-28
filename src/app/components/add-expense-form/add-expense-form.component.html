@@ -1,0 +1,169 @@
+<app-app-navigation></app-app-navigation>
+
+<div class="relative flex size-full min-h-screen flex-col bg-slate-50 justify-between group/design-root overflow-x-hidden">
+  <div>
+    <!-- Header -->
+    <div class="flex items-center bg-slate-50 p-4 pb-2 justify-between">
+      <button
+        (click)="goBack()"
+        class="flex cursor-pointer items-center justify-center rounded-full h-12 w-12 bg-red-500 text-white hover:bg-red-600 transition-colors"
+        title="Cerrar formulario"
+      >
+        <fa-icon [icon]="faX"></fa-icon>
+      </button>
+      <h2 class="text-[#0e141b] text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-12">
+        {{ isEditing ? 'Editar Gasto' : 'Agregar Gasto' }}
+      </h2>
+    </div>
+
+    <!-- Loading indicator -->
+    <div *ngIf="loading" class="flex justify-center items-center py-8">
+      <div class="text-[#0e141b] text-base">Cargando...</div>
+    </div>
+
+    <!-- Formulario -->
+    <form *ngIf="!loading" [formGroup]="expenseForm" (ngSubmit)="onSubmit()" class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
+      <!-- Título -->
+      <label class="flex flex-col min-w-40 flex-1">
+        <p class="text-[#0e141b] text-base font-medium leading-normal pb-2">Título</p>
+        <input
+          formControlName="title"
+          placeholder="Título del gasto"
+          class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#0e141b] focus:outline-0 focus:ring-0 border-none bg-[#e7edf3] focus:border-none h-14 placeholder:text-[#4e7097] p-4 text-base font-normal leading-normal"
+        />
+        <div *ngIf="getErrorMessage('title')" class="error-message">
+          {{ getErrorMessage('title') }}
+        </div>
+      </label>
+    </form>
+
+    <form *ngIf="!loading" [formGroup]="expenseForm" (ngSubmit)="onSubmit()" class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
+      <!-- Ícono -->
+      <label class="flex flex-col min-w-40 flex-1">
+        <p class="text-[#0e141b] text-base font-medium leading-normal pb-2">Ícono</p>
+        <div class="relative icon-selector-container">
+          <button
+            type="button"
+            (click)="toggleIconSelector()"
+            class="flex w-full items-center justify-between rounded-lg bg-[#e7edf3] h-14 px-4 text-base font-normal leading-normal text-[#0e141b] hover:bg-[#d1d9e3] transition-colors"
+          >
+            <span class="text-2xl">{{ selectedIcon }}</span>
+            <fa-icon [icon]="faSmile" class="text-[#4e7097]"></fa-icon>
+          </button>
+          
+          <!-- Selector de íconos -->
+          <div *ngIf="showIconSelector" class="absolute top-full left-0 right-0 z-50 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 max-h-80 overflow-y-auto icon-selector">
+            <div class="p-4">
+              <div *ngFor="let category of getUniqueCategories()" class="mb-4">
+                <h4 class="text-sm font-semibold text-[#0e141b] mb-2">{{ category }}</h4>
+                <div class="grid grid-cols-8 gap-2">
+                  <button
+                    *ngFor="let icon of getIconsByCategory(category)"
+                    type="button"
+                    (click)="selectIcon(icon)"
+                    class="icon-button flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-100 transition-colors text-xl"
+                    [title]="icon.name"
+                  >
+                    {{ icon.emoji }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <input type="hidden" formControlName="icon" />
+      </label>
+    </form>
+
+    <form *ngIf="!loading" [formGroup]="expenseForm" (ngSubmit)="onSubmit()" class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
+      <!-- Descripción -->
+      <label class="flex flex-col min-w-40 flex-1">
+        <p class="text-[#0e141b] text-base font-medium leading-normal pb-2">Descripción</p>
+        <textarea
+          formControlName="description"
+          placeholder="Descripción del gasto"
+          class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#0e141b] focus:outline-0 focus:ring-0 border-none bg-[#e7edf3] focus:border-none min-h-36 placeholder:text-[#4e7097] p-4 text-base font-normal leading-normal"
+        ></textarea>
+        <div *ngIf="getErrorMessage('description')" class="error-message">
+          {{ getErrorMessage('description') }}
+        </div>
+      </label>
+    </form>
+
+    <form *ngIf="!loading" [formGroup]="expenseForm" (ngSubmit)="onSubmit()" class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
+      <!-- Monto -->
+      <label class="flex flex-col min-w-40 flex-1">
+        <p class="text-[#0e141b] text-base font-medium leading-normal pb-2">Monto</p>
+        <input
+          formControlName="amount"
+          (input)="formatAmount($event)"
+          placeholder="$0"
+          class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#0e141b] focus:outline-0 focus:ring-0 border-none bg-[#e7edf3] focus:border-none h-14 placeholder:text-[#4e7097] p-4 text-base font-normal leading-normal"
+        />
+        <div *ngIf="getErrorMessage('amount')" class="error-message">
+          {{ getErrorMessage('amount') }}
+        </div>
+      </label>
+    </form>
+
+    <form *ngIf="!loading" [formGroup]="expenseForm" (ngSubmit)="onSubmit()" class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
+      <!-- Fecha de vencimiento -->
+      <label class="flex flex-col min-w-40 flex-1">
+        <p class="text-[#0e141b] text-base font-medium leading-normal pb-2">Fecha de Vencimiento</p>
+        <div class="flex w-full flex-1 items-stretch rounded-lg">
+          <input
+            formControlName="due_date"
+            type="date"
+            placeholder="Seleccionar fecha"
+            class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#0e141b] focus:outline-0 focus:ring-0 border-none bg-[#e7edf3] focus:border-none h-14 placeholder:text-[#4e7097] p-4 rounded-r-none border-r-0 pr-2 text-base font-normal leading-normal"
+          />
+          <div class="text-[#4e7097] flex border-none bg-[#e7edf3] items-center justify-center pr-4 rounded-r-lg border-l-0">
+            <fa-icon [icon]="faCalendar"></fa-icon>
+          </div>
+        </div>
+        <div *ngIf="getErrorMessage('due_date')" class="error-message">
+          {{ getErrorMessage('due_date') }}
+        </div>
+      </label>
+    </form>
+
+    <form *ngIf="!loading" [formGroup]="expenseForm" (ngSubmit)="onSubmit()" class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
+      <!-- Miembro responsable -->
+      <label class="flex flex-col min-w-40 flex-1">
+        <p class="text-[#0e141b] text-base font-medium leading-normal pb-2">Miembro Responsable</p>
+        <select
+          formControlName="responsible_member_id"
+          class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#0e141b] focus:outline-0 focus:ring-0 border-none bg-[#e7edf3] focus:border-none h-14 placeholder:text-[#4e7097] p-4 text-base font-normal leading-normal"
+        >
+          <option value="">Seleccionar miembro</option>
+          <option *ngFor="let member of members" [value]="member.id">
+            {{ member.name }}
+          </option>
+        </select>
+        <div *ngIf="getErrorMessage('responsible_member_id')" class="error-message">
+          {{ getErrorMessage('responsible_member_id') }}
+        </div>
+      </label>
+    </form>
+  </div>
+
+  <!-- Footer con botón de guardar -->
+  <div *ngIf="!loading">
+    <div class="flex px-4 py-3 pb-20">
+      <button
+        type="submit"
+        [disabled]="expenseForm.invalid || submitting"
+        (click)="onSubmit()"
+        class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 flex-1 bg-[#1978e5] text-slate-50 text-base font-bold leading-normal tracking-[0.015em] disabled:bg-gray-400 disabled:cursor-not-allowed"
+      >
+        <span *ngIf="!submitting" class="truncate">
+          {{ isEditing ? 'Actualizar Gasto' : 'Agregar Gasto' }}
+        </span>
+        <span *ngIf="submitting" class="truncate">
+          {{ isEditing ? 'Actualizando...' : 'Agregando...' }}
+        </span>
+      </button>
+    </div>
+    <div class="h-5 bg-slate-50"></div>
+  </div>
+</div> 

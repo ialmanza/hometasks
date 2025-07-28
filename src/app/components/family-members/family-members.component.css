@@ -1,0 +1,96 @@
+/* Estilos específicos para el componente de miembros de familia */
+
+/* Animaciones de transición */
+.group\/design-root {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Estilos para los avatares */
+.avatar-initials {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  transition: transform 0.2s ease;
+}
+
+.avatar-initials:hover {
+  transform: scale(1.05);
+}
+
+/* Estilos para los botones de acción */
+.action-button {
+  transition: all 0.2s ease;
+}
+
+.action-button:hover {
+  transform: translateY(-1px);
+}
+
+/* Estilos para el formulario */
+.form-input:focus {
+  box-shadow: 0 0 0 2px rgba(25, 120, 229, 0.2);
+}
+
+/* Animación de carga */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Estados de hover para botones */
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Estilos para el estado vacío */
+.empty-state {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border-radius: 12px;
+  padding: 2rem;
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .min-h-\[72px\] {
+    min-height: 64px;
+  }
+  
+  .h-14 {
+    height: 3rem;
+  }
+  
+  .w-14 {
+    width: 3rem;
+  }
+}
+
+/* Estilos para validación de formularios */
+.error-message {
+  color: #ef4444;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Estilos para botones deshabilitados */
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+} 

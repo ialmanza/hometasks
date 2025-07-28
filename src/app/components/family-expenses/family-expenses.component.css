@@ -1,0 +1,227 @@
+/* Estilos específicos para el componente de gastos familiares */
+
+/* Animaciones de transición */
+.group\/design-root {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Estilos para los filtros */
+.filter-button {
+  transition: all 0.2s ease;
+}
+
+.filter-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para los iconos de gastos */
+.expense-icon {
+  transition: transform 0.2s ease;
+}
+
+.expense-icon:hover {
+  transform: scale(1.1);
+}
+
+/* Estilos para los botones de acción */
+.action-button {
+  transition: all 0.2s ease;
+}
+
+.action-button:hover {
+  transform: translateY(-1px);
+}
+
+/* Estilos para el estado de pago */
+.status-paid {
+  color: #059669;
+  font-weight: 500;
+}
+
+.status-unpaid {
+  color: #ea580c;
+  font-weight: 500;
+}
+
+/* Animación de carga */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Estados de hover para botones */
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Estilos para el estado vacío */
+.empty-state {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border-radius: 12px;
+  padding: 2rem;
+}
+
+/* Estilos para las tarjetas de gastos */
+.expense-card {
+  transition: all 0.2s ease;
+  border-radius: 8px;
+}
+
+.expense-card:hover {
+  background-color: #f1f5f9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Estilos para el texto truncado */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .min-h-\[72px\] {
+    min-height: 64px;
+  }
+  
+  .size-12 {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+  
+  .text-2xl {
+    font-size: 1.25rem;
+  }
+  
+  .gap-3 {
+    gap: 0.5rem;
+  }
+  
+  .px-4 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Estilos para los iconos de estado */
+.status-icon {
+  transition: all 0.2s ease;
+}
+
+.status-icon:hover {
+  transform: scale(1.1);
+}
+
+/* Estilos para el botón de toggle */
+.toggle-button {
+  transition: all 0.2s ease;
+  border-radius: 50%;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toggle-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Estilos para el filtro activo */
+.filter-active {
+  background-color: #1978e5;
+  color: white;
+  box-shadow: 0 2px 8px rgba(25, 120, 229, 0.3);
+}
+
+/* Animación para nuevos gastos */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.expense-item {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Estilos para el scroll horizontal en filtros */
+.overflow-x-hidden {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.overflow-x-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+/* Estilos para el botón de agregar en el footer */
+.footer-button {
+  transition: all 0.2s ease;
+}
+
+.footer-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(25, 120, 229, 0.3);
+}
+
+/* Estilos para el estado de carga */
+.loading-state {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Estilos para los tooltips */
+[title] {
+  position: relative;
+}
+
+[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #1f2937;
+  color: white;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  z-index: 10;
+  margin-bottom: 0.5rem;
+}
+
+[title]:hover::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 0.25rem solid transparent;
+  border-top-color: #1f2937;
+  z-index: 10;
+  margin-bottom: 0.25rem;
+} 

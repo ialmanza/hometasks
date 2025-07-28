@@ -1,4 +1,5 @@
 <nav class="app-navigation">
+  <!-- DESKTOP NAVIGATION -->
   <div class="nav-desktop">
     <div class="logo">
       <img src="sin_fondo.png" alt="Family Planner Logo">
@@ -7,63 +8,108 @@
     <ul class="nav-links">
       <li>
         <a routerLink="/inicio" routerLinkActive="active">
-          <i class="icon-tasks"></i>
+          <fa-icon [icon]="faHome"></fa-icon>
           Inicio
         </a>
       </li>
       <li>
         <a routerLink="/tasks" routerLinkActive="active">
-          <i class="icon-tasks"></i>
+          <fa-icon [icon]="faTasks"></fa-icon>
           Tareas
         </a>
       </li>
       <li>
-        <a routerLink="/weekly-planner" routerLinkActive="active">
-          <i class="icon-calendar"></i>
-          Planificador Semanal
+        <a routerLink="/shopping-list" routerLinkActive="active">
+          <fa-icon [icon]="faShoppingCart"></fa-icon>
+          Compras
         </a>
       </li>
-      <!-- <li>
-        <a routerLink="/meals" routerLinkActive="active">
-          <i class="icon-meals"></i>
-          Comidas
+      <li>
+        <a routerLink="/expenses" routerLinkActive="active">
+          <fa-icon [icon]="faDollarSign"></fa-icon>
+          Gastos
         </a>
-      </li>-->
+      </li>
+      <li>
+        <a routerLink="/members" routerLinkActive="active">
+          <fa-icon [icon]="faUsers"></fa-icon>
+          Miembros
+        </a>
+      </li>
       <li>
         <a routerLink="/activities" routerLinkActive="active">
-          <i class="icon-family"></i>
+          <fa-icon [icon]="faCalendar"></fa-icon>
           Actividades
         </a>
       </li>
       <li>
-        <a routerLink="/shopping-list" routerLinkActive="active">
-          <i class="icon-family"></i>
-          <span>Shooping</span>
+        <a routerLink="/weekly-planner" routerLinkActive="active">
+          <fa-icon [icon]="faUtensils"></fa-icon>
+          Comidas
         </a>
       </li>
     </ul>
   </div>
 
- <!-- VERSION MOVIL -->
- <div class="nav-mobile">
-  <a routerLink="/tasks" routerLinkActive="active">
-    <i class="icon-tasks"></i>
-    <span>Tareas</span>
-  </a>
-  <a routerLink="/activities" routerLinkActive="active">
-    <i class="icon-tasks"></i>
-    <span>Actividades</span>
-  </a>
-  <div class="mobile-logo">
-    <img src="sin_fondo.png" alt="Family Planner Logo"  routerLink="/inicio" routerLinkActive="active">
+  <!-- MOBILE NAVIGATION -->
+  <div class="nav-mobile">
+    <!-- Home -->
+    <a routerLink="/inicio" routerLinkActive="active" (click)="closeMoreMenu()">
+      <fa-icon [icon]="faHome"></fa-icon>
+      <span>Inicio</span>
+    </a>
+
+    <!-- Tareas -->
+    <a routerLink="/tasks" routerLinkActive="active" (click)="closeMoreMenu()">
+      <fa-icon [icon]="faTasks"></fa-icon>
+      <span>Tareas</span>
+    </a>
+
+    <!-- Compras -->
+    <a routerLink="/shopping-list" routerLinkActive="active" (click)="closeMoreMenu()">
+      <fa-icon [icon]="faShoppingCart"></fa-icon>
+      <span>Compras</span>
+    </a>
+
+    <!-- Gastos -->
+    <a routerLink="/expenses" routerLinkActive="active" (click)="closeMoreMenu()">
+      <fa-icon [icon]="faDollarSign"></fa-icon>
+      <span>Gastos</span>
+    </a>
+
+    <!-- Menú Más -->
+    <button class="more-menu-btn" (click)="toggleMoreMenu()" [class.active]="showMoreMenu">
+      <fa-icon [icon]="faEllipsisV"></fa-icon>
+      <span>Más</span>
+    </button>
   </div>
-  <a routerLink="/weekly-planner" routerLinkActive="active">
-    <i class="icon-calendar"></i>
-    <span>Comidas</span>
-  </a>
-  <a routerLink="/shopping-list" routerLinkActive="active">
-    <i class="icon-family"></i>
-    <span>Compras</span>
-  </a>
-</div>
+
+  <!-- MODAL MENÚ MÁS -->
+  <div *ngIf="showMoreMenu" class="more-menu-overlay" (click)="closeMoreMenu()">
+    <div class="more-menu-content" (click)="$event.stopPropagation()">
+      <div class="more-menu-header">
+        <h3>Más opciones</h3>
+        <button class="close-btn" (click)="closeMoreMenu()">
+          <fa-icon [icon]="faEllipsisV"></fa-icon>
+        </button>
+      </div>
+      
+      <div class="more-menu-items">
+        <a routerLink="/members" routerLinkActive="active" (click)="closeMoreMenu()" class="more-menu-item">
+          <fa-icon [icon]="faUsers"></fa-icon>
+          <span>Miembros</span>
+        </a>
+        
+        <a routerLink="/activities" routerLinkActive="active" (click)="closeMoreMenu()" class="more-menu-item">
+          <fa-icon [icon]="faCalendar"></fa-icon>
+          <span>Actividades</span>
+        </a>
+        
+        <a routerLink="/weekly-planner" routerLinkActive="active" (click)="closeMoreMenu()" class="more-menu-item">
+          <fa-icon [icon]="faUtensils"></fa-icon>
+          <span>Comidas</span>
+        </a>
+      </div>
+    </div>
+  </div>
 </nav>
