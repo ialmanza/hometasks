@@ -2,7 +2,7 @@
 
 ## 📋 Descripción General
 
-**Family Planner** es una aplicación web progresiva (PWA) desarrollada en Angular 19 que permite a las familias organizar y gestionar sus tareas diarias, actividades, comidas y listas de compras de manera eficiente. La aplicación está diseñada para ser responsive y funciona tanto en dispositivos móviles como de escritorio.
+**Family Planner** es una aplicación web progresiva (PWA) desarrollada en Angular 19 que permite a las familias organizar y gestionar sus tareas diarias, actividades, comidas, listas de compras y gastos familiares de manera eficiente. La aplicación está diseñada para ser responsive y funciona tanto en dispositivos móviles como de escritorio.
 
 ## 🎯 Propósito del Proyecto
 
@@ -10,6 +10,7 @@ El proyecto está pensado para:
 - **Organización familiar**: Centralizar todas las tareas y actividades de la familia
 - **Planificación semanal**: Gestionar comidas y actividades por día de la semana
 - **Lista de compras**: Mantener un control de los productos necesarios
+- **Gestión de gastos**: Controlar gastos familiares y miembros responsables
 - **Notificaciones**: Recordatorios automáticos para actividades programadas
 - **Colaboración**: Permitir que múltiples miembros de la familia accedan y actualicen la información
 
@@ -47,6 +48,8 @@ hometasks/
   - Logo y branding de "Family Planner"
   - Enlaces a todas las secciones principales
   - Indicador de página activa
+  - **Nuevo**: Navegación optimizada con acceso directo al dashboard de gastos
+  - **Nuevo**: Padding inferior mejorado para mejor legibilidad en móvil
 
 ### 2. **InicioComponent** (`inicio/`)
 - **Propósito**: Dashboard principal con vista general
@@ -57,6 +60,7 @@ hometasks/
   - Vista previa de comidas del día
   - Vista previa de lista de compras
   - Estados vacíos para cada sección
+  - **Nuevo**: Espaciado optimizado para móvil y tablet
 
 ### 3. **HomeTasksComponent** (`home-tasks/`)
 - **Propósito**: Gestión de tareas generales
@@ -67,6 +71,7 @@ hometasks/
   - Formularios reactivos con validación
   - Integración con notificaciones push
   - Sonido de notificación al crear tareas
+  - **Nuevo**: Espaciado optimizado para móvil y tablet
 
 ### 4. **DailyActivitiesListComponent** (`daily-activities-list/`)
 - **Propósito**: Gestión de actividades diarias por día de la semana
@@ -76,6 +81,7 @@ hometasks/
   - Programación de notificaciones automáticas
   - Validación de formularios
   - Iconos de FontAwesome para acciones
+  - **Nuevo**: Espaciado optimizado para móvil y tablet
 
 ### 5. **WeeklyPlannerComponent** (`weekly-planner/`)
 - **Propósito**: Planificador semanal integrado
@@ -85,6 +91,7 @@ hometasks/
   - Gestión de actividades por día
   - Formularios separados para comidas y actividades
   - Edición inline de elementos
+  - **Nuevo**: Espaciado optimizado para móvil y tablet
 
 ### 6. **MealsComponent** (`meals/`)
 - **Propósito**: Gestión específica de comidas
@@ -93,6 +100,7 @@ hometasks/
   - Tipos de comida: Desayuno, Almuerzo, Cena
   - Validación de formularios
   - Confirmación antes de eliminar
+  - **Nuevo**: Espaciado optimizado para móvil y tablet
 
 ### 7. **ShoppingListComponent** (`shopping-list/`)
 - **Propósito**: Lista de compras familiar
@@ -103,6 +111,50 @@ hometasks/
   - Productos de acceso rápido
   - Gestión de cantidades y unidades
   - Valores por defecto inteligentes
+  - **Nuevo**: Espaciado optimizado para móvil y tablet
+
+### 8. **FamilyMembersComponent** (`family-members/`)
+- **Propósito**: Gestión de miembros de la familia
+- **Funcionalidades**:
+  - CRUD completo de miembros familiares
+  - Avatares generados automáticamente con iniciales
+  - Formularios reactivos con validación
+  - Estados de carga y vacío
+  - Diseño responsive
+  - **Nuevo**: Espaciado optimizado para móvil y tablet
+
+### 9. **AddExpenseFormComponent** (`add-expense-form/`)
+- **Propósito**: Formulario para agregar gastos familiares
+- **Funcionalidades**:
+  - Formulario completo con validaciones
+  - Integración con miembros de familia
+  - Formateo automático de montos
+  - Estados de carga y envío
+  - Navegación integrada
+  - **Nuevo**: Espaciado optimizado para móvil y tablet
+
+### 10. **FamilyExpensesComponent** (`family-expenses/`)
+- **Propósito**: Lista y gestión de gastos familiares
+- **Funcionalidades**:
+  - Lista completa de gastos con filtros
+  - Filtros dinámicos: All, Unpaid, Paid
+  - Toggle de estado pagado/pendiente
+  - CRUD completo de gastos
+  - Iconos automáticos basados en título
+  - Estados vacíos contextuales
+  - **Nuevo**: Espaciado optimizado para móvil y tablet
+
+### 11. **FamilyExpensesDashboardComponent** (`family-expenses-dashboard/`)
+- **Propósito**: Dashboard de estadísticas de gastos
+- **Funcionalidades**:
+  - Estadísticas completas de gastos
+  - Selector de rango (semana/mes)
+  - Tarjetas de métricas principales
+  - Resumen por miembro
+  - Próximos vencimientos
+  - **Nuevo**: Estado vacío con botón de acción
+  - **Nuevo**: Botón "Agregar Primer Gasto" en estado vacío
+  - **Nuevo**: Espaciado optimizado para móvil y tablet
 
 ## 📊 Modelos de Datos
 
@@ -148,6 +200,45 @@ interface Task {
   description: string;
   completed: boolean;
   created_at?: Date;
+}
+```
+
+### 5. **FamilyMember** (`models/family-member.model.ts`)
+```typescript
+interface FamilyMember {
+  id?: string;
+  name: string;
+  email?: string;
+  role?: string;
+  created_at?: string;
+}
+```
+
+### 6. **FamilyExpense** (`models/family-expense.model.ts`)
+```typescript
+interface FamilyExpense {
+  id?: string;
+  title: string;
+  description?: string;
+  amount: number;
+  responsible_member_id?: string;
+  due_date?: string;
+  is_paid: boolean;
+  icon?: string;
+  created_at?: string;
+}
+```
+
+### 7. **ExpenseStats** (definido en `expenses.service.ts`)
+```typescript
+interface ExpenseStats {
+  totalSpent: number;
+  totalPending: number;
+  totalExpenses: number;
+  topSpender: { name: string; amount: number } | null;
+  dailyTotals: { date: string; amount: number }[];
+  memberTotals: { name: string; amount: number }[];
+  upcomingExpenses: FamilyExpense[];
 }
 ```
 
@@ -227,6 +318,25 @@ interface Task {
   - Creación de nuevas suscripciones
   - Integración con VAPID keys
 
+### 8. **MembersService** (`services/members.service.ts`)
+- **Responsabilidad**: Gestión de miembros de familia
+- **Métodos principales**:
+  - `getAllMembers()`: Obtener todos los miembros
+  - `addMember()`: Crear nuevo miembro
+  - `updateMember()`: Actualizar miembro existente
+  - `deleteMember()`: Eliminar miembro
+
+### 9. **ExpensesService** (`services/expenses.service.ts`)
+- **Responsabilidad**: Gestión completa de gastos familiares
+- **Métodos principales**:
+  - `getAllExpenses()`: Obtener todos los gastos
+  - `getUnpaidExpenses()`: Obtener gastos pendientes
+  - `getExpenseStats()`: Obtener estadísticas completas
+  - `addExpense()`: Crear nuevo gasto
+  - `updateExpense()`: Actualizar gasto existente
+  - `deleteExpense()`: Eliminar gasto
+  - `togglePaidStatus()`: Cambiar estado de pago
+
 ## 🗄️ Base de Datos (Supabase)
 
 ### Tablas Principales:
@@ -239,6 +349,8 @@ interface Task {
 7. **`daily_activities`**: Actividades del planificador
 8. **`push_subscriptions`**: Suscripciones push
 9. **`activity_notifications`**: Historial de notificaciones
+10. **`family_members`**: Miembros de la familia
+11. **`family_expenses`**: Gastos familiares
 
 ## 🎨 Estilos y UI
 
@@ -253,6 +365,8 @@ interface Task {
 - **Iconografía**: FontAwesome para iconos
 - **Estados vacíos**: Mensajes informativos cuando no hay datos
 - **Formularios**: Validación reactiva con Angular Forms
+- **Nuevo**: Espaciado optimizado para móvil y tablet
+- **Nuevo**: Estados vacíos con botones de acción
 
 ## 🔔 Sistema de Notificaciones
 
@@ -300,6 +414,14 @@ interface Task {
 - Estadísticas rápidas
 - Acceso directo a funcionalidades
 - Estados vacíos informativos
+
+### 6. **Gestión Familiar** (Nuevo)
+- **Miembros de Familia**: CRUD completo de miembros
+- **Gastos Familiares**: Gestión completa de gastos
+- **Dashboard de Gastos**: Estadísticas y métricas
+- **Formularios Integrados**: Agregar gastos con miembros
+- **Filtros Inteligentes**: Por estado de pago
+- **Estados Vacíos**: Con botones de acción directa
 
 ## 🔧 Configuración del Proyecto
 
@@ -354,6 +476,11 @@ Formulario → ShoppingListService → Supabase → UI Update (Observable)
 Evento → NotificationService → Service Worker → Push Notification → UI Update
 ```
 
+### 5. **Gestión Familiar** (Nuevo):
+```
+Formulario → MembersService/ExpensesService → Supabase → UI Update (Observable)
+```
+
 ## 🛠️ Comandos de Desarrollo
 
 ```bash
@@ -372,16 +499,6 @@ npm test
 # Construir en modo watch
 npm run watch
 ```
-
-## 📋 Próximas Mejoras Sugeridas
-
-### Funcionalidades:
-1. **Autenticación de usuarios**: Sistema de login/logout
-2. **Compartir listas**: Compartir listas entre familiares
-3. **Recordatorios avanzados**: Notificaciones más sofisticadas
-4. **Estadísticas**: Dashboard con métricas de uso
-5. **Templates**: Plantillas predefinidas para actividades
-6. **Gestión de gastos familiares**: Sistema completo de gastos y miembros
 
 ## 🚀 **Nuevas Funcionalidades Implementadas**
 
@@ -546,6 +663,81 @@ Home  Tareas Compras Gastos Más
 - **Navegación fluida**: Transiciones entre secciones
 - **Estados activos**: Indicador visual de página actual
 - **Cierre automático**: Menú modal se cierra al navegar
+
+### **Sistema de Gestión Familiar (Fase 6 - Completada)**
+
+#### **Componente FamilyExpensesDashboardComponent:**
+- **Ubicación**: `components/family-expenses-dashboard/`
+- **Funcionalidades**:
+  - Dashboard completo de estadísticas de gastos
+  - Selector de rango temporal (semana/mes)
+  - Tarjetas de métricas principales:
+    - Total gastado
+    - Pendiente de pago
+    - Total de gastos
+    - Gastador principal
+  - Resumen de gastos por miembro
+  - Lista de próximos vencimientos
+  - Estados de carga y error
+  - **Nuevo**: Estado vacío con mensaje informativo
+  - **Nuevo**: Botón "Agregar Primer Gasto" en estado vacío
+
+#### **Características del Dashboard:**
+- **Estadísticas en tiempo real**: Cálculo automático de métricas
+- **Filtros temporales**: Vista por semana o mes
+- **Métricas visuales**: Tarjetas con iconos y colores
+- **Resumen por miembro**: Desglose de gastos por persona
+- **Vencimientos próximos**: Lista de gastos pendientes
+- **Estados vacíos inteligentes**: Mensajes contextuales según el rango
+- **Botón de acción**: Acceso directo para agregar gastos
+- **Responsive design**: Adaptado para móvil y desktop
+
+#### **Integración Completa:**
+- **`ExpensesService`**: Para obtener estadísticas y datos
+- **`MembersService`**: Para mostrar nombres de miembros
+- **Navegación**: Integración con formulario de agregar gastos
+- **Estados reactivos**: Actualización automática de métricas
+
+#### **Rutas Agregadas:**
+- **`/expenses-dashboard`**: Acceso al dashboard de gastos
+
+### **Optimizaciones de UX/UI (Fase 7 - Completada)**
+
+#### **Espaciado Optimizado:**
+- **Navegación móvil**: Padding inferior aumentado para mejor legibilidad
+- **Componentes**: Espaciado reducido en móvil y tablet
+- **Estilos globales**: Ajustes responsivos en `styles.css`
+- **Consistencia**: Mismo patrón de espaciado en todos los componentes
+
+#### **Estados Vacíos Mejorados:**
+- **Dashboard de gastos**: Estado vacío con botón de acción
+- **Mensajes contextuales**: Diferentes según el rango temporal
+- **Call-to-action**: Botones prominentes para agregar contenido
+- **Animaciones**: Transiciones suaves y efectos hover
+
+#### **Navegación Optimizada:**
+- **Acceso directo**: Icono de gastos lleva al dashboard
+- **Menú modal**: Funcionalidades secundarias organizadas
+- **Estados activos**: Indicadores visuales mejorados
+- **Responsive**: Adaptación perfecta móvil/desktop
+
+#### **Características Técnicas:**
+- **CSS optimizado**: Estilos específicos para móvil y tablet
+- **Animaciones**: Efectos suaves y transiciones
+- **Estados reactivos**: Actualización automática de UI
+- **Accesibilidad**: Navegación por teclado y focus visible
+
+## 📋 Próximas Mejoras Sugeridas
+
+### Funcionalidades:
+1. **Autenticación de usuarios**: Sistema de login/logout
+2. **Compartir listas**: Compartir listas entre familiares
+3. **Recordatorios avanzados**: Notificaciones más sofisticadas
+4. **Estadísticas avanzadas**: Dashboard con métricas más detalladas
+5. **Templates**: Plantillas predefinidas para actividades
+6. **Exportación de datos**: Exportar reportes en PDF/Excel
+7. **Sincronización offline**: Mejor manejo de datos offline
+8. **Notificaciones push avanzadas**: Programación automática de recordatorios
 
 ### Técnicas:
 1. **Testing**: Aumentar cobertura de tests
