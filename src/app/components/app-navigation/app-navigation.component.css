@@ -67,7 +67,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 8px 10px; /* Reducir padding */
+  padding: 8px 10px 12px 10px !important; /* Aumentar padding inferior de 8px a 12px */
   height: 60px; /* Altura fija más compacta */
 }
 

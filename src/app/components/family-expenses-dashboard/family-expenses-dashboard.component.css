@@ -65,6 +65,19 @@ canvas {
   color: #6b7280;
 }
 
+/* Estilos para el estado vacío */
+.empty-state-container {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.empty-state-icon {
+  transition: all 0.3s ease;
+}
+
+.empty-state-container:hover .empty-state-icon {
+  transform: scale(1.05);
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .grid-cols-2 {
@@ -87,6 +100,19 @@ canvas {
   /* Mejorar espaciado en móviles */
   .space-y-4 > * + * {
     margin-top: 1rem;
+  }
+  
+  /* Ajustes para el estado vacío en móvil */
+  .empty-state-container {
+    padding: 1.5rem !important;
+  }
+  
+  .empty-state-container h3 {
+    font-size: 1.1rem !important;
+  }
+  
+  .empty-state-container p {
+    font-size: 0.9rem !important;
   }
 }
 

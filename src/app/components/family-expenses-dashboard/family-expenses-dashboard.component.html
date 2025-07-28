@@ -47,8 +47,28 @@
       </div>
     </div>
 
+    <!-- Empty State - No hay gastos -->
+    <div *ngIf="!loading && !error && stats && stats.totalExpenses === 0" class="p-4">
+      <div class="bg-white rounded-xl p-8 shadow-sm text-center empty-state-container">
+        <div class="flex justify-center mb-4">
+          <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center empty-state-icon">
+            <fa-icon [icon]="faReceipt" class="text-gray-400 text-2xl"></fa-icon>
+          </div>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">
+          No hay gastos registrados {{ selectedRange === 'week' ? 'esta semana' : 'este mes' }}
+        </h3>
+        <p class="text-gray-600 mb-4">
+          {{ selectedRange === 'week' ? 'No se han registrado gastos en los últimos 7 días.' : 'No se han registrado gastos en el mes actual.' }}
+        </p>
+        <div class="text-sm text-gray-500">
+          <p>Cuando agregues gastos, aparecerán aquí las estadísticas y resúmenes.</p>
+        </div>
+      </div>
+    </div>
+
     <!-- Dashboard Content -->
-    <div *ngIf="!loading && !error && stats" class="space-y-4">
+    <div *ngIf="!loading && !error && stats && stats.totalExpenses > 0" class="space-y-4">
       <!-- Stats Cards -->
       <div class="p-4">
         <div class="grid grid-cols-2 gap-4">
