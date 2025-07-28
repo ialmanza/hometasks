@@ -2,11 +2,11 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { 
-  faArrowLeft, 
-  faDollarSign, 
-  faClock, 
-  faReceipt, 
+import {
+  faArrowLeft,
+  faDollarSign,
+  faClock,
+  faReceipt,
   faUser,
   faCalendar,
   faExclamationTriangle,
@@ -17,11 +17,13 @@ import {
   faWifi,
   faBolt,
   faWater,
-  faPhone
+  faPhone,
+  faPlus
 } from '@fortawesome/free-solid-svg-icons';
 import { Observable, Subscription } from 'rxjs';
 import { ExpensesService, ExpenseStats } from '../../services/expenses.service';
 import { Location } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-family-expenses-dashboard',
@@ -39,6 +41,7 @@ export class FamilyExpensesDashboardComponent implements OnInit, OnDestroy {
   faUser = faUser;
   faCalendar = faCalendar;
   faExclamationTriangle = faExclamationTriangle;
+  faPlus = faPlus;
 
   // Estado del componente
   selectedRange: 'week' | 'month' = 'month';
@@ -51,7 +54,8 @@ export class FamilyExpensesDashboardComponent implements OnInit, OnDestroy {
 
   constructor(
     private expensesService: ExpensesService,
-    private location: Location
+    private location: Location,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -68,6 +72,10 @@ export class FamilyExpensesDashboardComponent implements OnInit, OnDestroy {
 
   goBack(): void {
     this.location.back();
+  }
+
+  goToAddExpense(): void {
+    this.router.navigate(['/add-expense']);
   }
 
   getIcon(iconName: string): any {
@@ -88,9 +96,9 @@ export class FamilyExpensesDashboardComponent implements OnInit, OnDestroy {
   private loadStats(): void {
     this.loading = true;
     this.error = false;
-    
+
     this.stats$ = this.expensesService.getExpenseStats(this.selectedRange);
-    
+
     this.subscription.add(
       this.stats$.subscribe({
         next: (stats) => {
@@ -135,4 +143,4 @@ export class FamilyExpensesDashboardComponent implements OnInit, OnDestroy {
     if (daysUntilDue <= 3) return 'text-orange-500';
     return 'text-gray-500';
   }
-} 
+}

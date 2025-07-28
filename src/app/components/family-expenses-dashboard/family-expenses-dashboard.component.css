@@ -78,6 +78,21 @@ canvas {
   transform: scale(1.05);
 }
 
+/* Estilos para el botón de agregar gasto */
+.add-expense-btn {
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+.add-expense-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+}
+
+.add-expense-btn:active {
+  transform: translateY(0);
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .grid-cols-2 {
