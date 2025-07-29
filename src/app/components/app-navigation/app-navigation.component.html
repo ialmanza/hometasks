@@ -72,7 +72,7 @@
     </a>
 
     <!-- Gastos - Acceso directo al Dashboard -->
-    <a routerLink="/expenses-dashboard" routerLinkActive="active" (click)="closeMoreMenu()">
+    <a routerLink="/expenses" routerLinkActive="active" (click)="closeMoreMenu()">
       <fa-icon [icon]="faDollarSign"></fa-icon>
       <span>Gastos</span>
     </a>
@@ -93,26 +93,31 @@
           <fa-icon [icon]="faEllipsisV"></fa-icon>
         </button>
       </div>
-      
+
       <div class="more-menu-items">
         <!-- <a routerLink="/members" routerLinkActive="active" (click)="closeMoreMenu()" class="more-menu-item">
           <fa-icon [icon]="faUsers"></fa-icon>
           <span>Miembros</span>
         </a> -->
-        
+
         <a routerLink="/activities" routerLinkActive="active" (click)="closeMoreMenu()" class="more-menu-item">
           <fa-icon [icon]="faCalendar"></fa-icon>
           <span>Actividades</span>
         </a>
-        
+
         <a routerLink="/weekly-planner" routerLinkActive="active" (click)="closeMoreMenu()" class="more-menu-item">
           <fa-icon [icon]="faUtensils"></fa-icon>
           <span>Comidas</span>
         </a>
 
-        <a routerLink="/expenses" routerLinkActive="active" (click)="closeMoreMenu()" class="more-menu-item">
+        <a routerLink="/expenses-dashboard" routerLinkActive="active" (click)="closeMoreMenu()" class="more-menu-item">
           <fa-icon [icon]="faDollarSign"></fa-icon>
-          <span>Gastos Detallados</span>
+          <span>Dashboard</span>
+        </a>
+
+        <a routerLink="/monthly-transactions" routerLinkActive="active" (click)="closeMoreMenu()" class="more-menu-item">
+          <fa-icon [icon]="faDollarSign"></fa-icon>
+          <span>Transacciones</span>
         </a>
       </div>
     </div>

@@ -22,8 +22,8 @@ export const routes: Routes = [
   { path: 'members', component: FamilyMembersComponent },
   { path: 'add-expense', component: AddExpenseFormComponent },
   { path: 'edit-expense/:id', component: AddExpenseFormComponent },
-  { path: 'expenses', component: FamilyExpensesComponent },
+  { path: 'expenses', component: MonthlyTransactionsComponent},
   { path: 'expenses-dashboard', component: FamilyExpensesDashboardComponent },
-  { path: 'monthly-transactions', component: MonthlyTransactionsComponent },
+  { path: 'monthly-transactions', component:  FamilyExpensesComponent},
   { path: '**', redirectTo: '/inicio' }
 ];
