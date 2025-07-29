@@ -292,4 +292,43 @@ export class ExpensesService {
       })
     );
   }
+
+  // Obtener gastos por mes y año
+  getExpensesByMonth(month: number, year: number): Observable<FamilyExpense[]> {
+    // Asegurar que month sea un número
+    const monthNum = Number(month);
+    const yearNum = Number(year);
+    
+    // Calcular la fecha de inicio del mes
+    const startDate = `${yearNum}-${monthNum.toString().padStart(2, '0')}-01`;
+    
+    // Calcular la fecha de inicio del siguiente mes
+    let nextMonth = monthNum + 1;
+    let nextYear = yearNum;
+    
+    // Si estamos en diciembre, el siguiente mes es enero del año siguiente
+    if (nextMonth > 12) {
+      nextMonth = 1;
+      nextYear = yearNum + 1;
+    }
+    
+    const endDate = `${nextYear}-${nextMonth.toString().padStart(2, '0')}-01`;
+    
+    return from(
+      this.supabase
+        .from('family_expenses')
+        .select('*')
+        .not('due_date', 'is', null) // Solo gastos con due_date
+        .gte('due_date', startDate)
+        .lt('due_date', endDate)
+        .order('due_date', { ascending: true })
+    ).pipe(
+      map(response => {
+        if (response.error) {
+          throw response.error;
+        }
+        return response.data as FamilyExpense[];
+      })
+    );
+  }
 } 

@@ -8,6 +8,15 @@
       <h2 class="text-[#101418] text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-12">
         Dashboard de Gastos
       </h2>
+      <div class="flex items-center gap-2">
+        <button
+          routerLink="/monthly-transactions"
+          class="flex cursor-pointer items-center justify-center rounded-full h-10 w-10 bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+          title="Ver Transacciones Mensuales"
+        >
+          <fa-icon [icon]="faCalendar" class="text-sm"></fa-icon>
+        </button>
+      </div>
     </div>
 
     <!-- Range Selector -->
@@ -81,7 +90,11 @@
       <div class="p-4">
         <div class="grid grid-cols-2 gap-4">
           <!-- Total Spent -->
-          <div class="flex items-stretch justify-between gap-4 rounded-xl bg-white p-4 shadow-sm">
+          <div 
+            class="flex items-stretch justify-between gap-4 rounded-xl bg-white p-4 shadow-sm cursor-pointer hover:shadow-md transition-all duration-200 hover:scale-[1.02]"
+            (click)="goToMonthlyTransactions()"
+            title="Ver transacciones mensuales"
+          >
             <div class="flex flex-col gap-1 flex-[2_2_0px]">
               <p class="text-[#101418] text-base font-bold leading-tight">Total Gastado</p>
               <p class="text-[#5c718a] text-sm font-normal leading-normal">{{ formatCurrency(stats.totalSpent) }}</p>

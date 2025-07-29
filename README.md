@@ -156,6 +156,19 @@ hometasks/
   - **Nuevo**: Botón "Agregar Primer Gasto" en estado vacío
   - **Nuevo**: Espaciado optimizado para móvil y tablet
 
+### 12. **MonthlyTransactionsComponent** (`monthly-transactions/`)
+- **Propósito**: Vista detallada de transacciones por mes/año
+- **Funcionalidades**:
+  - Selector de mes y año personalizable
+  - Filtros dinámicos: Todos, Pagados, Pendientes
+  - Estadísticas mensuales: Total gastado y pendiente
+  - Lista de transacciones con iconos y estados
+  - Navegación integrada desde dashboard y lista de gastos
+  - Estados vacíos informativos por mes
+  - Filtrado por fecha de vencimiento (`due_date`)
+  - Formateo de moneda en pesos argentinos
+  - Responsive design optimizado para móvil
+
 ## 📊 Modelos de Datos
 
 ### 1. **DailyActivity** (`models/daily_activity.ts`)
@@ -332,6 +345,7 @@ interface ExpenseStats {
   - `getAllExpenses()`: Obtener todos los gastos
   - `getUnpaidExpenses()`: Obtener gastos pendientes
   - `getExpenseStats()`: Obtener estadísticas completas
+  - `getExpensesByMonth()`: Obtener gastos por mes/año específico
   - `addExpense()`: Crear nuevo gasto
   - `updateExpense()`: Actualizar gasto existente
   - `deleteExpense()`: Eliminar gasto
@@ -419,9 +433,11 @@ interface ExpenseStats {
 - **Miembros de Familia**: CRUD completo de miembros
 - **Gastos Familiares**: Gestión completa de gastos
 - **Dashboard de Gastos**: Estadísticas y métricas
+- **Transacciones Mensuales**: Vista detallada por mes/año
 - **Formularios Integrados**: Agregar gastos con miembros
-- **Filtros Inteligentes**: Por estado de pago
+- **Filtros Inteligentes**: Por estado de pago y período
 - **Estados Vacíos**: Con botones de acción directa
+- **Navegación Intuitiva**: Acceso rápido desde dashboard y lista de gastos
 
 ## 🔧 Configuración del Proyecto
 
@@ -700,6 +716,7 @@ Home  Tareas Compras Gastos Más
 
 #### **Rutas Agregadas:**
 - **`/expenses-dashboard`**: Acceso al dashboard de gastos
+- **`/monthly-transactions`**: Acceso a transacciones mensuales
 
 ### **Optimizaciones de UX/UI (Fase 7 - Completada)**
 
@@ -726,6 +743,48 @@ Home  Tareas Compras Gastos Más
 - **Animaciones**: Efectos suaves y transiciones
 - **Estados reactivos**: Actualización automática de UI
 - **Accesibilidad**: Navegación por teclado y focus visible
+
+### **Sistema de Transacciones Mensuales (Fase 8 - Completada)**
+
+#### **Componente MonthlyTransactionsComponent:**
+- **Ubicación**: `components/monthly-transactions/`
+- **Funcionalidades**:
+  - Selector de mes y año personalizable
+  - Filtros dinámicos: Todos, Pagados, Pendientes
+  - Estadísticas mensuales: Total gastado y pendiente
+  - Lista de transacciones con iconos y estados
+  - Navegación integrada desde dashboard y lista de gastos
+  - Estados vacíos informativos por mes
+  - Filtrado por fecha de vencimiento (`due_date`)
+  - Formateo de moneda en pesos argentinos
+  - Responsive design optimizado para móvil
+
+#### **Características del Componente:**
+- **Selector temporal**: Dropdowns para mes y año
+- **Filtros inteligentes**: Cambio en tiempo real de filtros
+- **Estadísticas precisas**: Total gastado solo incluye pagados
+- **Lista detallada**: Gastos con iconos, fechas, responsables y estados
+- **Estados vacíos contextuales**: Mensajes específicos por mes y filtro
+- **Navegación fluida**: Botón de regreso y enlaces desde otros componentes
+- **Formateo de moneda**: Formato argentino (ARS) con separadores de miles
+
+#### **Integración Completa:**
+- **`ExpensesService`**: Método `getExpensesByMonth()` para filtrado por fecha
+- **`MembersService`**: Para mostrar nombres de miembros responsables
+- **Navegación**: Enlaces desde dashboard y lista de gastos
+- **Rutas**: Nueva ruta `/monthly-transactions` configurada
+
+#### **Características Técnicas:**
+- **Filtrado por fecha**: Usa `due_date` para agrupar gastos mensuales
+- **Manejo de errores**: Estados vacíos cuando no hay gastos
+- **Conversión de tipos**: Manejo correcto de strings/numbers en selectores
+- **Responsive design**: Adaptado para móvil y desktop
+- **Animaciones**: Transiciones suaves y efectos hover
+
+#### **Navegación Integrada:**
+- **Dashboard de gastos**: Card "Total Gastado" clickeable
+- **Lista de gastos**: Botón de calendario en header
+- **Acceso directo**: Navegación rápida desde componentes principales
 
 ## 📋 Próximas Mejoras Sugeridas
 

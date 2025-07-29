@@ -14,7 +14,14 @@
         </button>
         <h2 class="text-[#0e141b] text-lg font-bold leading-tight tracking-[-0.015em]">Gastos</h2>
       </div>
-      <div class="flex w-12 items-center justify-end">
+      <div class="flex items-center gap-2">
+        <button
+          routerLink="/monthly-transactions"
+          class="flex cursor-pointer items-center justify-center rounded-full h-10 w-10 bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+          title="Ver Transacciones Mensuales"
+        >
+          <fa-icon [icon]="faCalendar" class="text-sm"></fa-icon>
+        </button>
         <button
           (click)="addNewExpense()"
           class="flex cursor-pointer items-center justify-center rounded-full h-12 w-12 bg-[#1978e5] text-white hover:bg-[#1565c0] transition-colors"

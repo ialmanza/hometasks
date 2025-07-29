@@ -78,6 +78,10 @@ export class FamilyExpensesDashboardComponent implements OnInit, OnDestroy {
     this.router.navigate(['/add-expense']);
   }
 
+  goToMonthlyTransactions(): void {
+    this.router.navigate(['/monthly-transactions']);
+  }
+
   getIcon(iconName: string): any {
     const iconMap: { [key: string]: any } = {
       'home': faHome,
