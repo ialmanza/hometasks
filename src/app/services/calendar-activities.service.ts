@@ -1,14 +1,76 @@
 import { Injectable } from '@angular/core';
 import { CalendarActivity, CalendarActivityWithMember } from '../models/calendar-activity';
 import { AuthService } from './auth.service';
+import { NotificationService } from './notifications.service';
+import { CalendarNotificationsService } from './calendar-notifications.service';
 import { supabase } from './Supabase-Client/supabase-client';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CalendarActivitiesService {
+  private activitiesSubject = new BehaviorSubject<CalendarActivityWithMember[]>([]);
+  public activities$ = this.activitiesSubject.asObservable();
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private notificationService: NotificationService,
+    private calendarNotificationsService: CalendarNotificationsService
+  ) {
+    this.setupRealtimeSubscription();
+  }
+
+  // Configurar suscripción en tiempo real
+  private setupRealtimeSubscription() {
+    const channel = supabase
+      .channel('calendar_activities_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'calendar_activities'
+        },
+        (payload) => {
+          console.log('Cambio en tiempo real detectado:', payload);
+          
+          // Manejar diferentes tipos de eventos
+          switch (payload.eventType) {
+            case 'INSERT':
+              this.handleNewActivity(payload.new as CalendarActivity);
+              break;
+            case 'UPDATE':
+              this.handleUpdatedActivity(payload.new as CalendarActivity);
+              break;
+            case 'DELETE':
+              this.handleDeletedActivity(payload.old as CalendarActivity);
+              break;
+          }
+        }
+      )
+      .subscribe();
+
+    console.log('Suscripción en tiempo real configurada para actividades del calendario');
+  }
+
+  // Manejar nueva actividad
+  private handleNewActivity(activity: CalendarActivity) {
+    console.log('Nueva actividad creada:', activity);
+    // La notificación ya se envía en createActivity, pero podemos agregar lógica adicional aquí
+  }
+
+  // Manejar actividad actualizada
+  private handleUpdatedActivity(activity: CalendarActivity) {
+    console.log('Actividad actualizada:', activity);
+    // La notificación ya se envía en updateActivity, pero podemos agregar lógica adicional aquí
+  }
+
+  // Manejar actividad eliminada
+  private handleDeletedActivity(activity: CalendarActivity) {
+    console.log('Actividad eliminada:', activity);
+    // La notificación ya se envía en deleteActivity, pero podemos agregar lógica adicional aquí
+  }
 
   // Obtener actividades por mes
   async getActivitiesByMonth(month: number, year: number): Promise<CalendarActivityWithMember[]> {
@@ -31,11 +93,16 @@ export class CalendarActivitiesService {
       return [];
     }
 
-    return data?.map(item => ({
+    const activities = data?.map(item => ({
       ...item,
       member_name: item.family_members?.name,
       member_color: item.family_members?.color
     })) || [];
+
+    // Actualizar el BehaviorSubject
+    this.activitiesSubject.next(activities);
+
+    return activities;
   }
 
   // Obtener actividades por día específico
@@ -86,6 +153,14 @@ export class CalendarActivitiesService {
       console.error('Error creating activity:', error);
       return null;
     }
+
+    // Enviar notificación en tiempo real
+    if (data) {
+      this.notificationService.sendCalendarEventNotification(data);
+      // También enviar notificación push
+      await this.calendarNotificationsService.sendCalendarEventPushNotification(data);
+    }
+
     return data;
   }
 
@@ -102,11 +177,26 @@ export class CalendarActivitiesService {
       console.error('Error updating activity:', error);
       return null;
     }
+
+    // Enviar notificación de actualización en tiempo real
+    if (data) {
+      this.notificationService.sendCalendarEventUpdateNotification(data);
+      // También enviar notificación push
+      await this.calendarNotificationsService.sendCalendarEventUpdatePushNotification(data);
+    }
+
     return data;
   }
 
   // Eliminar actividad
   async deleteActivity(id: number): Promise<boolean> {
+    // Obtener la actividad antes de eliminarla para la notificación
+    const { data: activityToDelete } = await supabase
+      .from('calendar_activities')
+      .select('title')
+      .eq('id', id)
+      .single();
+
     const { error } = await supabase
       .from('calendar_activities')
       .delete()
@@ -116,6 +206,14 @@ export class CalendarActivitiesService {
       console.error('Error deleting activity:', error);
       return false;
     }
+
+    // Enviar notificación de eliminación en tiempo real
+    if (activityToDelete) {
+      this.notificationService.sendCalendarEventDeleteNotification(activityToDelete.title);
+      // También enviar notificación push
+      await this.calendarNotificationsService.sendCalendarEventDeletePushNotification(activityToDelete.title);
+    }
+
     return true;
   }
 

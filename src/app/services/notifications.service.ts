@@ -54,6 +54,75 @@ export class NotificationService {
     }
   }
 
+  // Enviar notificación de evento del calendario en tiempo real
+  sendCalendarEventNotification(eventData: any): void {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      const notification = new Notification('Nuevo Evento del Calendario', {
+        body: `${eventData.title} - ${eventData.date} ${eventData.time ? `a las ${eventData.time}` : ''}`,
+        icon: '/assets/icons/icon-192x192.jpg',
+        tag: 'calendar-event',
+        requireInteraction: false
+      });
+
+      // Reproducir sonido de notificación
+      this.playNotificationSound();
+
+      // Auto-cerrar la notificación después de 5 segundos
+      setTimeout(() => {
+        notification.close();
+      }, 5000);
+    }
+  }
+
+  // Enviar notificación de actualización de evento
+  sendCalendarEventUpdateNotification(eventData: any): void {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      const notification = new Notification('Evento Actualizado', {
+        body: `${eventData.title} ha sido actualizado`,
+        icon: '/assets/icons/icon-192x192.jpg',
+        tag: 'calendar-update',
+        requireInteraction: false
+      });
+
+      this.playNotificationSound();
+
+      setTimeout(() => {
+        notification.close();
+      }, 5000);
+    }
+  }
+
+  // Enviar notificación de eliminación de evento
+  sendCalendarEventDeleteNotification(eventTitle: string): void {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      const notification = new Notification('Evento Eliminado', {
+        body: `${eventTitle} ha sido eliminado del calendario`,
+        icon: '/assets/icons/icon-192x192.jpg',
+        tag: 'calendar-delete',
+        requireInteraction: false
+      });
+
+      this.playNotificationSound();
+
+      setTimeout(() => {
+        notification.close();
+      }, 5000);
+    }
+  }
+
+  // Reproducir sonido de notificación
+  private playNotificationSound(): void {
+    try {
+      const audio = new Audio('/level-up-191997.mp3');
+      audio.volume = 0.5;
+      audio.play().catch(error => {
+        console.log('No se pudo reproducir el sonido:', error);
+      });
+    } catch (error) {
+      console.log('Error reproduciendo sonido:', error);
+    }
+  }
+
   // Limpiar recursos
   cleanup(): void {
     // Implementar limpieza si es necesario
