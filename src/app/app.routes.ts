@@ -15,7 +15,7 @@ import { Login } from './components/Login/login/login';
 import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/login', pathMatch: 'full' },
+  { path: '', redirectTo: '/expenses-dashboard', pathMatch: 'full' },
   { path: 'tasks', component: HomeTasksComponent, canActivate: [AuthGuard]},
   { path: 'weekly-planner',component: WeeklyPlannerComponent, canActivate: [AuthGuard] },
   { path: 'meals', component: MealsComponent, canActivate: [AuthGuard] },

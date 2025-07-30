@@ -10,6 +10,13 @@
       </h2>
       <div class="flex items-center gap-2">
         <button
+          (click)="goToAddExpense()"
+          class="flex cursor-pointer items-center justify-center rounded-full h-10 w-10 bg-green-600 text-white hover:bg-green-700 transition-colors"
+          title="Agregar Nuevo Gasto"
+        >
+          <fa-icon [icon]="faPlus" class="text-sm"></fa-icon>
+        </button>
+        <button
           routerLink="/monthly-transactions"
           class="flex cursor-pointer items-center justify-center rounded-full h-10 w-10 bg-blue-600 text-white hover:bg-blue-700 transition-colors"
           title="Ver Transacciones Mensuales"
@@ -88,6 +95,18 @@
     <div *ngIf="!loading && !error && stats && stats.totalExpenses > 0" class="space-y-4">
       <!-- Stats Cards -->
       <div class="p-4">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-[#101418] text-[22px] font-bold leading-tight tracking-[-0.015em]">
+            Resumen General
+          </h2>
+          <button 
+            (click)="goToMonthlyTransactions()"
+            class="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+            title="Ver transacciones mensuales">
+            <fa-icon [icon]="faCalendar" class="mr-1"></fa-icon>
+            Ver Todo
+          </button>
+        </div>
         <div class="grid grid-cols-2 gap-4">
           <!-- Total Spent -->
           <div 
@@ -149,7 +168,16 @@
         
         
         <!-- <div class="bg-white rounded-xl p-4 shadow-sm mb-4">
-          <h3 class="text-lg font-semibold mb-4">Resumen por Día</h3>
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold">Resumen por Día</h3>
+            <button 
+              (click)="goToMonthlyTransactions()"
+              class="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+              title="Ver transacciones mensuales">
+              <fa-icon [icon]="faCalendarAlt" class="mr-1"></fa-icon>
+              Ver Todo
+            </button>
+          </div>
           <div class="space-y-3">
             <div *ngFor="let day of stats.dailyTotals" class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
               <span class="text-sm font-medium text-gray-700">
@@ -164,7 +192,16 @@
 
         <!-- Member Totals Summary -->
         <div class="bg-white rounded-xl p-4 shadow-sm mb-4" *ngIf="stats.memberTotals.length > 0">
-          <h3 class="text-lg font-semibold mb-4">Gastos por Miembro</h3>
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold">Gastos por Miembro</h3>
+            <button 
+              (click)="goToMonthlyTransactions()"
+              class="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+              title="Ver transacciones mensuales">
+              <fa-icon [icon]="faCalendar" class="mr-1"></fa-icon>
+              Ver Todo
+            </button>
+          </div>
           <div class="space-y-3">
             <div *ngFor="let member of stats.memberTotals" class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
               <span class="text-sm font-medium text-gray-700">
@@ -180,9 +217,18 @@
 
       <!-- Upcoming Expenses -->
       <div class="px-4" *ngIf="stats.upcomingExpenses.length > 0">
-        <h2 class="text-[#101418] text-[22px] font-bold leading-tight tracking-[-0.015em] pb-3">
-          Próximos Vencimientos
-        </h2>
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-[#101418] text-[22px] font-bold leading-tight tracking-[-0.015em]">
+            Próximos Vencimientos
+          </h2>
+          <button 
+            (click)="goToMonthlyTransactions()"
+            class="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+            title="Ver transacciones mensuales">
+            <fa-icon [icon]="faCalendar" class="mr-1"></fa-icon>
+            Ver Todo
+          </button>
+        </div>
         <div class="bg-white rounded-xl shadow-sm overflow-hidden">
           <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
@@ -230,6 +276,210 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shopping List Section -->
+      <div class="px-4 mt-6">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-[#101418] text-[22px] font-bold leading-tight tracking-[-0.015em]">
+            Próximas Compras
+          </h2>
+          <button 
+            (click)="goToShoppingList()"
+            class="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+            title="Ver lista completa de compras">
+            <fa-icon [icon]="faList" class="mr-1"></fa-icon>
+            Ver Todo
+          </button>
+        </div>
+
+        <!-- Loading State for Shopping List -->
+        <div *ngIf="shoppingListLoading" class="bg-white rounded-xl p-6 shadow-sm">
+          <div class="flex items-center justify-center">
+            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+            <span class="ml-2 text-gray-600">Cargando lista de compras...</span>
+          </div>
+        </div>
+
+        <!-- Empty Shopping List State -->
+        <div *ngIf="!shoppingListLoading && shoppingList.length === 0" class="bg-white rounded-xl p-6 shadow-sm">
+          <div class="text-center">
+            <div class="flex justify-center mb-3">
+              <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                <fa-icon [icon]="faShoppingCart" class="text-gray-400 text-xl"></fa-icon>
+              </div>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Lista de Compras Vacía</h3>
+            <p class="text-gray-600 mb-4">No hay elementos pendientes de compra.</p>
+            <button 
+              (click)="goToShoppingList()"
+              class="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
+              <fa-icon [icon]="faPlus" class="mr-2 text-sm"></fa-icon>
+              Agregar Productos
+            </button>
+          </div>
+        </div>
+
+        <!-- Shopping List Items -->
+        <div *ngIf="!shoppingListLoading && shoppingList.length > 0" class="bg-white rounded-xl shadow-sm overflow-hidden">
+          <div class="divide-y divide-gray-200">
+            <div *ngFor="let item of shoppingList" class="p-4 hover:bg-gray-50 transition-colors">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                  <div class="flex-shrink-0">
+                    <fa-icon [icon]="getCategoryIcon(item.category)" 
+                             [class]="getCategoryColor(item.category)"
+                             class="text-lg"></fa-icon>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-900 truncate">
+                      {{ item.name }}
+                    </p>
+                    <p class="text-sm text-gray-500">
+                      {{ item.quantity }} {{ item.unit }}
+                    </p>
+                  </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    {{ item.category === 'fruits' ? 'Frutas' : 
+                       item.category === 'vegetables' ? 'Verduras' : 'Otros' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- View All Button -->
+          <div class="px-4 py-3 bg-gray-50 border-t border-gray-200">
+            <!-- <button 
+              (click)="goToShoppingList()"
+              class="w-full text-center text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors">
+              Ver lista completa ({{ shoppingList.length }} elementos)
+            </button> -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Upcoming Activities Section -->
+      <div class="px-4 mt-6">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-[#101418] text-[22px] font-bold leading-tight tracking-[-0.015em]">
+            Próximas Citas
+          </h2>
+          <button 
+            (click)="goToCalendar()"
+            class="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+            title="Ver calendario completo">
+            <fa-icon [icon]="faCalendarAlt" class="mr-1"></fa-icon>
+            Ver Todo
+          </button>
+        </div>
+
+        <!-- Loading State for Activities -->
+        <div *ngIf="activitiesLoading" class="bg-white rounded-xl p-6 shadow-sm">
+          <div class="flex items-center justify-center">
+            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+            <span class="ml-2 text-gray-600">Cargando próximas citas...</span>
+          </div>
+        </div>
+
+        <!-- Empty Activities State -->
+        <div *ngIf="!activitiesLoading && upcomingActivities.length === 0" class="bg-white rounded-xl p-6 shadow-sm">
+          <div class="text-center">
+            <div class="flex justify-center mb-3">
+              <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                <fa-icon [icon]="faCalendarAlt" class="text-gray-400 text-xl"></fa-icon>
+              </div>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">No Hay Citas Próximas</h3>
+            <p class="text-gray-600 mb-4">No hay citas programadas para los próximos 7 días.</p>
+            <button 
+              (click)="goToCalendar()"
+              class="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
+              <fa-icon [icon]="faPlus" class="mr-2 text-sm"></fa-icon>
+              Agregar Cita
+            </button>
+          </div>
+        </div>
+
+        <!-- Activities Table -->
+        <div *ngIf="!activitiesLoading && upcomingActivities.length > 0" class="bg-white rounded-xl shadow-sm overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Título
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Categoría
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Fecha
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Hora
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Miembro
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr *ngFor="let activity of upcomingActivities" class="hover:bg-gray-50 transition-colors">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <fa-icon [icon]="faCalendarAlt" 
+                               [class]="getActivityTypeColor(activity.activity_type)"
+                               class="mr-3"></fa-icon>
+                      <div>
+                        <div class="text-sm font-medium text-gray-900">{{ activity.title }}</div>
+                        <div class="text-sm text-gray-500" *ngIf="activity.description">{{ activity.description }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                          [class]="activity.activity_type === 'medico' ? 'bg-blue-100 text-blue-800' :
+                                   activity.activity_type === 'salida' ? 'bg-green-100 text-green-800' :
+                                   'bg-purple-100 text-purple-800'">
+                      {{ getActivityTypeLabel(activity.activity_type) }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {{ formatDate(activity.date) }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {{ formatTime(activity.time) }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="flex-shrink-0 h-8 w-8">
+                        <div class="h-8 w-8 rounded-full flex items-center justify-center text-white text-sm font-medium"
+                             [style.background-color]="activity.member_color || '#6b7280'">
+                          {{ activity.member_name?.charAt(0)?.toUpperCase() || '?' }}
+                        </div>
+                      </div>
+                      <div class="ml-3">
+                        <div class="text-sm font-medium text-gray-900">{{ activity.member_name || 'Sin asignar' }}</div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- View All Button -->
+          <div class="px-4 py-3 bg-gray-50 border-t border-gray-200">
+            <!-- <button 
+              (click)="goToCalendar()"
+              class="w-full text-center text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors">
+              Ver calendario completo ({{ upcomingActivities.length }} citas)
+            </button> -->
           </div>
         </div>
       </div>
