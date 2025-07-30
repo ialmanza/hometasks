@@ -1,18 +1,128 @@
-/* Variables de colores para el tema oscuro */
+/* Variables de colores para el tema con imagen de fondo */
 :host {
-  --bg-primary: #121417;
-  --bg-secondary: #2b3036;
-  --border-color: #3f4750;
+  --bg-primary: rgba(18, 20, 23, 0.8);
+  --bg-secondary: rgba(43, 48, 54, 0.7);
+  --border-color: rgba(63, 71, 80, 0.8);
   --text-primary: #ffffff;
-  --text-secondary: #a1abb5;
+  --text-secondary: #e1e5e9;
   --accent-blue: #327fcc;
   --accent-blue-hover: #2a6cb8;
-  --error-bg: rgba(239, 68, 68, 0.1);
-  --error-border: rgba(239, 68, 68, 0.3);
+  --error-bg: rgba(239, 68, 68, 0.2);
+  --error-border: rgba(239, 68, 68, 0.4);
   --error-text: #fca5a5;
-  --success-bg: rgba(34, 197, 94, 0.1);
-  --success-border: rgba(34, 197, 94, 0.3);
+  --success-bg: rgba(34, 197, 94, 0.2);
+  --success-border: rgba(34, 197, 94, 0.4);
   --success-text: #86efac;
+}
+
+/* Reset para pantalla completa */
+* {
+  box-sizing: border-box;
+}
+
+/* Contenedor principal del login */
+.login-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-family: "Plus Jakarta Sans", "Noto Sans", sans-serif;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* Contenido del login */
+.login-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+}
+
+/* Formulario del login */
+.login-form {
+  width: 100%;
+  max-width: 400px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* Header del formulario */
+.login-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.login-title {
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 1.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  margin: 0;
+}
+
+/* Contenedor de mensajes */
+.message-container {
+  margin-bottom: 1rem;
+}
+
+/* Contenido del formulario */
+.login-form-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Grupo de inputs */
+.input-group {
+  width: 100%;
+}
+
+/* Botón del formulario */
+.button-group {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+/* Imagen de fondo */
+.login-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('/login.webp');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 1;
+}
+
+/* Overlay para mejorar la legibilidad */
+.login-background::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 2;
 }
 
 /* Background principal */
@@ -20,56 +130,85 @@
   background-color: var(--bg-primary);
 }
 
-/* Estilos para inputs en modo oscuro */
-.form-input-dark {
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+/* Estilos para inputs con efecto glassmorphism */
+.form-input {
+  width: 100%;
+  height: 48px;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #000000;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 0 16px;
+  font-size: 14px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.form-input-dark::placeholder {
-  color: var(--text-secondary);
+.form-input::placeholder {
+  color: rgba(0, 0, 0, 0.6);
 }
 
-.form-input-dark:focus {
-  background-color: #3f4750;
+.form-input:focus {
+  background-color: rgba(255, 255, 255, 0.15);
   border-color: var(--accent-blue);
-  box-shadow: 0 0 0 2px rgba(50, 127, 204, 0.2);
+  box-shadow: 0 0 0 3px rgba(50, 127, 204, 0.3);
+  outline: none;
+  color: #000000;
 }
 
 /* Estado de error para inputs */
-.form-input-dark.error {
+.form-input.error {
   border-color: #ef4444;
-  background-color: rgba(239, 68, 68, 0.05);
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #000000;
 }
 
-/* Botón primario - modo oscuro */
-.btn-primary-dark {
-  background-color: var(--accent-blue);
+/* Botón primario con efecto glassmorphism */
+.btn-primary {
+  width: 100%;
+  height: 48px;
+  background: linear-gradient(135deg, rgba(50, 127, 204, 0.9), rgba(42, 108, 184, 0.9));
   color: var(--text-primary);
-  transition: background-color 0.2s ease, transform 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
 }
 
-.btn-primary-dark:hover:not(:disabled) {
-  background-color: var(--accent-blue-hover);
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(50, 127, 204, 1), rgba(42, 108, 184, 1));
   transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
 
-.btn-primary-dark:active:not(:disabled) {
+.btn-primary:active:not(:disabled) {
   transform: translateY(0);
 }
 
-/* Botón secundario - modo oscuro */
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Botón secundario con efecto glassmorphism */
 .btn-secondary-dark {
-  background-color: var(--bg-secondary);
+  background-color: rgba(255, 255, 255, 0.1);
   color: var(--text-primary);
-  border: 1px solid var(--border-color);
-  transition: background-color 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
 }
 
 .btn-secondary-dark:hover:not(:disabled) {
-  background-color: #3f4750;
+  background-color: rgba(255, 255, 255, 0.15);
   border-color: var(--accent-blue);
   transform: translateY(-1px);
 }
@@ -79,9 +218,10 @@
 }
 
 /* Título del login */
-.login-title-dark {
+.login-title {
   color: var(--text-primary);
   font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 /* Enlaces de texto */
@@ -105,19 +245,29 @@
   text-decoration-color: var(--accent-blue);
 }
 
-/* Mensajes de error - modo oscuro */
-.error-message-dark {
+/* Mensajes de error con efecto glassmorphism */
+.error-message {
   background-color: var(--error-bg);
-  border-color: var(--error-border);
+  border: 1px solid var(--error-border);
   color: var(--error-text);
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   animation: slideIn 0.3s ease-out;
 }
 
-/* Mensajes de éxito - modo oscuro */
-.success-message-dark {
+/* Mensajes de éxito con efecto glassmorphism */
+.success-message {
   background-color: var(--success-bg);
-  border-color: var(--success-border);
+  border: 1px solid var(--success-border);
   color: var(--success-text);
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   animation: slideIn 0.3s ease-out;
 }
 
@@ -165,93 +315,51 @@ input:focus {
 
 /* Responsividad para móviles */
 @media (max-width: 480px) {
-  .flex.max-w-\[480px\] {
+  .login-content {
+    padding: 0.5rem;
+  }
+
+  .login-form {
     max-width: 100%;
+    padding: 1.5rem;
   }
 
-  .px-4 {
-    padding-left: 1rem;
-    padding-right: 1rem;
+  .login-title {
+    font-size: 1.25rem;
   }
 
-  .min-h-screen {
-    min-height: 100vh;
-    padding: 1rem;
-  }
-
-  .h-14 {
-    height: 3rem;
-  }
-
-  .h-12 {
-    height: 2.75rem;
-  }
-
-  .h-10 {
-    height: 2.5rem;
-  }
-
-  .text-lg {
-    font-size: 1.125rem;
-  }
-
-  .text-base {
-    font-size: 0.875rem;
-  }
-
-  .text-sm {
-    font-size: 0.75rem;
-  }
-
-  /* Ajustes específicos para inputs en móvil */
-  .form-input-dark {
+  .form-input {
+    height: 44px;
     font-size: 16px; /* Previene zoom en iOS */
+  }
+
+  .btn-primary {
+    height: 44px;
+    font-size: 16px;
   }
 }
 
 /* Responsividad para tablets */
 @media (min-width: 481px) and (max-width: 768px) {
-  .flex.max-w-\[480px\] {
-    max-width: 90%;
-    margin: 0 auto;
+  .login-content {
+    padding: 1rem;
   }
 
-  .px-4 {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-  }
-
-  .min-h-screen {
+  .login-form {
+    max-width: 450px;
     padding: 2rem;
-  }
-
-  .h-14 {
-    height: 3.5rem;
-  }
-
-  .h-12 {
-    height: 3rem;
-  }
-
-  .h-10 {
-    height: 2.75rem;
   }
 }
 
-/* Responsividad para tablets grandes */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .flex.max-w-\[480px\] {
-    max-width: 70%;
-    margin: 0 auto;
+/* Responsividad para desktop */
+@media (min-width: 769px) {
+  .login-content {
+    padding: 2rem;
   }
 
-  .px-4 {
-    padding-left: 2rem;
-    padding-right: 2rem;
-  }
-
-  .min-h-screen {
-    padding: 3rem;
+  .login-form {
+    max-width: 400px;
+    padding: 2.5rem;
   }
 }
 
@@ -263,27 +371,9 @@ input:focus {
               transform 0.2s ease;
 }
 
-/* Mejoras adicionales para el modo oscuro */
-.form-input-dark:autofill,
-.form-input-dark:-webkit-autofill {
-  -webkit-box-shadow: 0 0 0 30px var(--bg-secondary) inset !important;
-  -webkit-text-fill-color: var(--text-primary) !important;
-}
-
-/* Scrollbar personalizado para el modo oscuro */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--bg-primary);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-blue);
+/* Mejoras adicionales para el modo glassmorphism */
+.form-input:autofill,
+.form-input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 30px rgba(255, 255, 255, 0.1) inset !important;
+  -webkit-text-fill-color: #000000 !important;
 }
