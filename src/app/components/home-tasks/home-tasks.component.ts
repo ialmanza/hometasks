@@ -84,7 +84,7 @@ export class HomeTasksComponent implements OnInit {
         this.cancelEditing();
       } else {
         // Crear nueva tarea y enviar notificación
-        //this.todoService.addTask(taskData);
+        this.todoService.addTask(taskData);
         this.notificationService.sendTaskNotification(taskData);
       }
 
@@ -105,7 +105,7 @@ export class HomeTasksComponent implements OnInit {
     this.taskForm.reset();
   }
 
-  deleteTask(taskId: string) {
+  deleteTask(taskId: number) {
     this.todoService.deleteTask(taskId);
 
     // Si la tarea eliminada es la que se está editando, cancelar edición
@@ -114,7 +114,7 @@ export class HomeTasksComponent implements OnInit {
     }
   }
 
-  toggleTaskCompletion(taskId: string) {
+  toggleTaskCompletion(taskId: number) {
     this.todoService.toggleTaskCompletion(taskId);
   }
 }
