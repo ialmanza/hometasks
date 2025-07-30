@@ -3,10 +3,14 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "prebuild": "node scripts/set-environment.js",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "generate-vapid": "node scripts/generate-vapid-keys.js",
+    "check-pwa": "node scripts/check-pwa-config.js",
+    "setup-dev": "node scripts/set-environment-dev.js",
+    "start": "npm run setup-dev && ng serve"
   },
   "private": true,
   "dependencies": {
