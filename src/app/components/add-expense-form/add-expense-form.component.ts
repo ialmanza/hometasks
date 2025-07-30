@@ -196,7 +196,7 @@ export class AddExpenseFormComponent implements OnInit {
             this.submitting = false;
             this.router.navigate(['/expenses']);
           },
-          error: (error) => {
+          error: (error: any) => {
             console.error('Error adding expense:', error);
             this.submitting = false;
           }

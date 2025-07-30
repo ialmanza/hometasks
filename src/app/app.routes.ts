@@ -10,20 +10,25 @@ import { AddExpenseFormComponent } from './components/add-expense-form/add-expen
 import { FamilyExpensesComponent } from './components/family-expenses/family-expenses.component';
 import { FamilyExpensesDashboardComponent } from './components/family-expenses-dashboard/family-expenses-dashboard.component';
 import { MonthlyTransactionsComponent } from './components/monthly-transactions/monthly-transactions.component';
+import { CalendarActivitiesComponent } from './components/calendar-activities/calendar-activities.component';
+import { Login } from './components/Login/login/login';
+import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/inicio', pathMatch: 'full' },
-  { path: 'tasks', component: HomeTasksComponent},
-  { path: 'weekly-planner',component: WeeklyPlannerComponent },
-  { path: 'meals', component: MealsComponent },
-  { path: 'activities', component: DailyActivitiesListComponent },
-  { path: 'shopping-list', component: ShoppingListComponent },
-  { path: 'inicio', component: InicioComponent },
-  { path: 'members', component: FamilyMembersComponent },
-  { path: 'add-expense', component: AddExpenseFormComponent },
-  { path: 'edit-expense/:id', component: AddExpenseFormComponent },
-  { path: 'expenses', component: MonthlyTransactionsComponent},
-  { path: 'expenses-dashboard', component: FamilyExpensesDashboardComponent },
-  { path: 'monthly-transactions', component:  FamilyExpensesComponent},
-  { path: '**', redirectTo: '/inicio' }
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
+  { path: 'tasks', component: HomeTasksComponent, canActivate: [AuthGuard]},
+  { path: 'weekly-planner',component: WeeklyPlannerComponent, canActivate: [AuthGuard] },
+  { path: 'meals', component: MealsComponent, canActivate: [AuthGuard] },
+  { path: 'activities', component: DailyActivitiesListComponent, canActivate: [AuthGuard] },
+  { path: 'calendar', component: CalendarActivitiesComponent, canActivate: [AuthGuard] },
+  { path: 'shopping-list', component: ShoppingListComponent, canActivate: [AuthGuard] },
+  { path: 'inicio', component: InicioComponent, canActivate: [AuthGuard] },
+  { path: 'members', component: FamilyMembersComponent, canActivate: [AuthGuard] },
+  { path: 'add-expense', component: AddExpenseFormComponent, canActivate: [AuthGuard] },
+  { path: 'edit-expense/:id', component: AddExpenseFormComponent, canActivate: [AuthGuard] },
+  { path: 'expenses', component: MonthlyTransactionsComponent, canActivate: [AuthGuard]},
+  { path: 'expenses-dashboard', component: FamilyExpensesDashboardComponent, canActivate: [AuthGuard] },
+  { path: 'monthly-transactions', component:  FamilyExpensesComponent, canActivate: [AuthGuard]},
+  { path: 'login', component: Login},
+  { path: '**', redirectTo: '/login' }
 ];

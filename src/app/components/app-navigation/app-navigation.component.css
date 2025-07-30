@@ -53,6 +53,25 @@
   color: #4a90e2;
 }
 
+.logout-btn {
+  background: none;
+  border: none;
+  color: #e74c3c;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background-color: #ffe6e6;
+  color: #c0392b;
+}
+
 .nav-links fa-icon {
   font-size: 1rem; /* Reducir tamaño de iconos */
 }
@@ -194,6 +213,18 @@
 .more-menu-item.active {
   background-color: #e6f2ff;
   color: #4a90e2;
+}
+
+.more-menu-item.logout-btn {
+  color: #e74c3c;
+  border-top: 1px solid #eee;
+  margin-top: 10px;
+  padding-top: 15px;
+}
+
+.more-menu-item.logout-btn:hover {
+  background-color: #ffe6e6;
+  color: #c0392b;
 }
 
 .more-menu-item fa-icon {
