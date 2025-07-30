@@ -85,16 +85,6 @@ self.addEventListener('push', (event) => {
     tag: notificationData.tag,
     requireInteraction: false,
     renotify: true,
-    actions: [
-      {
-        action: 'open',
-        title: 'Abrir'
-      },
-      {
-        action: 'close',
-        title: 'Cerrar'
-      }
-    ],
     vibrate: [200, 100, 200]
   };
 
@@ -109,23 +99,21 @@ self.addEventListener('notificationclick', (event) => {
   
   event.notification.close();
 
-  if (event.action === 'open' || !event.action) {
-    event.waitUntil(
-      clients.matchAll({ type: 'window', includeUncontrolled: true })
-        .then((clientList) => {
-          // Si ya hay una ventana abierta, enfocarla
-          for (const client of clientList) {
-            if (client.url.includes(self.location.origin) && 'focus' in client) {
-              return client.focus();
-            }
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true })
+      .then((clientList) => {
+        // Si ya hay una ventana abierta, enfocarla
+        for (const client of clientList) {
+          if (client.url.includes(self.location.origin) && 'focus' in client) {
+            return client.focus();
           }
-          // Si no hay ventana abierta, abrir una nueva
-          if (clients.openWindow) {
-            return clients.openWindow('/');
-          }
-        })
-    );
-  }
+        }
+        // Si no hay ventana abierta, abrir una nueva
+        if (clients.openWindow) {
+          return clients.openWindow('/');
+        }
+      })
+  );
 });
 
 // Manejar notificaciones cerradas

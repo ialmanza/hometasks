@@ -44,12 +44,12 @@ export class AppUpdateService {
       }
     });
 
-    // Escuchar eventos de activación
-    this.swUpdate.activated.subscribe(event => {
-      console.log('Nueva versión activada:', event);
-      // Recargar la página para aplicar la nueva versión
-      window.location.reload();
-    });
+    // Escuchar eventos de activación (comentado porque no existe en versiones recientes)
+    // this.swUpdate.activated.subscribe((event: any) => {
+    //   console.log('Nueva versión activada:', event);
+    //   // Recargar la página para aplicar la nueva versión
+    //   window.location.reload();
+    // });
   }
 
   async checkForUpdates(): Promise<void> {
@@ -87,20 +87,10 @@ export class AppUpdateService {
   showUpdateNotification(): void {
     if ('Notification' in window && Notification.permission === 'granted') {
       const notification = new Notification('Actualización Disponible', {
-        body: 'Hay una nueva versión de Hometasks disponible. ¿Deseas actualizar ahora?',
+        body: 'Hay una nueva versión de Hometasks disponible. Haz clic para actualizar.',
         icon: '/icons/icono angular/icon-192x192.png',
         tag: 'app-update',
-        requireInteraction: true,
-        actions: [
-          {
-            action: 'update',
-            title: 'Actualizar'
-          },
-          {
-            action: 'later',
-            title: 'Más tarde'
-          }
-        ]
+        requireInteraction: true
       });
 
       notification.onclick = () => {
