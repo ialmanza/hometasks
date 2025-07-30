@@ -1,86 +1,59 @@
-<div class="relative flex size-full min-h-screen flex-col bg-dark-primary justify-between group/design-root overflow-x-hidden" style='font-family: "Plus Jakarta Sans", "Noto Sans", sans-serif;'>
-  <div class="flex flex-1 w-full min-h-[80vh] justify-center items-center">
-    <div class="w-full max-w-[480px]">
-      <div class="flex items-center bg-dark-primary p-4 pb-2 justify-between">
-        <h2 class="login-title-dark text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pl-12 pr-12">Iniciar sesión</h2>
+<div class="login-container">
+  <div class="login-background"></div>
+  <div class="login-content">
+    <div class="login-form">
+      <div class="login-header">
+        <h2 class="login-title">Iniciar sesión</h2>
       </div>
 
       <!-- Mensaje de error -->
-      <div *ngIf="errorMessage" class="px-4 py-2">
-        <div class="bg-red-900/20 border border-red-500/50 text-red-300 px-4 py-3 rounded-lg text-sm error-message-dark">
+      <div *ngIf="errorMessage" class="message-container">
+        <div class="error-message backdrop-blur-sm">
           {{ errorMessage }}
         </div>
       </div>
 
       <!-- Mensaje de éxito -->
-      <div *ngIf="successMessage" class="px-4 py-2">
-        <div class="bg-green-900/20 border border-green-500/50 text-green-300 px-4 py-3 rounded-lg text-sm success-message-dark">
+      <div *ngIf="successMessage" class="message-container">
+        <div class="success-message backdrop-blur-sm">
           {{ successMessage }}
         </div>
       </div>
 
-      <form (ngSubmit)="onLogin()" #loginForm="ngForm">
-        <div class="flex flex-wrap items-end gap-4 px-4 py-3">
-          <label class="flex flex-col min-w-40 flex-1">
-            <input type="email"
-                   placeholder="Correo electrónico"
-                   class="form-input-dark flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-0 border-none focus:border-none h-14 p-4 text-base font-normal leading-normal"
-                   [(ngModel)]="email"
-                   name="email"
-                   required
-                   email
-                   (input)="onInputChange()"
-                   [class.error]="loginForm.submitted && loginForm.controls['email'].invalid" />
-          </label>
+      <form (ngSubmit)="onLogin()" #loginForm="ngForm" class="login-form-content">
+        <div class="input-group">
+          <input type="email"
+                 placeholder="Correo electrónico"
+                 class="form-input"
+                 [(ngModel)]="email"
+                 name="email"
+                 required
+                 email
+                 (input)="onInputChange()"
+                 [class.error]="loginForm.submitted && loginForm.controls['email'].invalid" />
         </div>
 
-        <div class="flex flex-wrap items-end gap-4 px-4 py-3">
-          <label class="flex flex-col min-w-40 flex-1">
-            <input type="password"
-                   placeholder="Contraseña"
-                   class="form-input-dark flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-0 border-none focus:border-none h-14 p-4 text-base font-normal leading-normal"
-                   [(ngModel)]="password"
-                   name="password"
-                   required
-                   (input)="onInputChange()"
-                   [class.error]="loginForm.submitted && loginForm.controls['password'].invalid" />
-          </label>
+        <div class="input-group">
+          <input type="password"
+                 placeholder="Contraseña"
+                 class="form-input"
+                 [(ngModel)]="password"
+                 name="password"
+                 required
+                 (input)="onInputChange()"
+                 [class.error]="loginForm.submitted && loginForm.controls['password'].invalid" />
         </div>
 
-        <div class="flex px-4 py-3">
+        <div class="button-group">
           <button type="submit"
                   [disabled]="!loginForm.valid || isLoading"
-                  class="btn-primary-dark flex min-w-[84px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 text-base font-bold leading-normal tracking-[0.015em] disabled:opacity-50 disabled:cursor-not-allowed"
+                  class="btn-primary"
                   [class.isLoading]="isLoading">
             <span class="truncate">{{ isLoading ? 'Iniciando sesión...' : 'Iniciar sesión' }}</span>
           </button>
         </div>
       </form>
 
-      <div class="flex flex-col gap-1 px-4 py-2">
-        <p class="text-link-dark text-sm font-normal leading-normal text-center underline cursor-pointer"
-           (click)="onForgotPassword()">¿Olvidaste tu contraseña?</p>
-        <p class="text-link-dark text-xs font-normal leading-normal text-center underline cursor-pointer opacity-70"
-           (click)="onGoToResetPassword()">¿Ya tienes un enlace de recuperación?</p>
-      </div>
-
-      <div class="flex flex-col gap-3 items-stretch px-4 py-3">
-        <button type="button"
-                (click)="onFacebookLogin()"
-                class="btn-secondary-dark flex min-w-[84px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 text-sm font-bold leading-normal tracking-[0.015em]">
-          <span class="truncate">Continuar con Facebook</span>
-        </button>
-        <button type="button"
-                (click)="onGoogleLogin()"
-                class="btn-secondary-dark flex min-w-[84px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 text-sm font-bold leading-normal tracking-[0.015em]">
-          <span class="truncate">Continuar con Google</span>
-        </button>
-      </div>
     </div>
-  </div>
-
-  <div>
-    <p class="text-link-dark text-sm font-normal leading-normal pb-3 pt-1 px-4 text-center underline cursor-pointer"
-       (click)="onRegister()">¿No tienes una cuenta? Regístrate</p>
   </div>
 </div>

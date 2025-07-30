@@ -1,4 +1,4 @@
 <div [class.has-desktop-nav]="isDesktop">
-  <app-app-navigation></app-app-navigation>
+  <app-app-navigation *ngIf="!isLoginPage"></app-app-navigation>
   <router-outlet />
 </div>
