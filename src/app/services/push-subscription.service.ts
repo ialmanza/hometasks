@@ -21,90 +21,100 @@ export class PushSubscriptionService {
     if ('serviceWorker' in navigator) {
       try {
         this.swRegistration = await navigator.serviceWorker.register('/ngsw-worker.js');
+        console.log('Service Worker registrado exitosamente');
+        
+        // Esperar a que el service worker esté listo
+        await navigator.serviceWorker.ready;
+        console.log('Service Worker listo');
+        
         await this.checkAndSubscribe();
       } catch (error) {
         console.error('Error registrando Service Worker:', error);
       }
+    } else {
+      console.warn('Service Worker no soportado en este navegador');
     }
   }
 
-//  async checkAndSubscribe() {
-//     // Verifica si las notificaciones están soportadas
-//     if (!('PushManager' in window)) {
-//       console.warn('Push no soportado');
-//       return;
-//     }
-
-//     // Solicitar permiso
-//     const permission = await Notification.requestPermission();
-//     if (permission !== 'granted') {
-//       console.warn('Permiso de notificación denegado');
-//       return;
-//     }
-
-//     // Obtener o crear suscripción
-//     await this.subscribeUser();
-//   }
-
   private async subscribeUser() {
-    if (!this.swRegistration) return;
+    if (!this.swRegistration) {
+      console.error('Service Worker no registrado');
+      return;
+    }
 
     try {
       // Verificar si ya existe una suscripción
       const existingSubscription = await this.swRegistration.pushManager.getSubscription();
 
       if (existingSubscription) {
-        // Guardar suscripción existente
+        console.log('Suscripción existente encontrada');
         await this.savePushSubscriptionToSupabase(existingSubscription);
         return;
       }
 
+      console.log('Creando nueva suscripción push...');
+      
       // Crear nueva suscripción
       const subscription = await this.swRegistration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: this.urlBase64ToUint8Array(environment.vapidPublicKey)
       });
 
+      console.log('Nueva suscripción creada:', subscription);
+      
       // Guardar suscripción en Supabase
       await this.savePushSubscriptionToSupabase(subscription);
     } catch (error) {
       console.error('Error en suscripción push:', error);
+      
+      // Si el error es por permisos, mostrar mensaje más claro
+      if (error instanceof Error && error.name === 'NotAllowedError') {
+        console.warn('Permisos de notificación denegados por el usuario');
+      }
     }
   }
 
   private async savePushSubscriptionToSupabase(subscription: PushSubscription) {
     try {
-      // Extraer información de la suscripción
-      //const { endpoint, keys, expirationTime } = subscription; ESTABA ASÍ ANTES
       const { endpoint, expirationTime } = subscription;
-      const keys = subscription.getKey('p256dh') && subscription.getKey('auth');
-      //const { p256dh, auth } = subscription.getKey('p256dh') && subscription.getKey('auth'); PROBAR DESPUÉS
+      
+      // Obtener las claves de la suscripción
+      const p256dh = subscription.getKey('p256dh');
+      const auth = subscription.getKey('auth');
+      
+      if (!p256dh || !auth) {
+        console.error('Claves de suscripción no disponibles');
+        return;
+      }
 
-      // Obtener el usuario actual de Supabase (si está autenticado)
+      // Obtener el usuario actual de Supabase
       const { data: { user } } = await this.supabase.auth.getUser();
+
+      // Convertir las claves a base64
+      const p256dhBase64 = btoa(String.fromCharCode.apply(null, Array.from(new Uint8Array(p256dh))));
+      const authBase64 = btoa(String.fromCharCode.apply(null, Array.from(new Uint8Array(auth))));
 
       // Insertar suscripción
       const { data, error } = await this.supabase
         .from('push_subscriptions')
         .upsert({
-          user_id: user?.id, // Opcional, depende de si el usuario está autenticado
+          user_id: user?.id,
           endpoint: endpoint,
           keys: {
-            //p256dh: keys.p256dh,
-            //auth: keys.auth
-            p256dh: subscription.getKey('p256dh'),
-            auth: subscription.getKey('auth')
+            p256dh: p256dhBase64,
+            auth: authBase64
           },
           expiration_time: expirationTime
             ? new Date(expirationTime).toISOString()
             : null
         }, {
-          // Upsert basado en el endpoint para evitar duplicados
           onConflict: 'endpoint'
         });
 
       if (error) {
         console.error('Error guardando suscripción:', error);
+      } else {
+        console.log('Suscripción push guardada exitosamente');
       }
     } catch (error) {
       console.error('Excepción al guardar suscripción:', error);

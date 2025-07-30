@@ -2,12 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, HostListener } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { AppNavigationComponent } from './components/app-navigation/app-navigation.component';
-import { filter } from 'rxjs/operators';
+import { AppUpdateComponent } from './components/app-update/app-update.component';
+import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, AppNavigationComponent, CommonModule],
+  imports: [CommonModule, RouterOutlet, AppNavigationComponent, AppUpdateComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
