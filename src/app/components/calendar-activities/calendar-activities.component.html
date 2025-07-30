@@ -1,0 +1,256 @@
+<app-app-navigation></app-app-navigation>
+
+<div class="calendar-container">
+  <!-- Header del calendario -->
+  <div class="calendar-header">
+    <div class="header-content">
+      <button class="nav-button" (click)="previousMonth()">
+        <fa-icon [icon]="faChevronLeft"></fa-icon>
+      </button>
+      <h2 class="month-title">{{ getMonthName() }} {{ currentYear }}</h2>
+      <button class="nav-button" (click)="nextMonth()">
+        <fa-icon [icon]="faChevronRight"></fa-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filters-container">
+    <div class="filter-buttons">
+      <button 
+        class="filter-btn" 
+        [class.active]="selectedFilter === 'all'"
+        (click)="applyFilter('all')">
+        Todos
+      </button>
+      <button 
+        class="filter-btn" 
+        [class.active]="selectedFilter === 'medico'"
+        (click)="applyFilter('medico')">
+        Médico
+      </button>
+      <button 
+        class="filter-btn" 
+        [class.active]="selectedFilter === 'salida'"
+        (click)="applyFilter('salida')">
+        Salida
+      </button>
+      <button 
+        class="filter-btn" 
+        [class.active]="selectedFilter === 'cumple'"
+        (click)="applyFilter('cumple')">
+        Cumpleaños
+      </button>
+    </div>
+
+    <!-- Filtro por miembro -->
+    <div class="member-filter">
+      <select 
+        class="member-select" 
+        (change)="onMemberFilterChange($event)"
+        [value]="selectedMemberFilter">
+        <option value="all">Todos los miembros</option>
+        <option *ngFor="let member of availableMembers" [value]="member.id">
+          {{ member.name }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Calendario -->
+  <div class="calendar-grid">
+    <!-- Días de la semana -->
+    <div class="weekdays">
+      <div class="weekday">D</div>
+      <div class="weekday">L</div>
+      <div class="weekday">M</div>
+      <div class="weekday">X</div>
+      <div class="weekday">J</div>
+      <div class="weekday">V</div>
+      <div class="weekday">S</div>
+    </div>
+
+    <!-- Días del mes -->
+    <div class="calendar-days">
+      <button 
+        *ngFor="let day of calendarDays; let i = index"
+        class="calendar-day"
+        [class.other-month]="!day"
+        [class.has-activities]="day && hasActivities(day)"
+        [class.past-day]="day && isPastDay(day)"
+        (click)="day && selectDay(day)"
+        [disabled]="!day">
+        
+        <div class="day-number" *ngIf="day">{{ day.getDate() }}</div>
+        
+        <!-- Indicadores de actividades -->
+        <div class="activity-indicators" *ngIf="day && hasActivities(day)">
+          <div 
+            *ngFor="let color of getMemberColors(day); let colorIndex = index"
+            class="activity-dot"
+            [style.background-color]="color"
+            [style.left]="(colorIndex * 4) + 'px'">
+          </div>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Botón flotante para agregar -->
+  <button class="floating-add-btn" (click)="showModal = true; openAddForm()">
+    <fa-icon [icon]="faPlus"></fa-icon>
+  </button>
+</div>
+
+<!-- Modal para actividades del día -->
+<div class="modal-overlay" *ngIf="showModal" (click)="showModal = false">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Actividades del {{ selectedDate | date:'longDate' }}</h3>
+      <button class="close-btn" (click)="showModal = false">
+        <fa-icon [icon]="faTimes"></fa-icon>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Loading spinner -->
+      <div class="loading-spinner" *ngIf="isLoading">
+        <div class="spinner"></div>
+        <p>Cargando actividades...</p>
+      </div>
+
+      <!-- Lista de actividades -->
+      <div class="activities-list" *ngIf="!showAddForm && !isLoading">
+        <div *ngIf="selectedDayActivities.length === 0" class="no-activities">
+          <p>No hay actividades programadas para este día</p>
+        </div>
+        
+        <div *ngFor="let activity of selectedDayActivities" class="activity-item">
+          <div class="activity-icon" [style.background-color]="getActivityTypeColor(activity.activity_type)">
+            {{ getActivityTypeIcon(activity.activity_type) }}
+          </div>
+          <div class="activity-info">
+            <h4 class="activity-title">{{ activity.title }}</h4>
+            <p class="activity-time" *ngIf="activity.time">{{ activity.time }}</p>
+            <p class="activity-description" *ngIf="activity.description">{{ activity.description }}</p>
+            <p class="activity-address" *ngIf="activity.address">
+              📍 {{ activity.address }}
+            </p>
+            <p class="activity-member" *ngIf="activity.member_name">
+              {{ activity.member_name }}
+            </p>
+          </div>
+          <div class="activity-actions">
+            <button class="action-btn edit" (click)="editActivity(activity)">
+              <fa-icon [icon]="faEdit"></fa-icon>
+            </button>
+            <button class="action-btn delete" (click)="deleteActivity(activity.id!)">
+              <fa-icon [icon]="faTrash"></fa-icon>
+            </button>
+          </div>
+          <!-- Indicador del tipo de actividad -->
+          <div class="activity-type-indicator" [class]="'type-' + activity.activity_type">
+            {{ getActivityTypeLabel(activity.activity_type) }}
+          </div>
+        </div>
+
+        <button class="add-activity-btn" (click)="openAddForm()">
+          <fa-icon [icon]="faPlus"></fa-icon>
+          Agregar Actividad
+        </button>
+      </div>
+
+      <!-- Formulario para agregar/editar actividad -->
+      <form *ngIf="showAddForm" [formGroup]="activityForm" (ngSubmit)="editingActivity ? updateActivity() : addActivity()" class="activity-form">
+        <!-- Mensaje de error -->
+        <div class="error-message" *ngIf="errorMessage">
+          {{ errorMessage }}
+        </div>
+
+        <div class="form-group">
+          <label for="title">Título</label>
+          <input 
+            id="title"
+            type="text" 
+            formControlName="title" 
+            placeholder="Título de la actividad"
+            class="form-input">
+        </div>
+
+        <div class="form-group">
+          <label for="description">Descripción</label>
+          <textarea 
+            id="description"
+            formControlName="description" 
+            placeholder="Descripción (opcional)"
+            class="form-textarea">
+          </textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="address">Dirección</label>
+          <input 
+            id="address"
+            type="text" 
+            formControlName="address" 
+            placeholder="Dirección (opcional)"
+            class="form-input">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="date">Fecha</label>
+            <input 
+              id="date"
+              type="date" 
+              formControlName="date" 
+              class="form-input"
+              (change)="onDateChange($event)">
+            <div class="error-message" *ngIf="dateError">
+              {{ dateError }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="time">Hora</label>
+            <input 
+              id="time"
+              type="time" 
+              formControlName="time" 
+              class="form-input">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="activity_type">Tipo de Actividad</label>
+            <select id="activity_type" formControlName="activity_type" class="form-select">
+              <option value="medico">Médico</option>
+              <option value="salida">Salida</option>
+              <option value="cumple">Cumpleaños</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="member_id">Miembro</label>
+            <select id="member_id" formControlName="member_id" class="form-select">
+              <option value="">Seleccionar miembro</option>
+              <option *ngFor="let member of availableMembers" [value]="member.id">
+                {{ member.name }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" (click)="cancelForm()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn-primary" [disabled]="!activityForm.valid">
+            {{ editingActivity ? 'Actualizar' : 'Agregar' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div> 

@@ -1,0 +1,289 @@
+/* Variables de colores para el tema oscuro */
+:host {
+  --bg-primary: #121417;
+  --bg-secondary: #2b3036;
+  --border-color: #3f4750;
+  --text-primary: #ffffff;
+  --text-secondary: #a1abb5;
+  --accent-blue: #327fcc;
+  --accent-blue-hover: #2a6cb8;
+  --error-bg: rgba(239, 68, 68, 0.1);
+  --error-border: rgba(239, 68, 68, 0.3);
+  --error-text: #fca5a5;
+  --success-bg: rgba(34, 197, 94, 0.1);
+  --success-border: rgba(34, 197, 94, 0.3);
+  --success-text: #86efac;
+}
+
+/* Background principal */
+.bg-dark-primary {
+  background-color: var(--bg-primary);
+}
+
+/* Estilos para inputs en modo oscuro */
+.form-input-dark {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-input-dark::placeholder {
+  color: var(--text-secondary);
+}
+
+.form-input-dark:focus {
+  background-color: #3f4750;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 2px rgba(50, 127, 204, 0.2);
+}
+
+/* Estado de error para inputs */
+.form-input-dark.error {
+  border-color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.05);
+}
+
+/* Botón primario - modo oscuro */
+.btn-primary-dark {
+  background-color: var(--accent-blue);
+  color: var(--text-primary);
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-primary-dark:hover:not(:disabled) {
+  background-color: var(--accent-blue-hover);
+  transform: translateY(-1px);
+}
+
+.btn-primary-dark:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Botón secundario - modo oscuro */
+.btn-secondary-dark {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  transition: background-color 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-secondary-dark:hover:not(:disabled) {
+  background-color: #3f4750;
+  border-color: var(--accent-blue);
+  transform: translateY(-1px);
+}
+
+.btn-secondary-dark:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Título del login */
+.login-title-dark {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+/* Enlaces de texto */
+.text-link-dark {
+  color: var(--text-secondary);
+  transition: color 0.2s ease;
+}
+
+.text-link-dark:hover {
+  color: var(--accent-blue);
+}
+
+/* Underline para enlaces */
+.text-link-dark.underline {
+  text-decoration: underline;
+  text-decoration-color: var(--text-secondary);
+  text-underline-offset: 2px;
+}
+
+.text-link-dark.underline:hover {
+  text-decoration-color: var(--accent-blue);
+}
+
+/* Mensajes de error - modo oscuro */
+.error-message-dark {
+  background-color: var(--error-bg);
+  border-color: var(--error-border);
+  color: var(--error-text);
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Mensajes de éxito - modo oscuro */
+.success-message-dark {
+  background-color: var(--success-bg);
+  border-color: var(--success-border);
+  color: var(--success-text);
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Animación de entrada para mensajes */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Estados deshabilitados */
+.disabled\:opacity-50:disabled {
+  opacity: 0.5;
+}
+
+.disabled\:cursor-not-allowed:disabled {
+  cursor: not-allowed;
+}
+
+/* Animación de carga */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.isLoading {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Mejoras en la accesibilidad */
+button:focus,
+input:focus {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+}
+
+/* Responsividad para móviles */
+@media (max-width: 480px) {
+  .flex.max-w-\[480px\] {
+    max-width: 100%;
+  }
+
+  .px-4 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .min-h-screen {
+    min-height: 100vh;
+    padding: 1rem;
+  }
+
+  .h-14 {
+    height: 3rem;
+  }
+
+  .h-12 {
+    height: 2.75rem;
+  }
+
+  .h-10 {
+    height: 2.5rem;
+  }
+
+  .text-lg {
+    font-size: 1.125rem;
+  }
+
+  .text-base {
+    font-size: 0.875rem;
+  }
+
+  .text-sm {
+    font-size: 0.75rem;
+  }
+
+  /* Ajustes específicos para inputs en móvil */
+  .form-input-dark {
+    font-size: 16px; /* Previene zoom en iOS */
+  }
+}
+
+/* Responsividad para tablets */
+@media (min-width: 481px) and (max-width: 768px) {
+  .flex.max-w-\[480px\] {
+    max-width: 90%;
+    margin: 0 auto;
+  }
+
+  .px-4 {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  .min-h-screen {
+    padding: 2rem;
+  }
+
+  .h-14 {
+    height: 3.5rem;
+  }
+
+  .h-12 {
+    height: 3rem;
+  }
+
+  .h-10 {
+    height: 2.75rem;
+  }
+}
+
+/* Responsividad para tablets grandes */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .flex.max-w-\[480px\] {
+    max-width: 70%;
+    margin: 0 auto;
+  }
+
+  .px-4 {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+
+  .min-h-screen {
+    padding: 3rem;
+  }
+}
+
+/* Transiciones suaves para todos los elementos interactivos */
+* {
+  transition: background-color 0.2s ease,
+              color 0.2s ease,
+              border-color 0.2s ease,
+              transform 0.2s ease;
+}
+
+/* Mejoras adicionales para el modo oscuro */
+.form-input-dark:autofill,
+.form-input-dark:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 30px var(--bg-secondary) inset !important;
+  -webkit-text-fill-color: var(--text-primary) !important;
+}
+
+/* Scrollbar personalizado para el modo oscuro */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-blue);
+}

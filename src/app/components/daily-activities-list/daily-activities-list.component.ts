@@ -56,7 +56,15 @@ export class DailyActivitiesListComponent {
     this.activities = await this.activitiesService.getActivitiesByDay(day);
     // Programar notificaciones para todas las actividades cargadas
     this.activities.forEach(activity => {
-      this.notificationService.scheduleActivityNotification(activity);
+      if (activity.id) {
+        this.notificationService.scheduleActivityNotification({
+          id: activity.id,
+          day_of_week: activity.day_of_week,
+          title: activity.title,
+          description: activity.description || '',
+          time: activity.time
+        });
+      }
     });
   }
 
@@ -89,7 +97,15 @@ export class DailyActivitiesListComponent {
         if (index !== -1) {
           this.activities[index] = result;
           // Actualizar la notificación programada
-          this.notificationService.scheduleActivityNotification(result);
+          if (result.id) {
+            this.notificationService.scheduleActivityNotification({
+              id: result.id,
+              day_of_week: result.day_of_week,
+              title: result.title,
+              description: result.description || '',
+              time: result.time
+            });
+          }
         }
         this.cancelEditing();
       }
@@ -121,7 +137,15 @@ export class DailyActivitiesListComponent {
       if (createdActivity) {
         this.activities.push(createdActivity);
          // Programar notificación para la nueva actividad
-        this.notificationService.scheduleActivityNotification(createdActivity);
+        if (createdActivity.id) {
+          this.notificationService.scheduleActivityNotification({
+            id: createdActivity.id,
+            day_of_week: createdActivity.day_of_week,
+            title: createdActivity.title,
+            description: createdActivity.description || '',
+            time: createdActivity.time
+          });
+        }
         this.activityForm.reset();
       }
     }
