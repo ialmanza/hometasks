@@ -41,6 +41,8 @@ export class DailyActivitiesListComponent {
 
   ngOnInit() {
     this.loadActivitiesForDay(this.selectedDay!);
+    // Verificar el estado de las notificaciones programadas
+    this.notificationService.checkScheduledNotifications();
   }
 
   ngOnDestroy() {
@@ -54,9 +56,12 @@ export class DailyActivitiesListComponent {
 
   async loadActivitiesForDay(day: string) {
     this.activities = await this.activitiesService.getActivitiesByDay(day);
+    console.log('Actividades cargadas para', day, ':', this.activities);
+    
     // Programar notificaciones para todas las actividades cargadas
     this.activities.forEach(activity => {
       if (activity.id) {
+        console.log('Programando notificación para actividad:', activity);
         this.notificationService.scheduleActivityNotification({
           id: activity.id,
           day_of_week: activity.day_of_week,

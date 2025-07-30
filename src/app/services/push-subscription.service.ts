@@ -20,8 +20,9 @@ export class PushSubscriptionService {
   private async initServiceWorker() {
     if ('serviceWorker' in navigator) {
       try {
-        this.swRegistration = await navigator.serviceWorker.register('/ngsw-worker.js');
-        console.log('Service Worker registrado exitosamente');
+        // Intentar registrar nuestro Service Worker personalizado primero
+        this.swRegistration = await navigator.serviceWorker.register('/sw.js');
+        console.log('Service Worker personalizado registrado exitosamente');
         
         // Esperar a que el service worker esté listo
         await navigator.serviceWorker.ready;
@@ -29,7 +30,20 @@ export class PushSubscriptionService {
         
         await this.checkAndSubscribe();
       } catch (error) {
-        console.error('Error registrando Service Worker:', error);
+        console.error('Error registrando Service Worker personalizado:', error);
+        
+        // Fallback: intentar con el Service Worker de Angular
+        try {
+          this.swRegistration = await navigator.serviceWorker.register('/ngsw-worker.js');
+          console.log('Service Worker de Angular registrado exitosamente');
+          
+          await navigator.serviceWorker.ready;
+          console.log('Service Worker de Angular listo');
+          
+          await this.checkAndSubscribe();
+        } catch (angularError) {
+          console.error('Error registrando Service Worker de Angular:', angularError);
+        }
       }
     } else {
       console.warn('Service Worker no soportado en este navegador');
