@@ -6,6 +6,7 @@ import { CalendarActivity, CalendarActivityWithMember } from '../../models/calen
 import { CalendarActivitiesService } from '../../services/calendar-activities.service';
 import { MembersService } from '../../services/members.service';
 import { NotificationService } from '../../services/notifications.service';
+import { PushSubscriptionService } from '../../services/push-subscription.service';
 import { AppNavigationComponent } from "../app-navigation/app-navigation.component";
 import { faEdit, faTrash, faPlus, faCalendar, faTimes, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 
@@ -56,6 +57,7 @@ export class CalendarActivitiesComponent implements OnInit {
     private calendarService: CalendarActivitiesService,
     private membersService: MembersService,
     private notificationService: NotificationService,
+    private pushSubscriptionService: PushSubscriptionService,
     private fb: FormBuilder
   ) {
     this.activityForm = this.fb.group({
@@ -73,10 +75,37 @@ export class CalendarActivitiesComponent implements OnInit {
     this.loadMembers();
     this.generateCalendar();
     this.loadActivities();
+    this.setupNotifications();
+    this.setupRealtimeSubscription();
   }
 
   ngOnDestroy() {
     this.notificationService.cleanup();
+  }
+
+  // Configurar notificaciones
+  private setupNotifications() {
+    this.notificationService.requestNotificationPermission();
+
+    // Solicitar permiso de notificaciones
+    if ('Notification' in window) {
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+          console.log('Notificaciones habilitadas para el calendario');
+          // Iniciar suscripción de push
+          this.pushSubscriptionService.checkAndSubscribe();
+        }
+      });
+    }
+  }
+
+  // Configurar suscripción en tiempo real
+  private setupRealtimeSubscription() {
+    this.calendarService.activities$.subscribe(activities => {
+      console.log('Actividades actualizadas en tiempo real:', activities);
+      // Aquí puedes agregar lógica adicional si necesitas actualizar la UI
+      // Por ejemplo, mostrar un toast o actualizar contadores
+    });
   }
 
   // Generar calendario del mes
