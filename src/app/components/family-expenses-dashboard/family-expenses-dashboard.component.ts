@@ -149,7 +149,7 @@ export class FamilyExpensesDashboardComponent implements OnInit, OnDestroy {
 
   private loadShoppingList(): void {
     this.shoppingListLoading = true;
-    
+
     this.subscription.add(
       this.shoppingListService.getItems().subscribe({
         next: (items) => {
@@ -169,35 +169,11 @@ export class FamilyExpensesDashboardComponent implements OnInit, OnDestroy {
 
   private async loadUpcomingActivities(): Promise<void> {
     this.activitiesLoading = true;
-    
+
     try {
-      const today = new Date();
-      const endDate = new Date();
-      endDate.setDate(today.getDate() + 7); // 7 días desde hoy
-      
-      const startDateStr = today.toISOString().split('T')[0];
-      const endDateStr = endDate.toISOString().split('T')[0];
-      
-      // Obtener todas las actividades del mes actual y filtrar por fecha
-      const currentMonth = today.getMonth() + 1;
-      const currentYear = today.getFullYear();
-      
-      const allActivities = await this.calendarActivitiesService.getActivitiesByMonth(currentMonth, currentYear);
-      
-      // Filtrar actividades que están entre hoy y 7 días
-      this.upcomingActivities = allActivities
-        .filter(activity => {
-          const activityDate = new Date(activity.date);
-          return activityDate >= today && activityDate <= endDate;
-        })
-        .sort((a, b) => {
-          // Ordenar por fecha y luego por hora
-          const dateA = new Date(`${a.date} ${a.time || '00:00'}`);
-          const dateB = new Date(`${b.date} ${b.time || '00:00'}`);
-          return dateA.getTime() - dateB.getTime();
-        })
-        .slice(0, 10); // Limitar a 10 actividades
-      
+      // Usar el método corregido getUpcomingActivities()
+      this.upcomingActivities = await this.calendarActivitiesService.getUpcomingActivities();
+
       this.activitiesLoading = false;
     } catch (error) {
       console.error('Error loading upcoming activities:', error);
