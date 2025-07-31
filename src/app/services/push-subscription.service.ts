@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '../../environments/environments';
+import { AuthorizedUsersService } from './authorized-users.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +10,7 @@ export class PushSubscriptionService {
   private supabase: SupabaseClient;
   private swRegistration: ServiceWorkerRegistration | null = null;
 
-  constructor() {
+  constructor(private authorizedUsersService: AuthorizedUsersService) {
     this.supabase = createClient(
       environment.supabaseUrl,
       environment.supabaseKey
@@ -182,10 +183,37 @@ export class PushSubscriptionService {
       return;
     }
 
+    // Obtener usuario actual
+    const { data: { user } } = await this.supabase.auth.getUser();
+    
+    if (!user?.email) {
+      console.log('Usuario no logueado - no se pueden enviar notificaciones push');
+      return;
+    }
+
+    console.log('Usuario logueado:', user.email);
+
+    // Verificar si el usuario está autorizado para recibir notificaciones
+    const authorizedUser = await this.authorizedUsersService.isUserAuthorized(user.email);
+    
+    if (!authorizedUser) {
+      console.log('Usuario logueado pero NO autorizado para recibir notificaciones:', user.email);
+      console.log('Para recibir notificaciones, el usuario debe estar en la lista de autorizados');
+      return;
+    }
+
+    console.log('Usuario logueado Y autorizado para notificaciones:', authorizedUser.name);
+
+    // Verificar preferencias de notificación
+    if (!authorizedUser.notification_preferences?.push) {
+      console.log('Usuario autorizado pero no tiene habilitadas las notificaciones push');
+      return;
+    }
+
     // Solicitar permiso
     const permission = await Notification.requestPermission();
     if (permission !== 'granted') {
-      console.warn('Permiso de notificación denegado');
+      console.warn('Permiso de notificación denegado por el usuario');
       return;
     }
 

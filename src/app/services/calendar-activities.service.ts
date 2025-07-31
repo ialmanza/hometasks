@@ -3,6 +3,8 @@ import { CalendarActivity, CalendarActivityWithMember } from '../models/calendar
 import { AuthService } from './auth.service';
 import { NotificationService } from './notifications.service';
 import { CalendarNotificationsService } from './calendar-notifications.service';
+import { PushNotificationService } from './push-notification.service';
+import { GuestNotificationService } from './guest-notification.service';
 import { supabase } from './Supabase-Client/supabase-client';
 import { BehaviorSubject, Observable } from 'rxjs';
 
@@ -16,7 +18,9 @@ export class CalendarActivitiesService {
   constructor(
     private authService: AuthService,
     private notificationService: NotificationService,
-    private calendarNotificationsService: CalendarNotificationsService
+    private calendarNotificationsService: CalendarNotificationsService,
+    private pushNotificationService: PushNotificationService,
+    private guestNotificationService: GuestNotificationService
   ) {
     this.setupRealtimeSubscription();
   }
@@ -159,6 +163,33 @@ export class CalendarActivitiesService {
       this.notificationService.sendCalendarEventNotification(data);
       // También enviar notificación push
       await this.calendarNotificationsService.sendCalendarEventPushNotification(data);
+      
+      // Enviar notificación push a todos los usuarios autorizados
+      await this.pushNotificationService.sendPushNotificationToAllAuthorized({
+        title: 'Nuevo Evento del Calendario',
+        body: `${data.description} - ${data.date} a las ${data.time}`,
+        icon: '/assets/icons/icon-192x192.jpg',
+        tag: 'calendar-event',
+        data: {
+          type: 'calendar_event',
+          activityId: data.id,
+          date: data.date,
+          time: data.time
+        }
+      });
+
+      // Enviar notificación a usuarios invitados
+      await this.guestNotificationService.sendGuestNotification({
+        title: 'Nuevo Evento del Calendario',
+        body: `${data.description} - ${data.date} a las ${data.time}`,
+        notification_type: 'calendar_event',
+        data: {
+          activityId: data.id,
+          date: data.date,
+          time: data.time,
+          description: data.description
+        }
+      });
     }
 
     return data;
