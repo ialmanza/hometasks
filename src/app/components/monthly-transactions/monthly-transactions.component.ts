@@ -110,6 +110,18 @@ export class MonthlyTransactionsComponent implements OnInit, OnDestroy {
         members: this.membersService.getAllMembers()
       }).subscribe({
         next: ({ expenses, members }) => {
+          console.log('=== DATOS CARGADOS ===');
+          console.log('Mes/Año seleccionado:', this.selectedMonth, this.selectedYear);
+          console.log('Gastos cargados:', expenses.length);
+          console.log('Miembros cargados:', members.length);
+          console.log('Gastos:', expenses.map(e => ({ 
+            title: e.title, 
+            amount: e.amount, 
+            is_paid: e.is_paid, 
+            due_date: e.due_date,
+            created_at: e.created_at 
+          })));
+          
           this.expenses = expenses;
           this.members = members;
           this.calculateStats();
@@ -130,16 +142,31 @@ export class MonthlyTransactionsComponent implements OnInit, OnDestroy {
   }
 
   calculateStats(): void {
-    const paidExpenses = this.expenses.filter(e => e.is_paid);
-    const pendingExpenses = this.expenses.filter(e => !e.is_paid);
+    // Filtrar gastos pagados y pendientes
+    const paidExpenses = this.expenses.filter(e => e.is_paid === true);
+    const pendingExpenses = this.expenses.filter(e => e.is_paid === false);
+
+    // Calcular totales usando reduce con valor inicial 0
+    const totalSpent = paidExpenses.reduce((sum, e) => sum + (e.amount || 0), 0);
+    const totalPending = pendingExpenses.reduce((sum, e) => sum + (e.amount || 0), 0);
 
     this.stats = {
-      totalSpent: paidExpenses.reduce((sum, e) => sum + e.amount, 0),
-      totalPending: pendingExpenses.reduce((sum, e) => sum + e.amount, 0),
+      totalSpent: totalSpent,
+      totalPending: totalPending,
       totalExpenses: this.expenses.length,
       paidExpenses: paidExpenses.length,
       pendingExpenses: pendingExpenses.length
     };
+
+    // Debug: mostrar los cálculos en consola
+    console.log('=== CÁLCULOS DE ESTADÍSTICAS ===');
+    console.log('Total gastos:', this.expenses.length);
+    console.log('Gastos pagados:', paidExpenses.length);
+    console.log('Gastos pendientes:', pendingExpenses.length);
+    console.log('Total pagado:', totalSpent);
+    console.log('Total pendiente:', totalPending);
+    console.log('Gastos pagados:', paidExpenses.map(e => ({ title: e.title, amount: e.amount, is_paid: e.is_paid })));
+    console.log('Gastos pendientes:', pendingExpenses.map(e => ({ title: e.title, amount: e.amount, is_paid: e.is_paid })));
   }
 
   applyFilter(): void {

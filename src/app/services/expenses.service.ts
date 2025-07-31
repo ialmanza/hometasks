@@ -318,7 +318,7 @@ export class ExpensesService {
       this.supabase
         .from('family_expenses')
         .select('*')
-        .not('due_date', 'is', null) // Solo gastos con due_date
+        .not('due_date', 'is', null) // Solo gastos con fecha de vencimiento
         .gte('due_date', startDate)
         .lt('due_date', endDate)
         .order('due_date', { ascending: true })

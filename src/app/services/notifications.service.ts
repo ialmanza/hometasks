@@ -154,7 +154,7 @@ export class NotificationService {
   }
 
   // Reproducir sonido de notificación
-  private playNotificationSound(): void {
+  playNotificationSound(): void {
     try {
       const audio = new Audio('/level-up-191997.mp3');
       audio.volume = 0.5;

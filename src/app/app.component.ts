@@ -60,6 +60,5 @@ export class AppComponent implements OnInit {
     const currentUrl = this.router.url;
     // Verificar si la ruta actual es login (la ruta raíz ahora redirige al dashboard)
     this.isLoginPage = currentUrl === '/login';
-    console.log('Current route:', currentUrl, 'Is login page:', this.isLoginPage);
   }
 }

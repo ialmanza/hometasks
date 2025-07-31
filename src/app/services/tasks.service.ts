@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { BehaviorSubject, Observable, from } from 'rxjs';
 import { environment } from '../../environments/environments';
+import { GuestNotificationService } from './guest-notification.service';
+import { NotificationService } from './notifications.service';
 
 export interface Task {
   id?: number;
@@ -19,7 +21,10 @@ export class TasksService {
   private _tasks = new BehaviorSubject<Task[]>([]);
   tasks$ = this._tasks.asObservable();
 
-  constructor() {
+  constructor(
+    private guestNotificationService: GuestNotificationService,
+    private notificationService: NotificationService
+  ) {
     this.supabase = createClient(
       environment.supabaseUrl,
       environment.supabaseKey
@@ -78,6 +83,22 @@ export class TasksService {
         this._tasks.next([data[0], ...currentTasks]);
         this.playNotificationSound();
         console.log('Tarea agregada exitosamente:', data[0]);
+        
+        // Enviar notificación local del navegador
+        this.notificationService.sendTaskNotification(task);
+        
+        // Enviar notificación push a usuarios autorizados
+        await this.guestNotificationService.sendGuestNotification({
+          title: 'Nueva Tarea Creada',
+          body: `${task.title} - ${task.description || 'Sin descripción'}`,
+          notification_type: 'task',
+          data: {
+            taskId: data[0].id,
+            title: task.title,
+            description: task.description,
+            completed: false
+          }
+        });
       } else {
         console.warn('No se recibieron datos de la inserción');
       }

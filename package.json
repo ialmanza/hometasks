@@ -10,7 +10,9 @@
     "generate-vapid": "node scripts/generate-vapid-keys.js",
     "check-pwa": "node scripts/check-pwa-config.js",
     "setup-dev": "node scripts/set-environment-dev.js",
-    "start": "npm run setup-dev && ng serve"
+    "start": "npm run setup-dev && ng serve",
+    "deploy-push-function": "node scripts/deploy-push-function.js",
+    "deploy-all": "npm run deploy-push-function && npm run build"
   },
   "private": true,
   "dependencies": {

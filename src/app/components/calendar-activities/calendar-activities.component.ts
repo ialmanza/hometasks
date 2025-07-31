@@ -33,6 +33,7 @@ export class CalendarActivitiesComponent implements OnInit {
   showAddForm = false;
   editingActivity: CalendarActivity | null = null;
   isLoading = false;
+  isSaving = false;
   errorMessage = '';
   dateError = '';
   
@@ -211,55 +212,68 @@ export class CalendarActivitiesComponent implements OnInit {
   // Agregar nueva actividad
   async addActivity() {
     if (this.activityForm.valid) {
-      const formValue = this.activityForm.value;
+      this.isSaving = true;
+      this.errorMessage = '';
       
-      // Verificar si la fecha ya pasó
-      if (this.isDateInPast(formValue.date)) {
-        this.errorMessage = 'No puedes crear actividades en fechas que ya pasaron. Por favor, elige una fecha futura.';
-        return;
-      }
-      
-      // Verificar si hay duplicados
-      if (formValue.time && formValue.member_id) {
-        const isDuplicate = await this.calendarService.checkDuplicateActivity(
-          formValue.date, 
-          formValue.time, 
-          formValue.member_id
-        );
+      try {
+        const formValue = this.activityForm.value;
         
-        if (isDuplicate) {
-          this.errorMessage = 'Ya existe una actividad para este miembro en la misma fecha y hora. Por favor, elige otro horario.';
+        // Verificar si la fecha ya pasó
+        if (this.isDateInPast(formValue.date)) {
+          this.errorMessage = 'No puedes crear actividades en fechas que ya pasaron. Por favor, elige una fecha futura.';
           return;
         }
-      }
-
-      // Limpiar mensaje de error si no hay problemas
-      this.errorMessage = '';
-
-      const newActivity: CalendarActivity = {
-        ...formValue
-        // user_id se maneja automáticamente en el servicio
-      };
-
-      const createdActivity = await this.calendarService.createActivity(newActivity);
-      if (createdActivity && createdActivity.id) {
-        // Programar notificación
-        this.notificationService.scheduleActivityNotification({
-          id: createdActivity.id,
-          day_of_week: this.getDayOfWeek(createdActivity.date),
-          title: createdActivity.title,
-          description: createdActivity.description || '',
-          time: createdActivity.time || ''
-        });
         
-        // Actualizar la fecha seleccionada si no estaba establecida
-        if (!this.selectedDate) {
-          this.selectedDate = createdActivity.date;
+        // Verificar si hay duplicados
+        if (formValue.time && formValue.member_id) {
+          const isDuplicate = await this.calendarService.checkDuplicateActivity(
+            formValue.date, 
+            formValue.time, 
+            formValue.member_id
+          );
+          
+          if (isDuplicate) {
+            this.errorMessage = 'Ya existe una actividad para este miembro en la misma fecha y hora. Por favor, elige otro horario.';
+            return;
+          }
         }
-        
-        this.selectedDayActivities = await this.calendarService.getActivitiesByDay(this.selectedDate);
-        this.cancelForm();
-        this.loadActivities(); // Recargar para actualizar indicadores
+
+        const newActivity: CalendarActivity = {
+          ...formValue
+          // user_id se maneja automáticamente en el servicio
+        };
+
+        const createdActivity = await this.calendarService.createActivity(newActivity);
+        if (createdActivity && createdActivity.id) {
+          // Programar notificación
+          this.notificationService.scheduleActivityNotification({
+            id: createdActivity.id,
+            day_of_week: this.getDayOfWeek(createdActivity.date),
+            title: createdActivity.title,
+            description: createdActivity.description || '',
+            time: createdActivity.time || ''
+          });
+          
+          // Reproducir sonido de notificación
+          this.notificationService.playNotificationSound();
+          
+          // Actualizar la fecha seleccionada si no estaba establecida
+          if (!this.selectedDate) {
+            this.selectedDate = createdActivity.date;
+          }
+          
+          this.selectedDayActivities = await this.calendarService.getActivitiesByDay(this.selectedDate);
+          this.cancelForm();
+          this.loadActivities(); // Recargar para actualizar indicadores
+          
+          // Cerrar el modal después de crear la actividad
+          this.showModal = false;
+        }
+      } catch (error) {
+        console.error('Error al crear actividad:', error);
+        this.errorMessage = 'Error al crear la actividad. Por favor, intenta de nuevo.';
+      } finally {
+        this.isSaving = false;
       }
     }
   }
@@ -282,41 +296,54 @@ export class CalendarActivitiesComponent implements OnInit {
   // Actualizar actividad
   async updateActivity() {
     if (this.activityForm.valid && this.editingActivity) {
-      const formValue = this.activityForm.value;
+      this.isSaving = true;
+      this.errorMessage = '';
       
-      // Verificar si la fecha ya pasó
-      if (this.isDateInPast(formValue.date)) {
-        this.errorMessage = 'No puedes actualizar actividades en fechas que ya pasaron. Por favor, elige una fecha futura.';
-        return;
-      }
-
-      // Verificar si hay duplicados (excluyendo la actividad actual)
-      if (formValue.time && formValue.member_id) {
-        const isDuplicate = await this.calendarService.checkDuplicateActivity(
-          formValue.date, 
-          formValue.time, 
-          formValue.member_id,
-          this.editingActivity.id
-        );
+      try {
+        const formValue = this.activityForm.value;
         
-        if (isDuplicate) {
-          this.errorMessage = 'Ya existe una actividad para este miembro en la misma fecha y hora. Por favor, elige otro horario.';
+        // Verificar si la fecha ya pasó
+        if (this.isDateInPast(formValue.date)) {
+          this.errorMessage = 'No puedes actualizar actividades en fechas que ya pasaron. Por favor, elige una fecha futura.';
           return;
         }
-      }
 
-      // Limpiar mensaje de error si no hay problemas
-      this.errorMessage = '';
+        // Verificar si hay duplicados (excluyendo la actividad actual)
+        if (formValue.time && formValue.member_id) {
+          const isDuplicate = await this.calendarService.checkDuplicateActivity(
+            formValue.date, 
+            formValue.time, 
+            formValue.member_id,
+            this.editingActivity.id
+          );
+          
+          if (isDuplicate) {
+            this.errorMessage = 'Ya existe una actividad para este miembro en la misma fecha y hora. Por favor, elige otro horario.';
+            return;
+          }
+        }
 
-      const updatedActivity: Partial<CalendarActivity> = {
-        ...formValue
-      };
+        const updatedActivity: Partial<CalendarActivity> = {
+          ...formValue
+        };
 
-      const result = await this.calendarService.updateActivity(this.editingActivity.id!, updatedActivity);
-      if (result) {
-        this.selectedDayActivities = await this.calendarService.getActivitiesByDay(this.selectedDate!);
-        this.cancelForm();
-        this.loadActivities();
+        const result = await this.calendarService.updateActivity(this.editingActivity.id!, updatedActivity);
+        if (result) {
+          // Reproducir sonido de notificación
+          this.notificationService.playNotificationSound();
+          
+          this.selectedDayActivities = await this.calendarService.getActivitiesByDay(this.selectedDate!);
+          this.cancelForm();
+          this.loadActivities();
+          
+          // Cerrar el modal después de actualizar la actividad
+          this.showModal = false;
+        }
+      } catch (error) {
+        console.error('Error al actualizar actividad:', error);
+        this.errorMessage = 'Error al actualizar la actividad. Por favor, intenta de nuevo.';
+      } finally {
+        this.isSaving = false;
       }
     }
   }
