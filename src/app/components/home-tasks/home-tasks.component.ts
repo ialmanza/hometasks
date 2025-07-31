@@ -83,9 +83,9 @@ export class HomeTasksComponent implements OnInit {
         });
         this.cancelEditing();
       } else {
-        // Crear nueva tarea y enviar notificación
+        // Crear nueva tarea - las notificaciones push se manejan en el servicio
         this.todoService.addTask(taskData);
-        this.notificationService.sendTaskNotification(taskData);
+        // La notificación local se maneja en el servicio también
       }
 
       this.taskForm.reset();

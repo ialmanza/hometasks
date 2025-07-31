@@ -102,18 +102,23 @@ export class PushSubscriptionService {
         return;
       }
 
-      // Obtener el usuario actual de Supabase
+      // Obtener el usuario actual de Supabase (este es el UUID correcto)
       const { data: { user } } = await this.supabase.auth.getUser();
+
+      if (!user?.id) {
+        console.error('Usuario no autenticado');
+        return;
+      }
 
       // Convertir las claves a base64
       const p256dhBase64 = btoa(String.fromCharCode.apply(null, Array.from(new Uint8Array(p256dh))));
       const authBase64 = btoa(String.fromCharCode.apply(null, Array.from(new Uint8Array(auth))));
 
-      // Insertar suscripción
+      // Insertar suscripción usando el UUID del usuario autenticado
       const { data, error } = await this.supabase
         .from('push_subscriptions')
         .upsert({
-          user_id: user?.id,
+          user_id: user.id, // Este es el UUID correcto de auth.users
           endpoint: endpoint,
           keys: {
             p256dh: p256dhBase64,
