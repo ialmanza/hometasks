@@ -119,7 +119,7 @@ export class AddExpenseFormComponent implements OnInit {
         responsible_member_id: expense.responsible_member_id || '',
         icon: expense.icon || getIconByTitle(expense.title)
       });
-      
+
       this.selectedIcon = expense.icon || getIconByTitle(expense.title);
     }
   }
@@ -159,7 +159,7 @@ export class AddExpenseFormComponent implements OnInit {
   onSubmit() {
     if (this.expenseForm.valid) {
       this.submitting = true;
-      
+
       const expenseData: Omit<FamilyExpense, 'id' | 'created_at'> = {
         title: this.expenseForm.get('title')?.value,
         description: this.expenseForm.get('description')?.value || '',
@@ -177,11 +177,11 @@ export class AddExpenseFormComponent implements OnInit {
           ...expenseData,
           created_at: this.currentExpense?.created_at || new Date().toISOString()
         };
-        
+
         this.expensesService.updateExpense(updatedExpense).subscribe({
           next: () => {
             this.submitting = false;
-            this.router.navigate(['/expenses']);
+            this.router.navigate(['/monthly-transactions']);
           },
           error: (error: any) => {
             console.error('Error updating expense:', error);
@@ -269,4 +269,4 @@ export class AddExpenseFormComponent implements OnInit {
     };
     return labels[controlName] || controlName;
   }
-} 
+}

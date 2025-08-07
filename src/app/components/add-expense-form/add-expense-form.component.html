@@ -22,7 +22,7 @@
     </div>
 
     <!-- Formulario -->
-    <form *ngIf="!loading" [formGroup]="expenseForm" (ngSubmit)="onSubmit()" class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
+    <form *ngIf="!loading" [formGroup]="expenseForm" (ngSubmit)="onSubmit()" class="flex flex-col max-w-[480px] gap-4 px-4 py-3">
       <!-- Título -->
       <label class="flex flex-col min-w-40 flex-1">
         <p class="text-[#0e141b] text-base font-medium leading-normal pb-2">Título</p>
@@ -35,9 +35,7 @@
           {{ getErrorMessage('title') }}
         </div>
       </label>
-    </form>
 
-    <form *ngIf="!loading" [formGroup]="expenseForm" (ngSubmit)="onSubmit()" class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
       <!-- Ícono -->
       <label class="flex flex-col min-w-40 flex-1">
         <p class="text-[#0e141b] text-base font-medium leading-normal pb-2">Ícono</p>
@@ -50,7 +48,7 @@
             <span class="text-2xl">{{ selectedIcon }}</span>
             <fa-icon [icon]="faSmile" class="text-[#4e7097]"></fa-icon>
           </button>
-          
+
           <!-- Selector de íconos -->
           <div *ngIf="showIconSelector" class="absolute top-full left-0 right-0 z-50 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 max-h-80 overflow-y-auto icon-selector">
             <div class="p-4">
@@ -73,9 +71,7 @@
         </div>
         <input type="hidden" formControlName="icon" />
       </label>
-    </form>
 
-    <form *ngIf="!loading" [formGroup]="expenseForm" (ngSubmit)="onSubmit()" class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
       <!-- Descripción -->
       <label class="flex flex-col min-w-40 flex-1">
         <p class="text-[#0e141b] text-base font-medium leading-normal pb-2">Descripción</p>
@@ -88,9 +84,7 @@
           {{ getErrorMessage('description') }}
         </div>
       </label>
-    </form>
 
-    <form *ngIf="!loading" [formGroup]="expenseForm" (ngSubmit)="onSubmit()" class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
       <!-- Monto -->
       <label class="flex flex-col min-w-40 flex-1">
         <p class="text-[#0e141b] text-base font-medium leading-normal pb-2">Monto</p>
@@ -104,9 +98,7 @@
           {{ getErrorMessage('amount') }}
         </div>
       </label>
-    </form>
 
-    <form *ngIf="!loading" [formGroup]="expenseForm" (ngSubmit)="onSubmit()" class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
       <!-- Fecha de vencimiento -->
       <label class="flex flex-col min-w-40 flex-1">
         <p class="text-[#0e141b] text-base font-medium leading-normal pb-2">Fecha de Vencimiento</p>
@@ -125,9 +117,7 @@
           {{ getErrorMessage('due_date') }}
         </div>
       </label>
-    </form>
 
-    <form *ngIf="!loading" [formGroup]="expenseForm" (ngSubmit)="onSubmit()" class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
       <!-- Miembro responsable -->
       <label class="flex flex-col min-w-40 flex-1">
         <p class="text-[#0e141b] text-base font-medium leading-normal pb-2">Miembro Responsable</p>
@@ -166,4 +156,4 @@
     </div>
     <div class="h-5 bg-slate-50"></div>
   </div>
-</div> 
+</div>
