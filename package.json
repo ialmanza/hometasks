@@ -3,10 +3,16 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "prebuild": "node scripts/set-environment.js",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "generate-vapid": "node scripts/generate-vapid-keys.js",
+    "check-pwa": "node scripts/check-pwa-config.js",
+    "setup-dev": "node scripts/set-environment-dev.js",
+    "start": "npm run setup-dev && ng serve",
+    "deploy-push-function": "node scripts/deploy-push-function.js",
+    "deploy-all": "npm run deploy-push-function && npm run build"
   },
   "private": true,
   "dependencies": {
@@ -27,7 +33,6 @@
     "chart.js": "^4.5.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
-    "web-push": "^3.6.7",
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
@@ -35,7 +40,6 @@
     "@angular/cli": "^19.0.5",
     "@angular/compiler-cli": "^19.0.4",
     "@types/jasmine": "~5.1.0",
-    "@types/web-push": "^3.6.4",
     "autoprefixer": "^10.4.20",
     "jasmine-core": "~5.2.0",
     "karma": "~6.4.0",

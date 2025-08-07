@@ -13,6 +13,8 @@ import { MonthlyTransactionsComponent } from './components/monthly-transactions/
 import { CalendarActivitiesComponent } from './components/calendar-activities/calendar-activities.component';
 import { Login } from './components/Login/login/login';
 import { AuthGuard } from './guards/auth.guard';
+import { AuthorizedUsersComponent } from './components/authorized-users/authorized-users.component';
+import { PushDiagnosticComponent } from './components/push-diagnostic/push-diagnostic.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/expenses-dashboard', pathMatch: 'full' },
@@ -29,6 +31,8 @@ export const routes: Routes = [
   { path: 'expenses', component: MonthlyTransactionsComponent, canActivate: [AuthGuard]},
   { path: 'expenses-dashboard', component: FamilyExpensesDashboardComponent, canActivate: [AuthGuard] },
   { path: 'monthly-transactions', component:  FamilyExpensesComponent, canActivate: [AuthGuard]},
+  { path: 'authorized-users', component: AuthorizedUsersComponent, canActivate: [AuthGuard] },
+  { path: 'push-diagnostic', component: PushDiagnosticComponent, canActivate: [AuthGuard] },
   { path: 'login', component: Login},
   { path: '**', redirectTo: '/login' }
 ];

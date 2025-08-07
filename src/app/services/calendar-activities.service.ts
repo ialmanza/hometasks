@@ -3,6 +3,8 @@ import { CalendarActivity, CalendarActivityWithMember } from '../models/calendar
 import { AuthService } from './auth.service';
 import { NotificationService } from './notifications.service';
 import { CalendarNotificationsService } from './calendar-notifications.service';
+import { PushNotificationService } from './push-notification.service';
+import { GuestNotificationService } from './guest-notification.service';
 import { supabase } from './Supabase-Client/supabase-client';
 import { BehaviorSubject, Observable } from 'rxjs';
 
@@ -16,7 +18,9 @@ export class CalendarActivitiesService {
   constructor(
     private authService: AuthService,
     private notificationService: NotificationService,
-    private calendarNotificationsService: CalendarNotificationsService
+    private calendarNotificationsService: CalendarNotificationsService,
+    private pushNotificationService: PushNotificationService,
+    private guestNotificationService: GuestNotificationService
   ) {
     this.setupRealtimeSubscription();
   }
@@ -34,7 +38,7 @@ export class CalendarActivitiesService {
         },
         (payload) => {
           console.log('Cambio en tiempo real detectado:', payload);
-          
+
           // Manejar diferentes tipos de eventos
           switch (payload.eventType) {
             case 'INSERT':
@@ -50,25 +54,20 @@ export class CalendarActivitiesService {
         }
       )
       .subscribe();
-
-    console.log('Suscripción en tiempo real configurada para actividades del calendario');
   }
 
   // Manejar nueva actividad
   private handleNewActivity(activity: CalendarActivity) {
-    console.log('Nueva actividad creada:', activity);
     // La notificación ya se envía en createActivity, pero podemos agregar lógica adicional aquí
   }
 
   // Manejar actividad actualizada
   private handleUpdatedActivity(activity: CalendarActivity) {
-    console.log('Actividad actualizada:', activity);
     // La notificación ya se envía en updateActivity, pero podemos agregar lógica adicional aquí
   }
 
   // Manejar actividad eliminada
   private handleDeletedActivity(activity: CalendarActivity) {
-    console.log('Actividad eliminada:', activity);
     // La notificación ya se envía en deleteActivity, pero podemos agregar lógica adicional aquí
   }
 
@@ -159,6 +158,33 @@ export class CalendarActivitiesService {
       this.notificationService.sendCalendarEventNotification(data);
       // También enviar notificación push
       await this.calendarNotificationsService.sendCalendarEventPushNotification(data);
+
+      // Enviar notificación push a todos los usuarios autorizados
+      await this.pushNotificationService.sendPushNotificationToAllAuthorized({
+        title: 'Nuevo Evento del Calendario',
+        body: `${data.description} - ${data.date} a las ${data.time}`,
+        icon: '/assets/icons/icon-192x192.jpg',
+        tag: 'calendar-event',
+        data: {
+          type: 'calendar_event',
+          activityId: data.id,
+          date: data.date,
+          time: data.time
+        }
+      });
+
+      // Enviar notificación a usuarios invitados
+      await this.guestNotificationService.sendGuestNotification({
+        title: 'Nuevo Evento del Calendario',
+        body: `${data.description} - ${data.date} a las ${data.time}`,
+        notification_type: 'calendar_event',
+        data: {
+          activityId: data.id,
+          date: data.date,
+          time: data.time,
+          description: data.description
+        }
+      });
     }
 
     return data;
@@ -298,4 +324,44 @@ export class CalendarActivitiesService {
 
     return (data?.length || 0) > 0;
   }
-} 
+
+  // Obtener próximas citas (hoy + 7 días, máximo 5)
+  async getUpcomingActivities(): Promise<CalendarActivityWithMember[]> {
+    // Obtener el ID del usuario actual
+    const userId = await this.authService.getCurrentUserId();
+    if (!userId) {
+      console.error('No authenticated user found');
+      return [];
+    }
+
+    const today = new Date();
+    const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+    const startDate = today.toISOString().split('T')[0];
+    const endDate = nextWeek.toISOString().split('T')[0];
+
+    const { data, error } = await supabase
+      .from('calendar_activities')
+      .select(`
+        *,
+        family_members(name, color)
+      `)
+      .eq('user_id', userId) // Filtrar por usuario actual
+      .gte('date', startDate)
+      .lte('date', endDate)
+      .order('date', { ascending: true })
+      .order('time', { ascending: true })
+      .limit(5);
+
+    if (error) {
+      console.error('Error fetching upcoming activities:', error);
+      return [];
+    }
+
+    return data?.map(item => ({
+      ...item,
+      member_name: item.family_members?.name,
+      member_color: item.family_members?.color
+    })) || [];
+  }
+}

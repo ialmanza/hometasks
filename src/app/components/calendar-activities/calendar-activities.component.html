@@ -243,11 +243,15 @@
         </div>
 
         <div class="form-actions">
-          <button type="button" class="btn-secondary" (click)="cancelForm()">
+          <button type="button" class="btn-secondary" (click)="cancelForm()" [disabled]="isSaving">
             Cancelar
           </button>
-          <button type="submit" class="btn-primary" [disabled]="!activityForm.valid">
-            {{ editingActivity ? 'Actualizar' : 'Agregar' }}
+          <button type="submit" class="btn-primary" [disabled]="!activityForm.valid || isSaving">
+            <span *ngIf="!isSaving">{{ editingActivity ? 'Actualizar' : 'Agregar' }}</span>
+            <span *ngIf="isSaving" class="saving-spinner">
+              <div class="spinner-small"></div>
+              Guardando...
+            </span>
           </button>
         </div>
       </form>

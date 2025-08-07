@@ -634,4 +634,27 @@
   color: #666;
   font-size: 14px;
   margin: 0;
+}
+
+/* Spinner de guardado */
+.saving-spinner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Deshabilitar botones durante el guardado */
+.btn-primary:disabled,
+.btn-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 } 

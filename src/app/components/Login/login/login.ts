@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { SupabaseService } from '../../../services/Supabase/supabaseservice';
+import { PushSubscriptionService } from '../../../services/push-subscription.service';
 
 @Component({
   selector: 'app-login',
@@ -20,7 +21,8 @@ export class Login {
 
   constructor(
     private supabaseService: SupabaseService,
-    private router: Router
+    private router: Router,
+    private pushSubscriptionService: PushSubscriptionService
   ) {}
 
   /**
@@ -42,7 +44,17 @@ export class Login {
         } else {
           console.log('Login exitoso:', response);
           this.showSuccess('¡Inicio de sesión exitoso!');
-          setTimeout(() => {
+          
+          // Inicializar notificaciones push después del login exitoso
+          setTimeout(async () => {
+            try {
+              console.log('Inicializando notificaciones push después del login...');
+              await this.pushSubscriptionService.checkAndSubscribe();
+            } catch (error) {
+              console.error('Error inicializando notificaciones push:', error);
+            }
+            
+            // Navegar al dashboard
             this.router.navigate(['/expenses-dashboard']);
           }, 1000);
         }
