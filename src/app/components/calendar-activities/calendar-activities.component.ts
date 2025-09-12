@@ -243,6 +243,9 @@ export class CalendarActivitiesComponent implements OnInit {
           // user_id se maneja automáticamente en el servicio
         };
 
+        // Limpiar cualquier mensaje de error previo antes de crear la actividad
+        this.errorMessage = '';
+
         const createdActivity = await this.calendarService.createActivity(newActivity);
         if (createdActivity && createdActivity.id) {
           // Programar notificación
