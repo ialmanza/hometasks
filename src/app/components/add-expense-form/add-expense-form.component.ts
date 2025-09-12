@@ -108,8 +108,16 @@ export class AddExpenseFormComponent implements OnInit {
   populateFormWithExpense(expense: FamilyExpense) {
     // Formatear la fecha para el input de tipo date
     if (expense.due_date) {
-      const dueDate = new Date(expense.due_date);
-      const formattedDate = dueDate.toISOString().split('T')[0];
+      // Si la fecha ya está en formato YYYY-MM-DD, usarla directamente
+      // Si no, parsearla como fecha local para evitar problemas de zona horaria
+      let formattedDate: string;
+      if (/^\d{4}-\d{2}-\d{2}$/.test(expense.due_date)) {
+        formattedDate = expense.due_date;
+      } else {
+        const [year, month, day] = expense.due_date.split('-').map(Number);
+        const dueDate = new Date(year, month - 1, day); // month es 0-indexado
+        formattedDate = dueDate.toISOString().split('T')[0];
+      }
 
       this.expenseForm.patchValue({
         title: expense.title,

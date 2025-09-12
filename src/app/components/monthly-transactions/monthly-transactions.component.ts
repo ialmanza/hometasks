@@ -217,7 +217,10 @@ export class MonthlyTransactionsComponent implements OnInit, OnDestroy {
   formatDate(dateString: string): string {
     if (!dateString) return 'Sin fecha';
     
-    const date = new Date(dateString);
+    // Parsear la fecha como fecha local (sin zona horaria)
+    const [year, month, day] = dateString.split('-').map(Number);
+    const date = new Date(year, month - 1, day); // month es 0-indexado
+    
     return date.toLocaleDateString('es-AR', {
       day: '2-digit',
       month: '2-digit'

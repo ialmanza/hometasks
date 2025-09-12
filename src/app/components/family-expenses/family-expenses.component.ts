@@ -158,8 +158,13 @@ export class FamilyExpensesComponent implements OnInit {
   }
 
   formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', {
+    if (!dateString) return 'Sin fecha';
+    
+    // Parsear la fecha como fecha local (sin zona horaria)
+    const [year, month, day] = dateString.split('-').map(Number);
+    const date = new Date(year, month - 1, day); // month es 0-indexado
+    
+    return date.toLocaleDateString('es-AR', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
