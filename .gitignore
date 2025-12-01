@@ -51,3 +51,7 @@ src/environments/environment.development.ts
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Documentation
+docs/
+/docs/**

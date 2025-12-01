@@ -15,6 +15,8 @@ export class CalendarActivitiesService {
   private activitiesSubject = new BehaviorSubject<CalendarActivityWithMember[]>([]);
   public activities$ = this.activitiesSubject.asObservable();
 
+  private realtimeSubscriptionSetup = false;
+
   constructor(
     private authService: AuthService,
     private notificationService: NotificationService,
@@ -22,11 +24,18 @@ export class CalendarActivitiesService {
     private pushNotificationService: PushNotificationService,
     private guestNotificationService: GuestNotificationService
   ) {
-    this.setupRealtimeSubscription();
+    // La suscripción en tiempo real se configura bajo demanda cuando se necesita
   }
 
-  // Configurar suscripción en tiempo real
+  /**
+   * Configura la suscripción en tiempo real para cambios en calendar_activities.
+   * Este método es idempotente - solo se ejecuta una vez aunque se llame múltiples veces.
+   */
   private setupRealtimeSubscription() {
+    if (this.realtimeSubscriptionSetup) {
+      return;
+    }
+    this.realtimeSubscriptionSetup = true;
     const channel = supabase
       .channel('calendar_activities_changes')
       .on(
@@ -73,6 +82,8 @@ export class CalendarActivitiesService {
 
   // Obtener actividades por mes
   async getActivitiesByMonth(month: number, year: number): Promise<CalendarActivityWithMember[]> {
+    // Configurar suscripción en tiempo real si no está configurada
+    this.setupRealtimeSubscription();
     const startDate = `${year}-${month.toString().padStart(2, '0')}-01`;
     const endDate = `${year}-${month.toString().padStart(2, '0')}-31`;
 
@@ -106,6 +117,8 @@ export class CalendarActivitiesService {
 
   // Obtener actividades por día específico
   async getActivitiesByDay(date: string): Promise<CalendarActivityWithMember[]> {
+    // Configurar suscripción en tiempo real si no está configurada
+    this.setupRealtimeSubscription();
     const { data, error } = await supabase
       .from('calendar_activities')
       .select(`
@@ -129,6 +142,8 @@ export class CalendarActivitiesService {
 
   // Crear nueva actividad
   async createActivity(activity: CalendarActivity): Promise<CalendarActivity | null> {
+    // Configurar suscripción en tiempo real si no está configurada
+    this.setupRealtimeSubscription();
     // Obtener el ID del usuario actual
     const userId = await this.authService.getCurrentUserId();
     if (!userId) {
@@ -221,7 +236,7 @@ export class CalendarActivitiesService {
       .from('calendar_activities')
       .select('title')
       .eq('id', id)
-      .single();
+      .maybeSingle(); // Usa maybeSingle() para evitar error si la actividad no existe
 
     const { error } = await supabase
       .from('calendar_activities')

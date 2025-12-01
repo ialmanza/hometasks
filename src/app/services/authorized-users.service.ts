@@ -38,10 +38,13 @@ export class AuthorizedUsersService {
         .select('*')
         .eq('email', email.toLowerCase())
         .eq('is_active', true)
-        .single();
+        .maybeSingle(); // Usa maybeSingle() en lugar de single() para evitar error cuando no hay resultados
 
       if (error) {
-        console.error('Error verificando autorización:', error);
+        // Solo loguear errores que no sean "no rows found"
+        if (error.code !== 'PGRST116') {
+          console.error('Error verificando autorización:', error);
+        }
         return null;
       }
 

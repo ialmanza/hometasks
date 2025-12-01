@@ -42,17 +42,26 @@ export class WeeklyScheduleService {
   private _activities = new BehaviorSubject<DailyActivity[]>([]);
   activities$ = this._activities.asObservable();
 
+  private initialized = false;
+
   constructor() {
     this.supabase = createClient(
       environment.supabaseUrl,
       environment.supabaseKey
     );
-
-    // Inicializar la carga de datos y limpieza al arrancar
-    this.initializeWeeklyData();
+    // La inicialización se hace bajo demanda cuando se necesita el servicio
   }
 
-  private async initializeWeeklyData() {
+  /**
+   * Inicializa los datos semanales. Se debe llamar explícitamente cuando se necesite usar este servicio.
+   * Este método es idempotente - solo se ejecuta una vez aunque se llame múltiples veces.
+   */
+  async initializeWeeklyData() {
+    if (this.initialized) {
+      return;
+    }
+    this.initialized = true;
+    
     // Borrar registros antiguos
     await this.cleanupOldRecords();
 

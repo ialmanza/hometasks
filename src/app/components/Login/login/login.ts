@@ -45,18 +45,13 @@ export class Login {
           console.log('Login exitoso:', response);
           this.showSuccess('¡Inicio de sesión exitoso!');
           
-          // Inicializar notificaciones push después del login exitoso
-          setTimeout(async () => {
-            try {
-              console.log('Inicializando notificaciones push después del login...');
-              await this.pushSubscriptionService.checkAndSubscribe();
-            } catch (error) {
-              console.error('Error inicializando notificaciones push:', error);
-            }
-            
-            // Navegar al dashboard
-            this.router.navigate(['/expenses-dashboard']);
-          }, 1000);
+          // Navegar inmediatamente al dashboard
+          this.router.navigate(['/expenses-dashboard']);
+          
+          // Inicializar notificaciones push en background (no bloquea la navegación)
+          this.pushSubscriptionService.checkAndSubscribe().catch(error => {
+            console.error('Error inicializando notificaciones push:', error);
+          });
         }
       },
       error: (error: any) => {

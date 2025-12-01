@@ -29,7 +29,7 @@ export class TasksService {
       environment.supabaseUrl,
       environment.supabaseKey
     );
-    this.loadTasks();
+    // La carga de tareas se hace bajo demanda cuando el componente lo requiere
   }
 
   async loadTasks() {

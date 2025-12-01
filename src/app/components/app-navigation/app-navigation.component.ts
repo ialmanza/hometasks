@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faHome, faTasks, faShoppingCart, faDollarSign, faEllipsisV, faUsers, faCalendar, faCalendarAlt, faUtensils, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from '../../services/auth.service';
+import { AuthGuard } from '../../guards/auth.guard';
 
 @Component({
   selector: 'app-app-navigation',
@@ -26,7 +27,10 @@ export class AppNavigationComponent {
   faUtensils = faUtensils;
   faSignOutAlt = faSignOutAlt;
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private authGuard: AuthGuard
+  ) {}
 
   toggleMoreMenu() {
     this.showMoreMenu = !this.showMoreMenu;
@@ -39,6 +43,8 @@ export class AppNavigationComponent {
   async logout() {
     try {
       await this.authService.logout();
+      // Limpiar caché de autenticación
+      this.authGuard.clearCache();
       // Redirigir a la página de login o home
       window.location.href = '/';
     } catch (error) {

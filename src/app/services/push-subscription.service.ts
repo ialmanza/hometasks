@@ -10,15 +10,25 @@ export class PushSubscriptionService {
   private supabase: SupabaseClient;
   private swRegistration: ServiceWorkerRegistration | null = null;
 
+  private initialized = false;
+
   constructor(private authorizedUsersService: AuthorizedUsersService) {
     this.supabase = createClient(
       environment.supabaseUrl,
       environment.supabaseKey
     );
-    this.initServiceWorker();
+    // La inicialización del service worker se hace bajo demanda cuando se necesita
   }
 
-  private async initServiceWorker() {
+  /**
+   * Inicializa el service worker y las suscripciones push.
+   * Este método es idempotente - solo se ejecuta una vez aunque se llame múltiples veces.
+   */
+  async initServiceWorker() {
+    if (this.initialized) {
+      return;
+    }
+    this.initialized = true;
     if ('serviceWorker' in navigator) {
       try {
         // Intentar registrar nuestro Service Worker personalizado primero
@@ -172,6 +182,11 @@ export class PushSubscriptionService {
   }
 
   async checkAndSubscribe() {
+    // Inicializar service worker si no está inicializado
+    if (!this.initialized) {
+      await this.initServiceWorker();
+    }
+
     // Verifica si las notificaciones están soportadas
     if (!('PushManager' in window)) {
       return;
