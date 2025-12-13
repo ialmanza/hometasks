@@ -22,6 +22,90 @@ export class PushNotificationService {
   }
   
   /**
+   * Verifica si el dispositivo está online
+   */
+  private isOnline(): boolean {
+    return navigator.onLine;
+  }
+
+  /**
+   * Verifica conectividad con un timeout corto
+   */
+  private async checkConnectivity(timeout: number = 2000): Promise<boolean> {
+    if (!this.isOnline()) {
+      return false;
+    }
+
+    try {
+      // Intentar hacer una petición HEAD rápida a un recurso pequeño
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeout);
+      
+      const response = await fetch(`${environment.supabaseUrl}/rest/v1/`, {
+        method: 'HEAD',
+        signal: controller.signal,
+        cache: 'no-cache'
+      });
+      
+      clearTimeout(timeoutId);
+      return response.ok;
+    } catch (error) {
+      // Si hay error de red, timeout, o abort, asumir offline
+      return false;
+    }
+  }
+
+  /**
+   * Muestra una notificación local usando el Service Worker o la API de Notification
+   */
+  private async showLocalNotification(data: any): Promise<void> {
+    if (!('Notification' in window) || Notification.permission !== 'granted') {
+      console.log('⚠️ Permisos de notificación no concedidos');
+      return;
+    }
+
+    try {
+      // Intentar usar Service Worker primero (mejor para PWA)
+      if ('serviceWorker' in navigator) {
+        const registration = await navigator.serviceWorker.ready;
+        if (registration) {
+          // Usar tipo extendido para incluir propiedades del Service Worker
+          const notificationOptions: NotificationOptions & { renotify?: boolean; vibrate?: number[] } = {
+            body: data.body || 'Nueva notificación',
+            icon: data.icon || '/icons/icono angular/icon-192x192.png',
+            badge: data.badge || '/icons/icono angular/icon-72x72.png',
+            data: data.data || {},
+            tag: data.tag || 'default',
+            requireInteraction: false,
+            renotify: true,
+            vibrate: [200, 100, 200]
+          };
+          
+          await registration.showNotification(data.title || 'Hometasks', notificationOptions);
+          console.log('✅ Notificación local enviada vía Service Worker');
+          return;
+        }
+      }
+    } catch (error) {
+      console.warn('Error usando Service Worker para notificación, usando API directa:', error);
+    }
+
+    // Fallback: usar API de Notification directamente
+    try {
+      new Notification(data.title || 'Hometasks', {
+        body: data.body || 'Nueva notificación',
+        icon: data.icon || '/icons/icono angular/icon-192x192.png',
+        badge: data.badge || '/icons/icono angular/icon-72x72.png',
+        data: data.data || {},
+        tag: data.tag || 'default'
+      });
+      console.log('✅ Notificación local enviada vía API de Notification');
+    } catch (error) {
+      console.error('❌ Error mostrando notificación local:', error);
+    }
+  }
+
+  /**
    * Envía notificación push real usando Supabase Edge Function
    */
   async sendPushNotification(subscription: PushSubscription & { keys: PushSubscriptionKeys }, data: any) {
@@ -41,76 +125,79 @@ export class PushNotificationService {
       // Para desarrollo local, usar notificación local del navegador
       if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
         console.log('🔄 Modo desarrollo: usando notificación local del navegador');
-        
-        if ('Notification' in window && Notification.permission === 'granted') {
-          new Notification(data.title || 'Hometasks', {
-            body: data.body || 'Nueva notificación',
-            icon: data.icon || '/icons/icono angular/icon-192x192.png',
-            badge: data.badge || '/icons/icono angular/icon-72x72.png',
-            data: data.data || {},
-            tag: data.tag || 'default'
-          });
-          console.log('✅ Notificación local enviada en desarrollo');
-        } else {
-          console.log('⚠️ Permisos de notificación no concedidos en desarrollo');
-        }
+        await this.showLocalNotification(data);
+        return;
+      }
+
+      // Verificar si está offline antes de intentar llamar a la Edge Function
+      const isConnected = await this.checkConnectivity();
+      if (!isConnected) {
+        console.log('📴 Modo offline: usando notificación local');
+        await this.showLocalNotification(data);
         return;
       }
 
       // Para producción, usar Supabase Edge Function
       console.log('🔄 Modo producción: usando Supabase Edge Function');
       
-      const response = await fetch(`${environment.supabaseUrl}/functions/v1/send-push-notification`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${environment.supabaseKey}`,
-        },
-        body: JSON.stringify({
-          subscription: {
-            endpoint: subscription.endpoint,
-            keys: {
-              p256dh: subscription.keys.p256dh,
-              auth: subscription.keys.auth
-            }
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 segundos timeout
+      
+      try {
+        const response = await fetch(`${environment.supabaseUrl}/functions/v1/send-push-notification`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${environment.supabaseKey}`,
           },
-          payload: payload
-        })
-      });
+          body: JSON.stringify({
+            subscription: {
+              endpoint: subscription.endpoint,
+              keys: {
+                p256dh: subscription.keys.p256dh,
+                auth: subscription.keys.auth
+              }
+            },
+            payload: payload
+          }),
+          signal: controller.signal
+        });
 
-      if (response.ok) {
-        const result = await response.json();
-        console.log('✅ Notificación push enviada exitosamente:', result);
-      } else {
-        console.error('❌ Error enviando notificación push:', response.status, response.statusText);
+        clearTimeout(timeoutId);
+
+        if (response.ok) {
+          const result = await response.json();
+          console.log('✅ Notificación push enviada exitosamente:', result);
+        } else {
+          console.error('❌ Error enviando notificación push:', response.status, response.statusText);
+          
+          // Fallback: usar notificación local si falla la Edge Function
+          await this.showLocalNotification(data);
+        }
+      } catch (fetchError: any) {
+        clearTimeout(timeoutId);
         
-        // Fallback: usar notificación local si falla la Edge Function
-        if ('Notification' in window && Notification.permission === 'granted') {
-          new Notification(data.title || 'Hometasks', {
-            body: data.body || 'Nueva notificación',
-            icon: data.icon || '/icons/icono angular/icon-192x192.png',
-            badge: data.badge || '/icons/icono angular/icon-72x72.png',
-            data: data.data || {},
-            tag: data.tag || 'default'
-          });
-          console.log('✅ Notificación local enviada como fallback');
+        // Detectar errores de red, timeout, o CORS
+        const isNetworkError = 
+          fetchError.name === 'AbortError' || // Timeout
+          fetchError.name === 'TypeError' || // Network error
+          fetchError.message?.includes('Failed to fetch') ||
+          fetchError.message?.includes('NetworkError') ||
+          fetchError.message?.includes('CORS');
+        
+        if (isNetworkError) {
+          console.log('📴 Error de red detectado, usando notificación local');
+          await this.showLocalNotification(data);
+        } else {
+          throw fetchError; // Re-lanzar otros errores
         }
       }
       
     } catch (error) {
       console.error('❌ Error en envío de notificación push:', error);
       
-      // Fallback: usar notificación local en caso de error
-      if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification(data.title || 'Hometasks', {
-          body: data.body || 'Nueva notificación',
-          icon: data.icon || '/icons/icono angular/icon-192x192.png',
-          badge: data.badge || '/icons/icono angular/icon-72x72.png',
-          data: data.data || {},
-          tag: data.tag || 'default'
-        });
-        console.log('✅ Notificación local enviada como fallback');
-      }
+      // Fallback: usar notificación local en caso de cualquier error
+      await this.showLocalNotification(data);
     }
   }
 
