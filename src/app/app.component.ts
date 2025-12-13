@@ -23,8 +23,12 @@ export class AppComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    // Inicialización básica primero (síncrona)
     this.checkScreenSize();
     this.checkCurrentRoute();
+
+    // Manejar errores de navegación no capturados
+    this.setupErrorHandling();
 
     // Suscribirse solo a los eventos NavigationEnd para detectar cambios de ruta
     this.router.events.pipe(
@@ -35,6 +39,24 @@ export class AppComponent implements OnInit {
 
     // Las notificaciones push se inicializan después del login exitoso
     // para evitar conflictos con la autenticación
+  }
+
+  /**
+   * Configura el manejo de errores global para la aplicación
+   */
+  private setupErrorHandling(): void {
+    // Manejar errores no capturados
+    window.addEventListener('error', (event) => {
+      console.error('Error global capturado:', event.error);
+      // No bloquear la aplicación por errores no críticos
+    });
+
+    // Manejar promesas rechazadas no capturadas
+    window.addEventListener('unhandledrejection', (event) => {
+      console.error('Promesa rechazada no capturada:', event.reason);
+      // Prevenir que el error bloquee la aplicación
+      event.preventDefault();
+    });
   }
 
   // Método comentado - las notificaciones se inicializan después del login

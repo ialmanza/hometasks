@@ -57,6 +57,6 @@
     "!/**/*__*",
     "!/**/*__*/**"
   ],
-  "navigationRequestStrategy": "freshness"
+  "navigationRequestStrategy": "performance"
 }
 
