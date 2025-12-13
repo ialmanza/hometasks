@@ -1,13 +1,15 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '../../environments/environments';
 import { AuthorizedUsersService } from './authorized-users.service';
+import { PushNotificationService } from './push-notification.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PushDiagnosticService {
   private supabase: SupabaseClient;
+  private pushNotificationService = inject(PushNotificationService);
 
   constructor(private authorizedUsersService: AuthorizedUsersService) {
     this.supabase = createClient(
@@ -30,6 +32,7 @@ export class PushDiagnosticService {
     subscriptions: any[];
     authorizedUsers: any[];
     errors: string[];
+    userEmail?: string;
   }> {
     const diagnostic: {
       browserSupport: boolean;
@@ -42,6 +45,7 @@ export class PushDiagnosticService {
       subscriptions: any[];
       authorizedUsers: any[];
       errors: string[];
+      userEmail?: string;
     } = {
       browserSupport: false,
       serviceWorker: false,
@@ -52,7 +56,8 @@ export class PushDiagnosticService {
       pushPreferences: false,
       subscriptions: [],
       authorizedUsers: [],
-      errors: []
+      errors: [],
+      userEmail: undefined
     };
 
     try {
@@ -80,6 +85,7 @@ export class PushDiagnosticService {
       // 5. Verificar usuario autenticado
       const { data: { user } } = await this.supabase.auth.getUser();
       diagnostic.userAuth = !!user;
+      diagnostic.userEmail = user?.email;
       console.log('✅ Usuario autenticado:', diagnostic.userAuth, user?.email);
 
       // 6. Verificar usuario autorizado
@@ -126,8 +132,9 @@ export class PushDiagnosticService {
 
   /**
    * Verificar si una notificación push puede ser enviada
+   * Si no se pasa email, usa el usuario autenticado
    */
-  async canSendPushNotification(email: string): Promise<{
+  async canSendPushNotification(email?: string): Promise<{
     canSend: boolean;
     reasons: string[];
   }> {
@@ -135,11 +142,29 @@ export class PushDiagnosticService {
     let canSend = true;
 
     try {
+      // Obtener el UUID del usuario autenticado primero
+      const { data: { user } } = await this.supabase.auth.getUser();
+      
+      if (!user?.id) {
+        canSend = false;
+        reasons.push('Usuario no autenticado');
+        return { canSend, reasons };
+      }
+
+      // Si no se pasa email, usar el del usuario autenticado
+      const emailToCheck = email || user.email;
+      
+      if (!emailToCheck) {
+        canSend = false;
+        reasons.push('No se puede determinar el email del usuario');
+        return { canSend, reasons };
+      }
+
       // Verificar si el usuario está autorizado
-      const authorizedUser = await this.authorizedUsersService.isUserAuthorized(email);
+      const authorizedUser = await this.authorizedUsersService.isUserAuthorized(emailToCheck);
       if (!authorizedUser) {
         canSend = false;
-        reasons.push('Usuario no autorizado');
+        reasons.push(`Usuario ${emailToCheck} no está autorizado`);
       } else {
         // Verificar preferencias de notificación
         if (!authorizedUser.notification_preferences?.push) {
@@ -147,26 +172,18 @@ export class PushDiagnosticService {
           reasons.push('Notificaciones push deshabilitadas');
         }
 
-        // Obtener el UUID del usuario autenticado
-        const { data: { user } } = await this.supabase.auth.getUser();
-        
-        if (!user?.id) {
-          canSend = false;
-          reasons.push('Usuario no autenticado');
-        } else {
-          // Verificar si tiene suscripciones usando el UUID correcto
-          const { data: subscriptions, error } = await this.supabase
-            .from('push_subscriptions')
-            .select('*')
-            .eq('user_id', user.id); // Usar el UUID de auth.users
+        // Verificar si tiene suscripciones usando el UUID correcto
+        const { data: subscriptions, error } = await this.supabase
+          .from('push_subscriptions')
+          .select('*')
+          .eq('user_id', user.id); // Usar el UUID de auth.users
 
-          if (error) {
-            canSend = false;
-            reasons.push(`Error obteniendo suscripciones: ${error.message}`);
-          } else if (!subscriptions || subscriptions.length === 0) {
-            canSend = false;
-            reasons.push('No hay suscripciones push registradas');
-          }
+        if (error) {
+          canSend = false;
+          reasons.push(`Error obteniendo suscripciones: ${error.message}`);
+        } else if (!subscriptions || subscriptions.length === 0) {
+          canSend = false;
+          reasons.push('No hay suscripciones push registradas');
         }
       }
     } catch (error) {
@@ -179,13 +196,25 @@ export class PushDiagnosticService {
 
   /**
    * Probar envío de notificación push
+   * Si no se pasa email, usa el usuario autenticado
    */
-  async testPushNotification(email: string): Promise<{
+  async testPushNotification(testMessage?: string): Promise<{
     success: boolean;
     message: string;
   }> {
     try {
-      const { canSend, reasons } = await this.canSendPushNotification(email);
+      // Obtener usuario autenticado
+      const { data: { user } } = await this.supabase.auth.getUser();
+      
+      if (!user?.email) {
+        return {
+          success: false,
+          message: 'Usuario no autenticado. Por favor, inicia sesión.'
+        };
+      }
+
+      // Verificar si puede enviar notificación
+      const { canSend, reasons } = await this.canSendPushNotification(user.email);
       
       if (!canSend) {
         return {
@@ -194,11 +223,38 @@ export class PushDiagnosticService {
         };
       }
 
-      // Aquí podrías implementar un envío de prueba real
-      // Por ahora solo verificamos que todo esté configurado correctamente
+      // Obtener suscripciones del usuario
+      const { data: subscriptions } = await this.supabase
+        .from('push_subscriptions')
+        .select('*')
+        .eq('user_id', user.id);
+
+      if (!subscriptions || subscriptions.length === 0) {
+        return {
+          success: false,
+          message: 'No hay suscripciones push registradas'
+        };
+      }
+
+      // Enviar notificación de prueba usando el servicio
+      const message = testMessage?.trim() || 'Esta es una notificación de prueba';
+      
+      // Enviar notificación usando el método del servicio que envía al usuario por email
+      await this.pushNotificationService.sendPushNotificationToUserByEmail(user.email, {
+        title: 'Prueba de Notificación',
+        body: message,
+        icon: '/icons/icono angular/icon-192x192.png',
+        badge: '/icons/icono angular/icon-72x72.png',
+        tag: 'test-notification',
+        data: {
+          type: 'test',
+          timestamp: new Date().toISOString()
+        }
+      });
+
       return {
         success: true,
-        message: 'Sistema de notificaciones push configurado correctamente'
+        message: `Notificación de prueba enviada a ${user.email}. Deberías verla en tu dispositivo.`
       };
     } catch (error) {
       return {

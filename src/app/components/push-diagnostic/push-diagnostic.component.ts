@@ -168,14 +168,20 @@ import { PushCleanupService } from '../../services/push-cleanup.service';
         <!-- Prueba de notificación -->
         <div class="bg-white p-6 rounded-lg shadow">
           <h3 class="text-lg font-semibold mb-4">Prueba de Notificación</h3>
+          <div class="mb-2 text-sm text-gray-600">
+            <p *ngIf="diagnostic.userEmail">
+              Usuario actual: <strong>{{ diagnostic.userEmail }}</strong>
+            </p>
+            <p class="text-xs mt-1">La notificación se enviará al usuario autenticado actual</p>
+          </div>
           <div class="flex space-x-4">
             <input 
               [(ngModel)]="testEmail" 
-              placeholder="Email para probar"
+              placeholder="Mensaje de prueba (opcional)"
               class="flex-1 px-3 py-2 border border-gray-300 rounded">
             <button 
               (click)="testNotification()" 
-              [disabled]="!testEmail || isTesting"
+              [disabled]="isTesting || !diagnostic.userEmail"
               class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50">
               {{ isTesting ? 'Probando...' : 'Probar Notificación' }}
             </button>
@@ -223,11 +229,12 @@ export class PushDiagnosticComponent implements OnInit {
   }
 
   async testNotification() {
-    if (!this.testEmail) return;
-    
     this.isTesting = true;
     try {
-      this.testResult = await this.pushDiagnosticService.testPushNotification(this.testEmail);
+      // El método ahora usa automáticamente el usuario autenticado
+      // El input es solo para un mensaje personalizado
+      const testMessage = this.testEmail?.trim();
+      this.testResult = await this.pushDiagnosticService.testPushNotification(testMessage);
     } catch (error) {
       this.testResult = {
         success: false,
