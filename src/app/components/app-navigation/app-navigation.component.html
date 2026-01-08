@@ -86,7 +86,7 @@
     <!-- Gastos - Acceso directo al Dashboard -->
     <a routerLink="/expenses" routerLinkActive="active" (click)="closeMoreMenu()">
       <fa-icon [icon]="faDollarSign"></fa-icon>
-      <span>Gastos</span>
+      <span>Transacciones</span>
     </a>
 
     <!-- Menú Más -->
@@ -134,7 +134,7 @@
 
         <a routerLink="/monthly-transactions" routerLinkActive="active" (click)="closeMoreMenu()" class="more-menu-item">
           <fa-icon [icon]="faDollarSign"></fa-icon>
-          <span>Transacciones</span>
+          <span>Gastos</span>
         </a>
 
         <button class="more-menu-item logout-btn" (click)="logout(); closeMoreMenu()">
