@@ -34,7 +34,7 @@
     </h3>
 
     <!-- Filtros -->
-    <div class="flex gap-3 p-3 overflow-x-hidden">
+    <div class="flex gap-3 p-3 overflow-x-auto items-center filters-container">
       <button 
         [class]="getFilterButtonClass('all')"
         (click)="setFilter('all')"
@@ -53,6 +53,19 @@
       >
         <p class="text-sm font-medium leading-normal">Pendientes</p>
       </button>
+      
+      <!-- Select de filtro por miembro -->
+      <select 
+        [ngModel]="selectedMemberId"
+        (ngModelChange)="onMemberFilterChange($event)"
+        class="member-filter-select"
+        [class.has-selection]="selectedMemberId"
+      >
+        <option [ngValue]="null">Todos los miembros</option>
+        <option *ngFor="let member of members" [ngValue]="member.id">
+          {{ member.name }}
+        </option>
+      </select>
     </div>
 
     <!-- Resumen de gastos -->
@@ -63,9 +76,36 @@
       </div>
     </div>
 
+    <!-- Resumen del miembro seleccionado --> <!-- VERIFICAR Y MEJORAR ESTILOS LUEGO --> 
+    <!-- <div *ngIf="selectedMemberId" class="bg-[#f0f7ff] border-t border-b border-[#1978e5] px-4 py-3 animate-fade-in">
+      <div class="flex items-center justify-between gap-4">
+        <div class="flex-1 min-w-0">
+          <p class="text-[#0e141b] text-base font-bold leading-normal truncate">
+            {{ getMemberName(selectedMemberId) }}
+          </p>
+          <p class="text-[#4e7097] text-xs font-normal leading-normal mt-0.5">
+            {{ memberStats.totalExpenses }} {{ memberStats.totalExpenses === 1 ? 'gasto' : 'gastos' }} en este mes
+          </p>
+        </div>
+        <div class="shrink-0 flex flex-col items-end">
+          <p class="text-[#0e141b] text-lg font-bold leading-normal whitespace-nowrap">
+            {{ formatAmount(memberStats.totalAmount) }}
+          </p>
+          <div class="flex gap-3 mt-1">
+            <span class="text-green-600 text-xs font-medium whitespace-nowrap">
+              Pagado: {{ formatAmount(memberStats.paidAmount) }}
+            </span>
+            <span class="text-orange-600 text-xs font-medium whitespace-nowrap">
+              Pendiente: {{ formatAmount(memberStats.pendingAmount) }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div> -->
+
     <!-- Lista de transacciones -->
     <div *ngIf="!loading; else loadingTemplate">
-      <div *ngFor="let expense of filteredExpenses" class="flex items-center gap-4 bg-slate-50 px-4 min-h-[72px] py-2 justify-between">
+      <div *ngFor="let expense of filteredExpenses; trackBy: trackByExpenseId" class="flex items-center gap-4 bg-slate-50 px-4 min-h-[72px] py-2 justify-between animate-fade-in">
         <div class="flex items-center gap-4">
           <!-- Icono del gasto -->
           <div class="text-[#0e141b] flex items-center justify-center rounded-lg bg-[#e7edf3] shrink-0 size-12 text-2xl">
@@ -101,21 +141,18 @@
       </div>
 
       <!-- Estado vacío -->
-      <div *ngIf="filteredExpenses.length === 0" class="flex flex-col items-center justify-center py-12 px-4">
+      <div *ngIf="filteredExpenses.length === 0" class="flex flex-col items-center justify-center py-12 px-4 animate-fade-in">
         <div class="text-[#4e7097] text-6xl mb-4">💰</div>
-        <h3 class="text-[#0e141b] text-lg font-medium mb-2">
-          {{ currentFilter === 'all' ? 'No hay gastos en ' + getSelectedMonthName() + ' ' + selectedYear : 
-             currentFilter === 'paid' ? 'No hay gastos pagados en ' + getSelectedMonthName() + ' ' + selectedYear : 
-             'No hay gastos pendientes en ' + getSelectedMonthName() + ' ' + selectedYear }}
+        <h3 class="text-[#0e141b] text-lg font-medium mb-2 text-center">
+          {{ getEmptyStateTitle() }}
         </h3>
-        <p class="text-[#4e7097] text-sm text-center mb-6">
-          {{ currentFilter === 'all' ? 'No se registraron gastos con vencimiento en ' + getSelectedMonthName() + ' ' + selectedYear :
-             currentFilter === 'paid' ? 'Todos los gastos del mes están pendientes de pago' : 
-             '¡Excelente! Todos los gastos del mes están pagados' }}
+        <p class="text-[#4e7097] text-sm text-center mb-6 max-w-md">
+          {{ getEmptyStateDescription() }}
         </p>
-        <p class="text-[#4e7097] text-xs text-center">
+        <!-- <p class="text-[#4e7097] text-xs text-center">
           Los gastos se filtran por fecha de vencimiento (due_date)
-        </p>
+          <span *ngIf="selectedMemberId"> y miembro responsable</span>
+        </p> -->
       </div>
     </div>
 
@@ -132,10 +169,10 @@
     <div class="flex justify-stretch">
       <div class="flex flex-1 gap-3 flex-wrap px-4 py-4 justify-between">
         <button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-6 bg-[#e7edf3] text-[#0e141b] text-sm font-bold leading-normal tracking-[0.015em] shadow-sm hover:shadow-md transition-all duration-200">
-          <span class="truncate">Pagados: {{ formatAmount(stats.totalSpent) }}</span>
+          <span class="truncate">Pagados: {{ formatAmount(getFooterPaidAmount()) }}</span>
         </button>
         <button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-6 bg-[#1978e5] text-slate-50 text-sm font-bold leading-normal tracking-[0.015em] shadow-sm hover:shadow-md transition-all duration-200">
-          <span class="truncate">Pendientes: {{ formatAmount(stats.totalPending) }}</span>
+          <span class="truncate">Pendientes: {{ formatAmount(getFooterPendingAmount()) }}</span>
         </button>
       </div>
     </div>

@@ -30,6 +30,13 @@ interface MonthlyStats {
   pendingExpenses: number;
 }
 
+interface MemberStats {
+  totalExpenses: number;
+  totalAmount: number;
+  paidAmount: number;
+  pendingAmount: number;
+}
+
 @Component({
   selector: 'app-monthly-transactions',
   standalone: true,
@@ -59,6 +66,15 @@ export class MonthlyTransactionsComponent implements OnInit, OnDestroy {
     totalExpenses: 0,
     paidExpenses: 0,
     pendingExpenses: 0
+  };
+
+  // Filtro por miembro
+  selectedMemberId: string | null = null;
+  memberStats: MemberStats = {
+    totalExpenses: 0,
+    totalAmount: 0,
+    paidAmount: 0,
+    pendingAmount: 0
   };
 
   // Selector de mes/año
@@ -170,21 +186,34 @@ export class MonthlyTransactionsComponent implements OnInit, OnDestroy {
   }
 
   applyFilter(): void {
+    let filtered: FamilyExpense[] = this.expenses;
+
+    // Aplicar filtro por estado
     switch (this.currentFilter) {
       case 'paid':
-        this.filteredExpenses = this.expenses.filter(e => e.is_paid);
+        filtered = filtered.filter(e => e.is_paid === true);
         break;
       case 'pending':
-        this.filteredExpenses = this.expenses.filter(e => !e.is_paid);
+        filtered = filtered.filter(e => e.is_paid === false);
         break;
       default:
-        this.filteredExpenses = this.expenses;
+        // 'all' - no filtrar por estado
+        break;
     }
+
+    // Aplicar filtro por miembro (si hay selección)
+    if (this.selectedMemberId) {
+      filtered = filtered.filter(e => e.responsible_member_id === this.selectedMemberId);
+    }
+
+    this.filteredExpenses = filtered;
+    this.calculateMemberStats();
   }
 
   setFilter(filter: FilterType): void {
     this.currentFilter = filter;
     this.applyFilter();
+    // calculateMemberStats se llama dentro de applyFilter()
   }
 
   getFilterButtonClass(filter: FilterType): string {
@@ -198,10 +227,21 @@ export class MonthlyTransactionsComponent implements OnInit, OnDestroy {
     // Asegurar que los valores sean números
     this.selectedMonth = Number(this.selectedMonth);
     this.selectedYear = Number(this.selectedYear);
+    // El filtro de miembro se mantiene al cambiar mes/año para mejor UX
     this.loadData();
   }
 
-  getMemberName(memberId: string): string {
+  /**
+   * TrackBy function para optimizar el renderizado de la lista de gastos.
+   */
+  trackByExpenseId(index: number, expense: FamilyExpense): string {
+    return expense.id || index.toString();
+  }
+
+  getMemberName(memberId: string | null): string {
+    if (!memberId) {
+      return 'Todos los miembros';
+    }
     const member = this.members.find(m => m.id === memberId);
     return member ? member.name : 'Sin asignar';
   }
@@ -263,11 +303,175 @@ export class MonthlyTransactionsComponent implements OnInit, OnDestroy {
     return month ? month.name : '';
   }
 
+  /**
+   * Genera el mensaje de título para el estado vacío considerando todos los filtros activos.
+   */
+  getEmptyStateTitle(): string {
+    const monthYear = `${this.getSelectedMonthName()} ${this.selectedYear}`;
+    const memberName = this.selectedMemberId ? this.getMemberName(this.selectedMemberId) : null;
+
+    if (memberName) {
+      // Hay filtro por miembro activo
+      if (this.currentFilter === 'paid') {
+        return `No hay gastos pagados para ${memberName} en ${monthYear}`;
+      } else if (this.currentFilter === 'pending') {
+        return `No hay gastos pendientes para ${memberName} en ${monthYear}`;
+      } else {
+        return `${memberName} no tiene gastos registrados en ${monthYear}`;
+      }
+    } else {
+      // Sin filtro por miembro
+      if (this.currentFilter === 'paid') {
+        return `No hay gastos pagados en ${monthYear}`;
+      } else if (this.currentFilter === 'pending') {
+        return `No hay gastos pendientes en ${monthYear}`;
+      } else {
+        return `No hay gastos en ${monthYear}`;
+      }
+    }
+  }
+
+  /**
+   * Genera el mensaje descriptivo para el estado vacío considerando todos los filtros activos.
+   */
+  getEmptyStateDescription(): string {
+    const monthYear = `${this.getSelectedMonthName()} ${this.selectedYear}`;
+    const memberName = this.selectedMemberId ? this.getMemberName(this.selectedMemberId) : null;
+
+    if (memberName) {
+      // Hay filtro por miembro activo
+      if (this.currentFilter === 'paid') {
+        return `Todos los gastos de ${memberName} en este mes están pendientes de pago`;
+      } else if (this.currentFilter === 'pending') {
+        return `¡Excelente! Todos los gastos de ${memberName} en este mes están pagados`;
+      } else {
+        return `No se registraron gastos para ${memberName} con vencimiento en ${monthYear}`;
+      }
+    } else {
+      // Sin filtro por miembro
+      if (this.currentFilter === 'paid') {
+        return 'Todos los gastos del mes están pendientes de pago';
+      } else if (this.currentFilter === 'pending') {
+        return '¡Excelente! Todos los gastos del mes están pagados';
+      } else {
+        return `No se registraron gastos con vencimiento en ${monthYear}`;
+      }
+    }
+  }
+
   goBack(): void {
     this.location.back();
   }
 
   addNewExpense(): void {
     this.router.navigate(['/add-expense']);
+  }
+
+  /**
+   * Calcula las estadísticas del miembro seleccionado.
+   * Calcula las estadísticas basándose en TODOS los gastos del miembro en el mes,
+   * independientemente del filtro de estado actual (para mostrar el total completo).
+   * Solo calcula estadísticas si hay un miembro seleccionado.
+   */
+  calculateMemberStats(): void {
+    // Si no hay miembro seleccionado, resetear estadísticas
+    if (!this.selectedMemberId) {
+      this.memberStats = {
+        totalExpenses: 0,
+        totalAmount: 0,
+        paidAmount: 0,
+        pendingAmount: 0
+      };
+      return;
+    }
+
+    // Obtener TODOS los gastos del miembro seleccionado (sin filtrar por estado)
+    // para mostrar el total completo del miembro
+    const allMemberExpenses = this.getExpensesByMember(this.selectedMemberId);
+
+    // Si no hay gastos, establecer valores en 0
+    if (allMemberExpenses.length === 0) {
+      this.memberStats = {
+        totalExpenses: 0,
+        totalAmount: 0,
+        paidAmount: 0,
+        pendingAmount: 0
+      };
+      return;
+    }
+
+    // Calcular totales de TODOS los gastos del miembro
+    const totalAmount = allMemberExpenses.reduce((sum, e) => sum + (e.amount || 0), 0);
+    
+    // Filtrar gastos pagados y pendientes del miembro
+    const paidExpenses = allMemberExpenses.filter(e => e.is_paid === true);
+    const pendingExpenses = allMemberExpenses.filter(e => e.is_paid === false);
+    
+    const paidAmount = paidExpenses.reduce((sum, e) => sum + (e.amount || 0), 0);
+    const pendingAmount = pendingExpenses.reduce((sum, e) => sum + (e.amount || 0), 0);
+
+    this.memberStats = {
+      totalExpenses: allMemberExpenses.length,
+      totalAmount: totalAmount,
+      paidAmount: paidAmount,
+      pendingAmount: pendingAmount
+    };
+
+    // Debug: mostrar los cálculos en consola
+    console.log('=== ESTADÍSTICAS DEL MIEMBRO ===');
+    console.log('Miembro seleccionado:', this.selectedMemberId, this.getMemberName(this.selectedMemberId || ''));
+    console.log('Total gastos del miembro:', allMemberExpenses.length);
+    console.log('Total monto del miembro:', totalAmount);
+    console.log('Total pagado del miembro:', paidAmount);
+    console.log('Total pendiente del miembro:', pendingAmount);
+  }
+
+  /**
+   * Maneja el cambio de selección del filtro por miembro.
+   * @param memberId ID del miembro seleccionado, o null para "Todos los miembros"
+   */
+  onMemberFilterChange(memberId: string | null): void {
+    // Convertir string vacío a null
+    if (memberId === '' || memberId === 'null') {
+      this.selectedMemberId = null;
+    } else {
+      this.selectedMemberId = memberId;
+    }
+    
+    // Reaplicar filtros para actualizar la lista y estadísticas
+    this.applyFilter();
+  }
+
+  /**
+   * Obtiene los gastos filtrados por miembro (sin considerar el filtro de estado).
+   * Útil para cálculos que necesiten todos los gastos del miembro.
+   * @param memberId ID del miembro, o null para todos
+   * @returns Array de gastos del miembro especificado
+   */
+  getExpensesByMember(memberId: string | null): FamilyExpense[] {
+    if (!memberId) {
+      return this.expenses;
+    }
+    return this.expenses.filter(e => e.responsible_member_id === memberId);
+  }
+
+  /**
+   * Retorna el monto de gastos pagados para mostrar en el botón del footer.
+   * Si hay un miembro seleccionado, retorna los gastos pagados del miembro.
+   * Si no hay miembro seleccionado, retorna el total general de gastos pagados.
+   * @returns Monto total de gastos pagados (general o del miembro según filtro)
+   */
+  getFooterPaidAmount(): number {
+    return this.selectedMemberId ? this.memberStats.paidAmount : this.stats.totalSpent;
+  }
+
+  /**
+   * Retorna el monto de gastos pendientes para mostrar en el botón del footer.
+   * Si hay un miembro seleccionado, retorna los gastos pendientes del miembro.
+   * Si no hay miembro seleccionado, retorna el total general de gastos pendientes.
+   * @returns Monto total de gastos pendientes (general o del miembro según filtro)
+   */
+  getFooterPendingAmount(): number {
+    return this.selectedMemberId ? this.memberStats.pendingAmount : this.stats.totalPending;
   }
 } 
