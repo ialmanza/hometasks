@@ -137,6 +137,11 @@
           <span>Gastos</span>
         </a>
 
+        <a routerLink="/vacation-expenses" routerLinkActive="active" (click)="closeMoreMenu()" class="more-menu-item">
+          <fa-icon [icon]="faUmbrella"></fa-icon>
+          <span>Vacaciones</span>
+        </a>
+
         <button class="more-menu-item logout-btn" (click)="logout(); closeMoreMenu()">
           <fa-icon [icon]="faSignOutAlt"></fa-icon>
           <span>Cerrar Sesión</span>

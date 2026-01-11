@@ -1,0 +1,198 @@
+/* Estilos específicos para el componente de gastos de vacaciones */
+
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* Animaciones suaves */
+.transition-colors {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Hover effects para botones */
+button:hover {
+  transform: translateY(-1px);
+}
+
+/* Estilos para los selectores de mes/año */
+select:focus {
+  box-shadow: 0 0 0 2px rgba(25, 120, 229, 0.2);
+}
+
+/* Estilos específicos para el select de filtro por miembro */
+.member-filter-select {
+  min-width: 160px;
+  max-width: 200px;
+  height: 2rem; /* h-8 - misma altura que los botones de filtro */
+  padding: 0 0.75rem;
+  padding-right: 2.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 9999px; /* rounded-full - mismo estilo que los botones */
+  background-color: white;
+  font-size: 0.875rem; /* text-sm */
+  font-weight: 500; /* font-medium */
+  color: #0e141b;
+  line-height: 1.5;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='24px' height='24px' fill='rgb(78,112,151)' viewBox='0 0 256 256'%3e%3cpath d='M181.66,170.34a8,8,0,0,1,0,11.32l-48,48a8,8,0,0,1-11.32,0l-48-48a8,8,0,0,1,11.32-11.32L128,212.69l42.34-42.35A8,8,0,0,1,181.66,170.34Zm-96-84.68L128,43.31l42.34,42.35a8,8,0,0,0,11.32-11.32l-48-48a8,8,0,0,0-11.32,0l-48,48A8,8,0,0,0,85.66,85.66Z'%3e%3c/path%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  background-size: 1.25rem;
+}
+
+.member-filter-select:hover:not(:disabled) {
+  border-color: #1978e5;
+  background-color: #f9fafb;
+}
+
+.member-filter-select:focus {
+  outline: none;
+  border-color: #1978e5;
+  box-shadow: 0 0 0 2px rgba(25, 120, 229, 0.2);
+  background-color: white;
+}
+
+/* Indicador de filtro activo */
+.member-filter-select.has-selection {
+  border-color: #1978e5;
+  background-color: #f0f7ff;
+}
+
+.member-filter-select.has-selection:hover {
+  background-color: #e6f2ff;
+}
+
+/* Estilos para las tarjetas de gastos */
+.expense-item {
+  transition: all 0.2s ease-in-out;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.expense-item:hover {
+  background-color: #f8fafc;
+}
+
+.expense-item:last-child {
+  border-bottom: none;
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .flex-1 {
+    flex: 1 1 0%;
+  }
+  
+  .gap-3 {
+    gap: 0.75rem;
+  }
+  
+  .px-4 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  /* Filtros en móviles - mantener horizontal pero permitir scroll */
+  .filters-container {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Select de miembro en móviles */
+  .filters-container .member-filter-select {
+    min-width: 140px;
+    max-width: 180px;
+  }
+
+  /* Botones en móviles mantienen su tamaño mínimo */
+  .filters-container > button {
+    min-width: auto;
+  }
+}
+
+/* Estilos específicos para el footer */
+.footer-summary {
+  position: relative;
+  z-index: 10;
+  padding-bottom: 5rem; /* pb-20 - mismo espaciado que el botón agregar gasto */
+}
+
+/* Hover effects mejorados para los botones del footer */
+.footer-summary button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Animaciones de fade-in para transiciones suaves */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Contenedor de filtros */
+.filters-container {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  flex-wrap: nowrap;
+  align-items: center;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+/* Ocultar scrollbar en Chrome, Safari y Edge */
+.filters-container::-webkit-scrollbar {
+  height: 4px;
+}
+
+.filters-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.filters-container::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 2px;
+}
+
+.filters-container::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8;
+}
+
+/* Ajustes para botones de filtro en el contenedor */
+.filters-container > button {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* Select de miembro en el contenedor de filtros */
+.filters-container .member-filter-select {
+  flex-shrink: 0;
+  min-width: 160px;
+  width: auto;
+  max-width: 200px;
+}
+

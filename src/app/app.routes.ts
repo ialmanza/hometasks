@@ -10,6 +10,7 @@ import { AddExpenseFormComponent } from './components/add-expense-form/add-expen
 import { FamilyExpensesComponent } from './components/family-expenses/family-expenses.component';
 import { FamilyExpensesDashboardComponent } from './components/family-expenses-dashboard/family-expenses-dashboard.component';
 import { MonthlyTransactionsComponent } from './components/monthly-transactions/monthly-transactions.component';
+import { VacationExpensesListComponent } from './components/vacation-expenses-list/vacation-expenses-list.component';
 import { CalendarActivitiesComponent } from './components/calendar-activities/calendar-activities.component';
 import { Login } from './components/Login/login/login';
 import { AuthGuard } from './guards/auth.guard';
@@ -28,6 +29,9 @@ export const routes: Routes = [
   { path: 'members', component: FamilyMembersComponent, canActivate: [AuthGuard] },
   { path: 'add-expense', component: AddExpenseFormComponent, canActivate: [AuthGuard] },
   { path: 'edit-expense/:id', component: AddExpenseFormComponent, canActivate: [AuthGuard] },
+  { path: 'vacation-expenses', component: VacationExpensesListComponent, canActivate: [AuthGuard] },
+  { path: 'add-vacation-expense', component: AddExpenseFormComponent, canActivate: [AuthGuard] },
+  { path: 'edit-vacation-expense/:id', component: AddExpenseFormComponent, canActivate: [AuthGuard] },
   { path: 'expenses', component: MonthlyTransactionsComponent, canActivate: [AuthGuard]},
   { path: 'expenses-dashboard', component: FamilyExpensesDashboardComponent, canActivate: [AuthGuard] },
   { path: 'monthly-transactions', component:  FamilyExpensesComponent, canActivate: [AuthGuard]},

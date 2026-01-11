@@ -1,0 +1,188 @@
+<div class="relative flex size-full min-h-screen flex-col bg-slate-50 justify-between group/design-root overflow-x-hidden">
+  <div>
+    <!-- Header -->
+    <div class="flex items-center bg-slate-50 p-4 pb-2 justify-between">
+      <div class="text-[#0e141b] flex size-12 shrink-0 items-center cursor-pointer" (click)="goBack()">
+        <fa-icon [icon]="faArrowLeft" class="text-xl"></fa-icon>
+      </div>
+      <h2 class="text-[#0e141b] text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-12">Gastos de Vacaciones</h2>
+      <button
+        (click)="addNewExpense()"
+        class="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#1978e5] text-white hover:bg-[#1565c0] transition-colors"
+        title="Agregar gasto de vacaciones"
+      >
+        <fa-icon [icon]="faPlus" class="text-xl"></fa-icon>
+      </button>
+    </div>
+
+    <!-- Selector de mes/año -->
+    <div class="px-4 pb-2">
+      <div class="flex gap-2 items-center">
+        <select 
+          [(ngModel)]="selectedMonth" 
+          (change)="onMonthYearChange()"
+          class="flex-1 px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#1978e5]"
+        >
+          <option *ngFor="let month of months" [value]="month.value">{{ month.name }}</option>
+        </select>
+        <select 
+          [(ngModel)]="selectedYear" 
+          (change)="onMonthYearChange()"
+          class="flex-1 px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#1978e5]"
+        >
+          <option *ngFor="let year of [2024, 2025, 2026, 2027, 2028]" [value]="year">{{ year }}</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Título del mes -->
+    <h3 class="text-[#0e141b] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">
+      {{ getSelectedMonthName() }} {{ selectedYear }}
+    </h3>
+
+    <!-- Filtros -->
+    <div class="flex gap-3 p-3 overflow-x-auto items-center filters-container">
+      <button 
+        [class]="getFilterButtonClass('all')"
+        (click)="setFilter('all')"
+      >
+        <p class="text-sm font-medium leading-normal">Todos</p>
+      </button>
+      <button 
+        [class]="getFilterButtonClass('paid')"
+        (click)="setFilter('paid')"
+      >
+        <p class="text-sm font-medium leading-normal">Pagados</p>
+      </button>
+      <button 
+        [class]="getFilterButtonClass('pending')"
+        (click)="setFilter('pending')"
+      >
+        <p class="text-sm font-medium leading-normal">Pendientes</p>
+      </button>
+      
+      <!-- Select de filtro por miembro -->
+      <select 
+        [ngModel]="selectedMemberId"
+        (ngModelChange)="onMemberFilterChange($event)"
+        class="member-filter-select"
+        [class.has-selection]="selectedMemberId"
+      >
+        <option [ngValue]="null">Todos los miembros</option>
+        <option *ngFor="let member of members" [ngValue]="member.id">
+          {{ member.name }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Resumen de gastos -->
+    <div class="flex items-center gap-4 bg-slate-50 px-4 min-h-14 justify-between">
+      <p class="text-[#0e141b] text-base font-normal leading-normal flex-1 truncate">Total Gastado</p>
+      <div class="shrink-0">
+        <p class="text-[#0e141b] text-base font-normal leading-normal">{{ formatAmount(stats.totalSpent) }}</p>
+      </div>
+    </div>
+
+    <!-- Lista de transacciones -->
+    <div *ngIf="!loading; else loadingTemplate">
+      <div *ngFor="let expense of filteredExpenses; trackBy: trackByExpenseId" class="flex items-center gap-4 bg-slate-50 px-4 min-h-[72px] py-2 justify-between animate-fade-in expense-item">
+        <div class="flex items-center gap-4 flex-1 min-w-0">
+          <!-- Icono del gasto -->
+          <div class="text-[#0e141b] flex items-center justify-center rounded-lg bg-[#e7edf3] shrink-0 size-12 text-2xl">
+            {{ getExpenseIcon(expense) }}
+          </div>
+          
+          <!-- Información del gasto -->
+          <div class="flex flex-col justify-center flex-1 min-w-0">
+            <p class="text-[#0e141b] text-base font-medium leading-normal line-clamp-1">{{ expense.title }}</p>
+            <p class="text-[#4e7097] text-sm font-normal leading-normal line-clamp-2">
+              {{ formatDate(expense.due_date || '') }} · {{ getMemberName(expense.responsible_member_id || null) }}
+            </p>
+            <p *ngIf="expense.description" class="text-[#4e7097] text-xs font-normal leading-normal line-clamp-1 mt-1">
+              {{ expense.description }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Estado, monto y acciones -->
+        <div class="flex items-center gap-3 shrink-0">
+          <!-- Estado del gasto -->
+          <div class="shrink-0">
+            <button
+              (click)="togglePaidStatus(expense)"
+              [class]="getExpenseStatusClass(expense.is_paid)"
+              class="cursor-pointer hover:opacity-80 transition-opacity"
+              [title]="expense.is_paid ? 'Marcar como pendiente' : 'Marcar como pagado'"
+            >
+              {{ getExpenseStatusText(expense.is_paid) }}
+            </button>
+          </div>
+
+          <!-- Monto -->
+          <div class="shrink-0">
+            <p class="text-[#0e141b] text-base font-normal leading-normal">{{ formatAmount(expense.amount) }}</p>
+          </div>
+
+          <!-- Acciones -->
+          <div class="flex items-center gap-2 shrink-0">
+            <button
+              (click)="editExpense(expense)"
+              class="flex items-center justify-center size-8 rounded-lg bg-[#e7edf3] text-[#1978e5] hover:bg-[#d1d9e3] transition-colors"
+              title="Editar gasto"
+            >
+              <fa-icon [icon]="faEdit" class="text-sm"></fa-icon>
+            </button>
+            <button
+              (click)="deleteExpense(expense)"
+              class="flex items-center justify-center size-8 rounded-lg bg-[#fee2e2] text-[#dc2626] hover:bg-[#fecaca] transition-colors"
+              title="Eliminar gasto"
+            >
+              <fa-icon [icon]="faTrash" class="text-sm"></fa-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Estado vacío -->
+      <div *ngIf="filteredExpenses.length === 0" class="flex flex-col items-center justify-center py-12 px-4 animate-fade-in">
+        <div class="text-[#4e7097] text-6xl mb-4">🏖️</div>
+        <h3 class="text-[#0e141b] text-lg font-medium mb-2 text-center">
+          {{ getEmptyStateTitle() }}
+        </h3>
+        <p class="text-[#4e7097] text-sm text-center mb-6 max-w-md">
+          {{ getEmptyStateDescription() }}
+        </p>
+        <button
+          (click)="addNewExpense()"
+          class="flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-[#1978e5] text-white hover:bg-[#1565c0] transition-colors"
+        >
+          <fa-icon [icon]="faPlus"></fa-icon>
+          <span>Agregar primer gasto de vacaciones</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Template de carga -->
+    <ng-template #loadingTemplate>
+      <div class="flex items-center justify-center py-12">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1978e5]"></div>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Footer con resumen -->
+  <div class="footer-summary">
+    <div class="flex justify-stretch">
+      <div class="flex flex-1 gap-3 flex-wrap px-4 py-4 justify-between">
+        <button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-6 bg-[#e7edf3] text-[#0e141b] text-sm font-bold leading-normal tracking-[0.015em] shadow-sm hover:shadow-md transition-all duration-200">
+          <span class="truncate">Pagados: {{ formatAmount(getFooterPaidAmount()) }}</span>
+        </button>
+        <button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-6 bg-[#1978e5] text-slate-50 text-sm font-bold leading-normal tracking-[0.015em] shadow-sm hover:shadow-md transition-all duration-200">
+          <span class="truncate">Pendientes: {{ formatAmount(getFooterPendingAmount()) }}</span>
+        </button>
+      </div>
+    </div>
+    <div class="h-5 bg-slate-50"></div>
+  </div>
+</div>
+

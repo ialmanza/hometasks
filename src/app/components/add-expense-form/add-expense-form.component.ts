@@ -5,8 +5,10 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faX, faCalendar, faSmile } from '@fortawesome/free-solid-svg-icons';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FamilyExpense } from '../../models/family-expense.model';
+import { VacationExpense } from '../../models/vacation-expense.model';
 import { FamilyMember } from '../../models/family-member.model';
 import { ExpensesService } from '../../services/expenses.service';
+import { VacationExpensesService } from '../../services/vacation-expenses.service';
 import { MembersService } from '../../services/members.service';
 import { AppNavigationComponent } from "../app-navigation/app-navigation.component";
 import { EXPENSE_ICONS, ExpenseIcon, getIconByTitle } from './expense-icons';
@@ -24,10 +26,11 @@ export class AddExpenseFormComponent implements OnInit {
   submitting = false;
   isEditing = false;
   expenseId: string | null = null;
-  currentExpense: FamilyExpense | null = null;
+  currentExpense: FamilyExpense | VacationExpense | null = null;
   showIconSelector = false;
   expenseIcons = EXPENSE_ICONS;
   selectedIcon = '💰';
+  isVacationExpense = false; // Determina si es un gasto de vacaciones
 
   // Icons
   faX = faX;
@@ -36,6 +39,7 @@ export class AddExpenseFormComponent implements OnInit {
 
   constructor(
     private expensesService: ExpensesService,
+    private vacationExpensesService: VacationExpensesService,
     private membersService: MembersService,
     private fb: FormBuilder,
     private route: ActivatedRoute,
@@ -47,7 +51,8 @@ export class AddExpenseFormComponent implements OnInit {
       amount: ['', [Validators.required, Validators.min(1)]], // Mínimo 1 peso argentino
       due_date: ['', Validators.required],
       responsible_member_id: [''],
-      icon: ['']
+      icon: [''],
+      isVacation: [false] // Toggle para vacaciones, por defecto false
     });
   }
 
@@ -60,9 +65,21 @@ export class AddExpenseFormComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.determineExpenseType();
     this.loadMembers();
     this.checkIfEditing();
     this.setupIconAutoSelection();
+  }
+
+  determineExpenseType() {
+    // Determinar si es gasto de vacaciones basado en la ruta
+    const currentUrl = this.router.url || this.route.snapshot.url.join('/');
+    this.isVacationExpense = currentUrl.includes('vacation-expense');
+    
+    // Si es vacaciones, establecer el toggle en true
+    if (this.isVacationExpense) {
+      this.expenseForm.patchValue({ isVacation: true });
+    }
   }
 
   setupIconAutoSelection() {
@@ -90,22 +107,42 @@ export class AddExpenseFormComponent implements OnInit {
 
   loadExpenseForEditing(expenseId: string) {
     this.loading = true;
-    this.expensesService.getExpenseById(expenseId).subscribe({
-      next: (expense: FamilyExpense) => {
-        this.currentExpense = expense;
-        this.populateFormWithExpense(expense);
-        this.loading = false;
-      },
-      error: (error: any) => {
-        console.error('Error loading expense for editing:', error);
-        this.loading = false;
-        // Si no se puede cargar el gasto, redirigir a la lista
-        this.router.navigate(['/expenses']);
-      }
-    });
+    
+    // Intentar cargar desde el servicio correspondiente según el tipo
+    if (this.isVacationExpense) {
+      this.vacationExpensesService.getVacationExpenseById(expenseId).subscribe({
+        next: (expense: VacationExpense) => {
+          this.currentExpense = expense;
+          this.populateFormWithExpense(expense);
+          this.expenseForm.patchValue({ isVacation: true });
+          this.loading = false;
+        },
+        error: (error: any) => {
+          console.error('Error loading vacation expense for editing:', error);
+          this.loading = false;
+          // Si no se puede cargar, redirigir a la lista
+          this.router.navigate(['/vacation-expenses']);
+        }
+      });
+    } else {
+      this.expensesService.getExpenseById(expenseId).subscribe({
+        next: (expense: FamilyExpense) => {
+          this.currentExpense = expense;
+          this.populateFormWithExpense(expense);
+          this.expenseForm.patchValue({ isVacation: false });
+          this.loading = false;
+        },
+        error: (error: any) => {
+          console.error('Error loading expense for editing:', error);
+          this.loading = false;
+          // Si no se puede cargar el gasto, redirigir a la lista
+          this.router.navigate(['/expenses']);
+        }
+      });
+    }
   }
 
-  populateFormWithExpense(expense: FamilyExpense) {
+  populateFormWithExpense(expense: FamilyExpense | VacationExpense) {
     // Formatear la fecha para el input de tipo date
     if (expense.due_date) {
       // Si la fecha ya está en formato YYYY-MM-DD, usarla directamente
@@ -167,8 +204,11 @@ export class AddExpenseFormComponent implements OnInit {
   onSubmit() {
     if (this.expenseForm.valid) {
       this.submitting = true;
+      
+      // Determinar si es vacaciones según el toggle
+      const isVacation = this.expenseForm.get('isVacation')?.value || this.isVacationExpense;
 
-      const expenseData: Omit<FamilyExpense, 'id' | 'created_at'> = {
+      const expenseData = {
         title: this.expenseForm.get('title')?.value,
         description: this.expenseForm.get('description')?.value || '',
         amount: parseFloat(this.expenseForm.get('amount')?.value),
@@ -180,35 +220,70 @@ export class AddExpenseFormComponent implements OnInit {
 
       if (this.isEditing && this.expenseId) {
         // Actualizar gasto existente
-        const updatedExpense: FamilyExpense = {
-          id: this.expenseId,
-          ...expenseData,
-          created_at: this.currentExpense?.created_at || new Date().toISOString()
-        };
+        if (isVacation) {
+          const updatedExpense: VacationExpense = {
+            id: this.expenseId,
+            ...expenseData,
+            created_at: this.currentExpense?.created_at || new Date().toISOString()
+          };
 
-        this.expensesService.updateExpense(updatedExpense).subscribe({
-          next: () => {
-            this.submitting = false;
-            this.router.navigate(['/monthly-transactions']);
-          },
-          error: (error: any) => {
-            console.error('Error updating expense:', error);
-            this.submitting = false;
-          }
-        });
+          this.vacationExpensesService.updateVacationExpense(updatedExpense).subscribe({
+            next: () => {
+              this.submitting = false;
+              this.router.navigate(['/vacation-expenses']);
+            },
+            error: (error: any) => {
+              console.error('Error updating vacation expense:', error);
+              this.submitting = false;
+            }
+          });
+        } else {
+          const updatedExpense: FamilyExpense = {
+            id: this.expenseId,
+            ...expenseData,
+            created_at: this.currentExpense?.created_at || new Date().toISOString()
+          };
+
+          this.expensesService.updateExpense(updatedExpense).subscribe({
+            next: () => {
+              this.submitting = false;
+              this.router.navigate(['/monthly-transactions']);
+            },
+            error: (error: any) => {
+              console.error('Error updating expense:', error);
+              this.submitting = false;
+            }
+          });
+        }
       } else {
         // Crear nuevo gasto
-        this.expensesService.addExpense(expenseData).subscribe({
-          next: () => {
-            this.expenseForm.reset();
-            this.submitting = false;
-            this.router.navigate(['/monthly-transactions']);
-          },
-          error: (error: any) => {
-            console.error('Error adding expense:', error);
-            this.submitting = false;
-          }
-        });
+        if (isVacation) {
+          this.vacationExpensesService.addVacationExpense(expenseData).subscribe({
+            next: () => {
+              this.expenseForm.reset();
+              this.expenseForm.patchValue({ isVacation: false }); // Reset toggle
+              this.submitting = false;
+              this.router.navigate(['/vacation-expenses']);
+            },
+            error: (error: any) => {
+              console.error('Error adding vacation expense:', error);
+              this.submitting = false;
+            }
+          });
+        } else {
+          this.expensesService.addExpense(expenseData).subscribe({
+            next: () => {
+              this.expenseForm.reset();
+              this.expenseForm.patchValue({ isVacation: false }); // Reset toggle
+              this.submitting = false;
+              this.router.navigate(['/monthly-transactions']);
+            },
+            error: (error: any) => {
+              console.error('Error adding expense:', error);
+              this.submitting = false;
+            }
+          });
+        }
       }
     } else {
       this.markFormGroupTouched();
@@ -223,7 +298,12 @@ export class AddExpenseFormComponent implements OnInit {
   }
 
   goBack() {
-    this.router.navigate(['/expenses']);
+    // Redirigir según el tipo de gasto
+    if (this.isVacationExpense || this.expenseForm.get('isVacation')?.value) {
+      this.router.navigate(['/vacation-expenses']);
+    } else {
+      this.router.navigate(['/expenses']);
+    }
   }
 
   formatAmount(event: any) {
