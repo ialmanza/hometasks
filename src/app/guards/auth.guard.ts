@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, Router } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { PinLockService } from '../services/pin-lock.service';
+import { SecuritySettingsService } from '../services/security-settings.service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,10 +14,12 @@ export class AuthGuard implements CanActivate {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private pinLockService: PinLockService,
+    private securitySettingsService: SecuritySettingsService
   ) {}
 
-  async canActivate(): Promise<boolean> {
+  async canActivate(_route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
     // Verificar caché
     if (this.authCache && (Date.now() - this.authCache.timestamp) < this.CACHE_DURATION) {
       if (!this.authCache.isAuthenticated) {
@@ -56,7 +60,29 @@ export class AuthGuard implements CanActivate {
         this.router.navigate(['/login']);
         return false;
       }
-      
+
+      // Verificación de bloqueo por PIN (solo si el usuario lo tiene configurado)
+      const needsLock = await this.pinLockService.isLockRequired();
+      if (needsLock) {
+        this.router.navigate(['/lock'], { queryParams: { returnUrl: state.url } });
+        return false;
+      }
+
+      // Verificar si el usuario tiene PIN configurado
+      // Si NO tiene PIN configurado y NO está en settings, redirigir a settings para configurarlo
+      if (state.url !== '/settings' && !state.url.startsWith('/settings')) {
+        const settings = await this.securitySettingsService.getSettings();
+        const hasPinConfigured = settings && settings.pin_hash && settings.pin_salt;
+        
+        if (!hasPinConfigured) {
+          // Redirigir a settings con query params para abrir modal y guardar returnUrl
+          this.router.navigate(['/settings'], { 
+            queryParams: { setupPin: 'true', returnUrl: state.url } 
+          });
+          return false;
+        }
+      }
+
       return true;
     } catch (error) {
       console.error('Error en AuthGuard:', error);

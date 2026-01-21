@@ -2,9 +2,8 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faHome, faTasks, faShoppingCart, faDollarSign, faEllipsisV, faUsers, faCalendar, faCalendarAlt, faUtensils, faSignOutAlt, faUmbrella } from '@fortawesome/free-solid-svg-icons';
-import { AuthService } from '../../services/auth.service';
-import { AuthGuard } from '../../guards/auth.guard';
+import { faHome, faTasks, faShoppingCart, faDollarSign, faEllipsisV, faUsers, faCalendar, faCalendarAlt, faUtensils, faSignOutAlt, faUmbrella, faCog } from '@fortawesome/free-solid-svg-icons';
+import { PinLockService } from '../../services/pin-lock.service';
 
 @Component({
   selector: 'app-app-navigation',
@@ -27,10 +26,10 @@ export class AppNavigationComponent {
   faUtensils = faUtensils;
   faSignOutAlt = faSignOutAlt;
   faUmbrella = faUmbrella;
+  faCog = faCog;
 
   constructor(
-    private authService: AuthService,
-    private authGuard: AuthGuard
+    private pinLockService: PinLockService
   ) {}
 
   toggleMoreMenu() {
@@ -41,15 +40,17 @@ export class AppNavigationComponent {
     this.showMoreMenu = false;
   }
 
-  async logout() {
-    try {
-      await this.authService.logout();
-      // Limpiar caché de autenticación
-      this.authGuard.clearCache();
-      // Redirigir a la página de login o home
-      window.location.href = '/';
-    } catch (error) {
-      console.error('Error during logout:', error);
-    }
+  /**
+   * Cierra sesión temporalmente (solo recarga la página y muestra el lock screen)
+   * No cierra la sesión de Supabase, solo limpia el cache de desbloqueo y recarga
+   * para que se muestre la pantalla de PIN
+   */
+  logout() {
+    // Limpiar cache de desbloqueo para que se pida el PIN
+    this.pinLockService.clearUnlockCache();
+    // Limpiar sessionStorage para que se detecte como recarga
+    sessionStorage.removeItem('app_session_active');
+    // Recargar la página, lo cual activará el lock screen automáticamente
+    window.location.reload();
   }
 }

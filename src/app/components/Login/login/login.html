@@ -6,21 +6,28 @@
         <h2 class="login-title">Iniciar sesión</h2>
       </div>
 
+      <!-- Indicador de verificación inicial -->
+      <div *ngIf="isCheckingInitialSession" class="message-container">
+        <div class="info-message backdrop-blur-sm">
+          Verificando sesión...
+        </div>
+      </div>
+
       <!-- Mensaje de error -->
-      <div *ngIf="errorMessage" class="message-container">
+      <div *ngIf="errorMessage && !isCheckingInitialSession" class="message-container">
         <div class="error-message backdrop-blur-sm">
           {{ errorMessage }}
         </div>
       </div>
 
       <!-- Mensaje de éxito -->
-      <div *ngIf="successMessage" class="message-container">
+      <div *ngIf="successMessage && !isCheckingInitialSession" class="message-container">
         <div class="success-message backdrop-blur-sm">
           {{ successMessage }}
         </div>
       </div>
 
-      <form (ngSubmit)="onLogin()" #loginForm="ngForm" class="login-form-content">
+      <form *ngIf="!isCheckingInitialSession" (ngSubmit)="onLogin()" #loginForm="ngForm" class="login-form-content">
         <div class="input-group">
           <input type="email"
                  placeholder="Correo electrónico"

@@ -1,0 +1,923 @@
+<div class="bg-background-light dark:bg-background-dark text-[#111817] dark:text-white min-h-screen flex justify-center">
+
+  <div class="max-w-[430px] mx-auto min-h-screen flex flex-col pb-10 w-full">
+
+    
+
+    <!-- TopAppBar -->
+
+    <header class="flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 sticky top-0 z-10">
+
+      <div class="text-[#111817] dark:text-white flex size-12 shrink-0 items-center cursor-pointer" (click)="goBack()">
+
+        <span class="material-symbols-outlined text-2xl" translate="no">arrow_back_ios</span>
+
+      </div>
+
+      <h2 class="text-[#111817] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-12">
+
+        @if (isInitialPinSetup()) {
+          Configurar PIN
+        } @else if (showChangePinModal()) {
+          Cambiar PIN
+        } @else {
+          Ajustes de la Aplicación
+        }
+
+      </h2>
+
+    </header>
+
+
+
+    @if (isLoading()) {
+
+      <div class="flex items-center justify-center py-20">
+
+        <span class="material-symbols-outlined animate-spin text-primary text-4xl" translate="no">hourglass_empty</span>
+
+      </div>
+
+    } @else if (isInitialPinSetup()) {
+
+      <!-- Vista de configuración inicial de PIN -->
+      <div class="px-4 py-6 flex-1 flex flex-col">
+
+        <div class="mb-6">
+          <p class="text-[#638884] dark:text-[#a1b7b5] text-sm text-center">
+            Ingresa un PIN de 6 dígitos para proteger tu aplicación. Este PIN no puede ser secuencial ni repetido.
+          </p>
+        </div>
+
+        <div class="flex-1 flex items-center justify-center">
+          <app-pin-setup 
+            (pinConfigured)="setupPin($event.pin, $event.confirmPin)"
+            (cancel)="cancelInitialPinSetup()"
+            [isProcessing]="isUpdatingSecurity()">
+          </app-pin-setup>
+        </div>
+
+      </div>
+
+    } @else if (showChangePinModal()) {
+
+      <!-- Vista de cambio de PIN -->
+      <div class="px-4 py-6 flex-1 flex flex-col">
+
+        <div class="mb-6">
+          <p class="text-[#638884] dark:text-[#a1b7b5] text-sm text-center">
+            Ingresa tu PIN actual y el nuevo PIN de 6 dígitos. El nuevo PIN no puede ser secuencial ni repetido.
+          </p>
+        </div>
+
+        <div class="flex-1 flex items-center justify-center">
+          <app-pin-change 
+            (pinChanged)="changePin($event.currentPin, $event.newPin, $event.confirmPin)"
+            (cancel)="closeChangePinModal()"
+            [isProcessing]="isUpdatingSecurity()">
+          </app-pin-change>
+        </div>
+
+      </div>
+
+    } @else {
+
+      <div class="px-4 space-y-6">
+
+        
+
+        <!-- Section 1: APARIENCIA -->
+
+        <section>
+
+          <h3 class="text-[#638884] dark:text-[#a1b7b5] text-xs font-bold leading-tight tracking-[0.05em] px-1 pb-3 pt-4 uppercase">
+
+            Apariencia
+
+          </h3>
+
+          <div class="bg-white dark:bg-[#22262b] rounded-xl overflow-hidden shadow-sm">
+
+            <div class="flex p-3">
+
+              <div class="flex h-11 flex-1 items-center justify-center rounded-lg bg-[#f0f4f4] dark:bg-[#2c3238] p-1">
+
+                <label class="flex cursor-pointer h-full grow items-center justify-center rounded-lg px-2 transition-all"
+
+                       [class.bg-white]="selectedTheme() === 'light'"
+
+                       [class.dark:bg-[#181b20]]="selectedTheme() === 'light'"
+
+                       [class.shadow-sm]="selectedTheme() === 'light'"
+
+                       [class.text-primary]="selectedTheme() === 'light'"
+
+                       [class.text-[#638884]]="selectedTheme() !== 'light'"
+
+                       [class.dark:text-[#a1b7b5]]="selectedTheme() !== 'light'"
+
+                       [class.font-semibold]="selectedTheme() === 'light'">
+
+                  <span class="truncate">Claro</span>
+
+                  <input class="invisible w-0" 
+
+                         name="theme-toggle" 
+
+                         type="radio" 
+
+                         value="light"
+
+                         [checked]="selectedTheme() === 'light'"
+
+                         (change)="onThemeChange('light')"/>
+
+                </label>
+
+                <label class="flex cursor-pointer h-full grow items-center justify-center rounded-lg px-2 transition-all"
+
+                       [class.bg-white]="selectedTheme() === 'dark'"
+
+                       [class.dark:bg-[#181b20]]="selectedTheme() === 'dark'"
+
+                       [class.shadow-sm]="selectedTheme() === 'dark'"
+
+                       [class.text-primary]="selectedTheme() === 'dark'"
+
+                       [class.text-[#638884]]="selectedTheme() !== 'dark'"
+
+                       [class.dark:text-[#a1b7b5]]="selectedTheme() !== 'dark'"
+
+                       [class.font-semibold]="selectedTheme() === 'dark'">
+
+                  <span class="truncate">Oscuro</span>
+
+                  <input class="invisible w-0" 
+
+                         name="theme-toggle" 
+
+                         type="radio" 
+
+                         value="dark"
+
+                         [checked]="selectedTheme() === 'dark'"
+
+                         (change)="onThemeChange('dark')"/>
+
+                </label>
+
+                <label class="flex cursor-pointer h-full grow items-center justify-center rounded-lg px-2 transition-all"
+
+                       [class.bg-white]="selectedTheme() === 'system'"
+
+                       [class.dark:bg-[#181b20]]="selectedTheme() === 'system'"
+
+                       [class.shadow-sm]="selectedTheme() === 'system'"
+
+                       [class.text-primary]="selectedTheme() === 'system'"
+
+                       [class.text-[#638884]]="selectedTheme() !== 'system'"
+
+                       [class.dark:text-[#a1b7b5]]="selectedTheme() !== 'system'"
+
+                       [class.font-semibold]="selectedTheme() === 'system'">
+
+                  <span class="truncate">Sistema</span>
+
+                  <input class="invisible w-0" 
+
+                         name="theme-toggle" 
+
+                         type="radio" 
+
+                         value="system"
+
+                         [checked]="selectedTheme() === 'system'"
+
+                         (change)="onThemeChange('system')"/>
+
+                </label>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+
+        <!-- Section 2: SEGURIDAD Y PRIVACIDAD -->
+
+        <section>
+
+          <h3 class="text-[#638884] dark:text-[#a1b7b5] text-xs font-bold leading-tight tracking-[0.05em] px-1 pb-3 pt-2 uppercase">
+
+            Seguridad y Privacidad
+
+          </h3>
+
+          <div class="bg-white dark:bg-[#22262b] rounded-xl overflow-hidden shadow-sm divide-y divide-[#f0f4f4] dark:divide-[#2c3238]">
+
+            
+
+            <!-- Bloqueo de App -->
+
+            <div class="flex items-center justify-between px-4 py-4">
+
+              <div class="flex items-center gap-4 flex-1">
+
+                <div class="text-primary flex items-center justify-center rounded-lg bg-primary/10 shrink-0 size-10">
+
+                  <span class="material-symbols-outlined text-xl" translate="no">lock</span>
+
+                </div>
+
+                <div class="flex flex-col">
+
+                  <p class="text-[#111817] dark:text-white text-base font-medium">Bloqueo de Aplicación</p>
+
+                  <p class="text-[#638884] dark:text-[#a1b7b5] text-xs mt-0.5">
+
+                    @if (isLockEnabled()) {
+
+                      Bloqueo activado
+
+                    } @else {
+
+                      Bloqueo desactivado
+
+                    }
+
+                  </p>
+
+                </div>
+
+              </div>
+
+              <label class="relative inline-flex items-center cursor-pointer">
+
+                <input 
+
+                  type="checkbox" 
+
+                  class="sr-only peer" 
+
+                  [checked]="isLockEnabled()"
+
+                  (change)="onLockToggleChange($any($event.target).checked)"
+
+                  [disabled]="isUpdatingSecurity()"/>
+
+                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary disabled:opacity-50 disabled:cursor-not-allowed"></div>
+
+              </label>
+
+            </div>
+
+
+
+            <!-- Configurar PIN -->
+
+            @if (!isPinConfigured()) {
+
+              <div class="flex items-center gap-4 px-4 py-4 cursor-pointer active:bg-[#f0f4f4] dark:active:bg-[#2c3238]"
+
+                   (click)="openSetupPinModal()">
+
+                <div class="text-blue-500 flex items-center justify-center rounded-lg bg-blue-500/10 shrink-0 size-10">
+
+                  <span class="material-symbols-outlined text-xl" translate="no">password</span>
+
+                </div>
+
+                <p class="text-[#111817] dark:text-white text-base font-medium flex-1">Configurar PIN</p>
+
+                <div class="shrink-0">
+
+                  <span class="material-symbols-outlined text-[#cbd5e1]" translate="no">chevron_right</span>
+
+                </div>
+
+              </div>
+
+            } @else {
+
+              <!-- Cambiar PIN -->
+
+              <div class="flex items-center gap-4 px-4 py-4 cursor-pointer active:bg-[#f0f4f4] dark:active:bg-[#2c3238]"
+
+                   (click)="openChangePinModal()">
+
+                <div class="text-blue-500 flex items-center justify-center rounded-lg bg-blue-500/10 shrink-0 size-10">
+
+                  <span class="material-symbols-outlined text-xl" translate="no">lock_reset</span>
+
+                </div>
+
+                <div class="flex flex-col flex-1">
+
+                  <p class="text-[#111817] dark:text-white text-base font-medium">Cambiar PIN</p>
+
+                  <p class="text-[#638884] dark:text-[#a1b7b5] text-xs mt-0.5">PIN configurado</p>
+
+                </div>
+
+                <div class="shrink-0">
+
+                  <span class="material-symbols-outlined text-[#cbd5e1]" translate="no">chevron_right</span>
+
+                </div>
+
+              </div>
+
+            }
+
+
+
+            <!-- Biometría -->
+
+            @if (isBiometricSupported() && isBiometricAvailable()) {
+
+              <div class="flex items-center justify-between px-4 py-4">
+
+                <div class="flex items-center gap-4 flex-1">
+
+                  <div class="text-green-500 flex items-center justify-center rounded-lg bg-green-500/10 shrink-0 size-10">
+
+                    <span class="material-symbols-outlined text-xl" translate="no">fingerprint</span>
+
+                  </div>
+
+                  <div class="flex flex-col">
+
+                    <p class="text-[#111817] dark:text-white text-base font-medium">Autenticación Biométrica</p>
+
+                    <p class="text-[#638884] dark:text-[#a1b7b5] text-xs mt-0.5">
+
+                      @if (isBiometricEnabled() && isBiometricRegistered()) {
+
+                        Biometría activada
+
+                      } @else if (isBiometricRegistered()) {
+
+                        Registrada pero inactiva
+
+                      } @else {
+
+                        No registrada
+
+                      }
+
+                    </p>
+
+                  </div>
+
+                </div>
+
+                <label class="relative inline-flex items-center cursor-pointer">
+
+                  <input 
+
+                    type="checkbox" 
+
+                    class="sr-only peer" 
+
+                    [checked]="isBiometricEnabled() && isBiometricRegistered()"
+
+                    (change)="onBiometricToggleChange($any($event.target).checked)"
+
+                    [disabled]="isUpdatingSecurity() || isRegisteringBiometric()"/>
+
+                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary disabled:opacity-50 disabled:cursor-not-allowed"></div>
+
+                </label>
+
+              </div>
+
+
+
+              <!-- Registrar Biometría / Eliminar Biometría -->
+
+              @if (!isBiometricRegistered()) {
+
+                <div class="flex items-center gap-4 px-4 py-4 cursor-pointer active:bg-[#f0f4f4] dark:active:bg-[#2c3238]"
+
+                     (click)="registerBiometric()">
+
+                  <div class="text-green-500 flex items-center justify-center rounded-lg bg-green-500/10 shrink-0 size-10">
+
+                    <span class="material-symbols-outlined text-xl" translate="no">fingerprint</span>
+
+                  </div>
+
+                  <div class="flex flex-col flex-1">
+
+                    <p class="text-[#111817] dark:text-white text-base font-medium">Registrar Biometría</p>
+
+                    <p class="text-[#638884] dark:text-[#a1b7b5] text-xs mt-0.5">Usa tu huella o rostro para desbloquear</p>
+
+                  </div>
+
+                  @if (isRegisteringBiometric()) {
+
+                    <span class="material-symbols-outlined animate-spin text-primary" translate="no">hourglass_empty</span>
+
+                  } @else {
+
+                    <div class="shrink-0">
+
+                      <span class="material-symbols-outlined text-[#cbd5e1]" translate="no">chevron_right</span>
+
+                    </div>
+
+                  }
+
+                </div>
+
+              } @else {
+
+                <div class="flex items-center gap-4 px-4 py-4 cursor-pointer active:bg-[#f0f4f4] dark:active:bg-[#2c3238]"
+
+                     (click)="deleteBiometric()">
+
+                  <div class="text-red-500 flex items-center justify-center rounded-lg bg-red-500/10 shrink-0 size-10">
+
+                    <span class="material-symbols-outlined text-xl" translate="no">delete</span>
+
+                  </div>
+
+                  <div class="flex flex-col flex-1">
+
+                    <p class="text-[#111817] dark:text-white text-base font-medium">Eliminar Biometría</p>
+
+                    <p class="text-[#638884] dark:text-[#a1b7b5] text-xs mt-0.5">Eliminar credencial biométrica registrada</p>
+
+                  </div>
+
+                  <div class="shrink-0">
+
+                    <span class="material-symbols-outlined text-[#cbd5e1]" translate="no">chevron_right</span>
+
+                  </div>
+
+                </div>
+
+              }
+
+            } @else if (isBiometricSupported() && !isBiometricAvailable()) {
+
+              <!-- Mensaje cuando WebAuthn está soportado pero biometría no está disponible -->
+
+              <div class="px-4 py-4">
+
+                <div class="flex items-center gap-4">
+
+                  <div class="text-gray-400 flex items-center justify-center rounded-lg bg-gray-400/10 shrink-0 size-10">
+
+                    <span class="material-symbols-outlined text-xl" translate="no">fingerprint</span>
+
+                  </div>
+
+                  <div class="flex flex-col flex-1">
+
+                    <p class="text-[#111817] dark:text-white text-base font-medium">Autenticación Biométrica</p>
+
+                    <p class="text-[#638884] dark:text-[#a1b7b5] text-xs mt-0.5">No disponible en este dispositivo</p>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            }
+
+
+
+            <!-- Cerrar Sesión -->
+
+            <div class="flex items-center gap-4 px-4 py-4 cursor-pointer active:bg-[#f0f4f4] dark:active:bg-[#2c3238] border-t border-[#f0f4f4] dark:border-[#2c3238]"
+
+                 (click)="signOut()">
+
+              <div class="text-red-500 flex items-center justify-center rounded-lg bg-red-500/10 shrink-0 size-10">
+
+                <span class="material-symbols-outlined text-xl" translate="no">logout</span>
+
+              </div>
+
+              <div class="flex flex-col flex-1">
+
+                <p class="text-[#111817] dark:text-white text-base font-medium">Cerrar Sesión</p>
+
+                <p class="text-[#638884] dark:text-[#a1b7b5] text-xs mt-0.5">Cerrar sesión y salir de la aplicación</p>
+
+              </div>
+
+              <div class="shrink-0">
+
+                <span class="material-symbols-outlined text-[#cbd5e1]" translate="no">chevron_right</span>
+
+              </div>
+
+            </div>
+
+
+
+          </div>
+
+        </section>
+
+        <!-- Section 4: INFORMACIÓN -->
+
+        <section>
+
+          <h3 class="text-[#638884] dark:text-[#a1b7b5] text-xs font-bold leading-tight tracking-[0.05em] px-1 pb-3 pt-2 uppercase">
+
+            Información
+
+          </h3>
+
+          <div class="bg-white dark:bg-[#22262b] rounded-xl overflow-hidden shadow-sm divide-y divide-[#f0f4f4] dark:divide-[#2c3238]">
+
+            <div class="flex items-center justify-between px-4 py-4">
+
+              <span class="text-[#111817] dark:text-white font-medium">Nombre de la App</span>
+
+              <span class="text-[#638884] dark:text-[#a1b7b5] font-semibold">{{ appName }}</span>
+
+            </div>
+
+            <div class="flex items-center justify-between px-4 py-4">
+
+              <span class="text-[#111817] dark:text-white font-medium">Versión</span>
+
+              <span class="text-[#638884] dark:text-[#a1b7b5]">{{ appVersion }}</span>
+
+            </div>
+
+            <div class="flex items-center justify-between px-4 py-4 cursor-pointer active:bg-[#f0f4f4] dark:active:bg-[#2c3238]">
+
+              <span class="text-[#111817] dark:text-white font-medium">Términos y Privacidad</span>
+
+              <span class="material-symbols-outlined text-[#cbd5e1]" translate="no">open_in_new</span>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+
+        <!-- Section 5: CRITICAL ACTIONS -->
+
+        <section class="pt-4">
+
+          <div class="bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 rounded-xl p-4 space-y-4">
+
+            <div class="flex gap-3">
+
+              <span class="material-symbols-outlined text-red-500" translate="no">warning</span>
+
+              <div>
+
+                <h4 class="text-red-700 dark:text-red-400 font-bold text-sm uppercase">Zona de Peligro</h4>
+
+                <p class="text-red-600/80 dark:text-red-400/70 text-xs mt-1 leading-relaxed">
+
+                  Esta acción es irreversible. Se eliminarán permanentemente todos los datos registrados en tu dispositivo.
+
+                </p>
+
+              </div>
+
+            </div>
+
+            <button 
+
+              class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg shadow-sm transition-colors text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+
+              (click)="showDeleteExpensesDialog()"
+
+              [disabled]="isDeletingExpenses()">
+
+              @if (isDeletingExpenses()) {
+
+                <span class="material-symbols-outlined animate-spin" translate="no">hourglass_empty</span>
+
+              } @else {
+
+                <span class="material-symbols-outlined text-xl" translate="no">delete_forever</span>
+
+              }
+
+              Eliminar todos los datos
+
+            </button>
+
+          </div>
+
+        </section>
+
+
+
+      </div>
+
+    }
+
+    <!-- Modal de Confirmación - Eliminar Gastos -->
+
+    @if (showDeleteConfirm()) {
+
+      <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" (click)="closeDeleteConfirm()">
+
+        <div class="bg-white dark:bg-[#22262b] rounded-xl p-6 max-w-sm w-full shadow-xl" (click)="$event.stopPropagation()">
+
+          <h3 class="text-[#111817] dark:text-white text-lg font-bold mb-2">Confirmar Eliminación</h3>
+
+          <p class="text-[#638884] dark:text-[#a1b7b5] text-sm mb-6">
+
+            ¿Estás seguro de que deseas eliminar todos los gastos? Esta acción no se puede deshacer.
+
+          </p>
+
+          <div class="flex gap-3">
+
+            <button 
+
+              class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-[#111817] dark:text-white font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+
+              (click)="closeDeleteConfirm()">
+
+              Cancelar
+
+            </button>
+
+            <button 
+
+              class="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition-colors disabled:opacity-50"
+
+              (click)="onDeleteAllExpenses()"
+
+              [disabled]="isDeletingExpenses()">
+
+              @if (isDeletingExpenses()) {
+
+                <span class="material-symbols-outlined animate-spin" translate="no">hourglass_empty</span>
+
+              } @else {
+
+                Eliminar
+
+              }
+
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    }
+
+
+    <!-- Modal de Confirmación - Restablecer Categorías -->
+
+    @if (showResetCategoriesConfirm()) {
+
+      <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" (click)="closeResetCategoriesConfirm()">
+
+        <div class="bg-white dark:bg-[#22262b] rounded-xl p-6 max-w-sm w-full shadow-xl" (click)="$event.stopPropagation()">
+
+          <h3 class="text-[#111817] dark:text-white text-lg font-bold mb-2">Restablecer Categorías</h3>
+
+          <p class="text-[#638884] dark:text-[#a1b7b5] text-sm mb-6">
+
+            ¿Estás seguro de que deseas restablecer las categorías? Se eliminarán todas las categorías personalizadas y se mantendrán solo las categorías por defecto.
+
+          </p>
+
+          <div class="flex gap-3">
+
+            <button 
+
+              class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-[#111817] dark:text-white font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+
+              (click)="closeResetCategoriesConfirm()">
+
+              Cancelar
+
+            </button>
+
+            <button 
+
+              class="flex-1 px-4 py-2 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg transition-colors disabled:opacity-50"
+
+              (click)="onResetCategories()"
+
+              [disabled]="isResettingCategories()">
+
+              @if (isResettingCategories()) {
+
+                <span class="material-symbols-outlined animate-spin" translate="no">hourglass_empty</span>
+
+              } @else {
+
+                Restablecer
+
+              }
+
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    }
+
+
+
+    <!-- Modal de Selección de Rango de Fechas -->
+
+    @if (showDateRangeModal()) {
+
+      <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" (click)="closeDateRangeModal()">
+
+        <div class="bg-white dark:bg-[#22262b] rounded-xl p-6 max-w-sm w-full shadow-xl" (click)="$event.stopPropagation()">
+
+          <h3 class="text-[#111817] dark:text-white text-lg font-bold mb-4">Seleccionar Rango de Fechas</h3>
+
+          
+
+          <div class="space-y-4 mb-6">
+
+            <div>
+
+              <label class="block text-sm font-medium text-[#111817] dark:text-white mb-2">
+
+                Fecha de Inicio
+
+              </label>
+
+              <input 
+
+                type="date"
+
+                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-[#181b20] text-[#111817] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
+
+                [value]="dateRangeStart()"
+
+                (change)="dateRangeStart.set($any($event.target).value)"
+
+                [max]="dateRangeEnd() || ''"/>
+
+            </div>
+
+            
+
+            <div>
+
+              <label class="block text-sm font-medium text-[#111817] dark:text-white mb-2">
+
+                Fecha de Fin
+
+              </label>
+
+              <input 
+
+                type="date"
+
+                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-[#181b20] text-[#111817] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
+
+                [value]="dateRangeEnd()"
+
+                (change)="dateRangeEnd.set($any($event.target).value)"
+
+                [min]="dateRangeStart() || ''"/>
+
+            </div>
+
+          </div>
+
+          <div class="flex gap-3">
+
+            <button 
+
+              class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-[#111817] dark:text-white font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+
+              (click)="closeDateRangeModal()">
+
+              Cancelar
+
+            </button>
+
+            <button 
+
+              class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-[#111817] dark:text-white text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+
+              (click)="resetToCurrentMonth()">
+
+              Mes Actual
+
+            </button>
+
+            <button 
+
+              class="flex-1 px-4 py-2 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg transition-colors"
+
+              (click)="applyDateRange()">
+
+              Aplicar
+
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    }
+
+    <!-- Modal de Configuración de PIN -->
+
+    @if (showSetupPinModal()) {
+
+      <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" (click)="closeSetupPinModal()">
+
+        <div class="bg-white dark:bg-[#22262b] rounded-xl p-6 max-w-sm w-full shadow-xl max-h-[90vh] overflow-y-auto" (click)="$event.stopPropagation()">
+
+          <h3 class="text-[#111817] dark:text-white text-lg font-bold mb-2">Configurar PIN</h3>
+
+          <p class="text-[#638884] dark:text-[#a1b7b5] text-sm mb-4">
+
+            Ingresa un PIN de 6 dígitos para proteger tu aplicación. Este PIN no puede ser secuencial ni repetido.
+
+          </p>
+
+          <app-pin-setup 
+
+            (pinConfigured)="setupPin($event.pin, $event.confirmPin)"
+
+            (cancel)="closeSetupPinModal()"
+
+            [isProcessing]="isUpdatingSecurity()">
+
+          </app-pin-setup>
+
+        </div>
+
+      </div>
+
+    }
+
+
+
+
+    <!-- Modal de Desactivar Bloqueo -->
+
+    @if (showDisableLockModal()) {
+
+      <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" (click)="showDisableLockModal.set(false)">
+
+        <div class="bg-white dark:bg-[#22262b] rounded-xl p-6 max-w-sm w-full shadow-xl" (click)="$event.stopPropagation()">
+
+          <h3 class="text-[#111817] dark:text-white text-lg font-bold mb-2">Desactivar Bloqueo</h3>
+
+          <p class="text-[#638884] dark:text-[#a1b7b5] text-sm mb-4">
+
+            Para desactivar el bloqueo, ingresa tu PIN actual.
+
+          </p>
+
+          
+
+          <app-pin-verify 
+
+            (pinVerified)="disableLock($event)"
+
+            (cancel)="showDisableLockModal.set(false)"
+
+            [isProcessing]="isUpdatingSecurity()"
+
+            label="PIN Actual">
+
+          </app-pin-verify>
+
+        </div>
+
+      </div>
+
+    }
+
+
+
+  </div>
+
+</div>

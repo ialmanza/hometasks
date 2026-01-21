@@ -1,0 +1,173 @@
+<div class="space-y-6">
+  @if (errorMessage() && showError()) {
+    <div class="p-3 bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-400 rounded-lg text-sm">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  @if (currentStep() === 'current') {
+    <!-- PIN Actual -->
+    <div>
+      <label class="block text-sm font-medium text-[#111817] dark:text-white mb-2">
+        Ingresa tu PIN actual
+      </label>
+      <div class="flex justify-center gap-2 mb-3">
+        @for (isFilled of getPinCircles(currentPin()); track $index) {
+          <div 
+            class="w-10 h-10 rounded-full border-2 transition-all duration-200 flex items-center justify-center"
+            [class.border-primary]="isFilled"
+            [class.bg-primary]="isFilled"
+            [class.border-gray-300]="!isFilled && getTheme() === 'light'"
+            [class.border-gray-600]="!isFilled && getTheme() === 'dark'">
+            @if (isFilled) {
+              <span class="w-2 h-2 rounded-full bg-white"></span>
+            }
+          </div>
+        }
+      </div>
+      <input
+        type="text"
+        inputmode="numeric"
+        pattern="[0-9]*"
+        maxlength="6"
+        [value]="currentPin()"
+        (input)="onPinInput($event, 'current')"
+        [disabled]="isProcessing"
+        class="sr-only"
+        autocomplete="off"
+        autofocus
+      />
+    </div>
+  } @else {
+    <!-- Nuevo PIN -->
+    <div>
+      <label class="block text-sm font-medium text-[#111817] dark:text-white mb-2">
+        Ingresa tu nuevo PIN
+      </label>
+      <div class="flex justify-center gap-2 mb-3">
+        @for (isFilled of getPinCircles(newPin()); track $index) {
+          <div 
+            class="w-10 h-10 rounded-full border-2 transition-all duration-200 flex items-center justify-center"
+            [class.border-primary]="isFilled"
+            [class.bg-primary]="isFilled"
+            [class.border-gray-300]="!isFilled && getTheme() === 'light'"
+            [class.border-gray-600]="!isFilled && getTheme() === 'dark'">
+            @if (isFilled) {
+              <span class="w-2 h-2 rounded-full bg-white"></span>
+            }
+          </div>
+        }
+      </div>
+      <input
+        type="text"
+        inputmode="numeric"
+        pattern="[0-9]*"
+        maxlength="6"
+        [value]="newPin()"
+        (input)="onPinInput($event, 'new')"
+        [disabled]="isProcessing"
+        class="sr-only"
+        autocomplete="off"
+        autofocus
+      />
+    </div>
+
+    <!-- Confirmar Nuevo PIN -->
+    <div>
+      <label class="block text-sm font-medium text-[#111817] dark:text-white mb-2">
+        Confirma tu nuevo PIN
+      </label>
+      <div class="flex justify-center gap-2 mb-3">
+        @for (isFilled of getPinCircles(confirmPin()); track $index) {
+          <div 
+            class="w-10 h-10 rounded-full border-2 transition-all duration-200 flex items-center justify-center"
+            [class.border-primary]="isFilled"
+            [class.bg-primary]="isFilled"
+            [class.border-gray-300]="!isFilled && getTheme() === 'light'"
+            [class.border-gray-600]="!isFilled && getTheme() === 'dark'">
+            @if (isFilled) {
+              <span class="w-2 h-2 rounded-full bg-white"></span>
+            }
+          </div>
+        }
+      </div>
+      <input
+        type="text"
+        inputmode="numeric"
+        pattern="[0-9]*"
+        maxlength="6"
+        [value]="confirmPin()"
+        (input)="onPinInput($event, 'confirm')"
+        [disabled]="isProcessing"
+        class="sr-only"
+        autocomplete="off"
+      />
+    </div>
+  }
+
+  <!-- Teclado Numérico -->
+  <div class="grid grid-cols-3 gap-2">
+    @for (number of ['1', '2', '3', '4', '5', '6', '7', '8', '9']; track number) {
+      <button
+        type="button"
+        (click)="onNumberClick(number)"
+        [disabled]="isProcessing || (currentStep() === 'current' ? currentPin().length >= PIN_LENGTH : (newPin().length >= PIN_LENGTH && confirmPin().length >= PIN_LENGTH))"
+        class="h-12 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-xl font-semibold text-[#111817] dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 active:bg-gray-300 dark:active:bg-gray-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+        {{ number }}
+      </button>
+    }
+    
+    <button
+      type="button"
+      (click)="onDelete()"
+      [disabled]="isProcessing || (currentStep() === 'current' ? currentPin().length === 0 : (newPin().length === 0 && confirmPin().length === 0))"
+      class="h-12 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-[#111817] dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 active:bg-gray-300 dark:active:bg-gray-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center">
+      <span class="material-symbols-outlined" translate="no">backspace</span>
+    </button>
+
+    <button
+      type="button"
+      (click)="onNumberClick('0')"
+      [disabled]="isProcessing || (currentStep() === 'current' ? currentPin().length >= PIN_LENGTH : (newPin().length >= PIN_LENGTH && confirmPin().length >= PIN_LENGTH))"
+      class="h-12 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-xl font-semibold text-[#111817] dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 active:bg-gray-300 dark:active:bg-gray-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+      0
+    </button>
+
+    <button
+      type="button"
+      (click)="onClear()"
+      [disabled]="isProcessing || (currentStep() === 'current' ? currentPin().length === 0 : (newPin().length === 0 && confirmPin().length === 0))"
+      class="h-12 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-xs font-semibold text-[#111817] dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 active:bg-gray-300 dark:active:bg-gray-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+      CLEAR
+    </button>
+  </div>
+
+  <!-- Botones -->
+  <div class="flex gap-3">
+    <button 
+      class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-[#111817] dark:text-white font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+      (click)="onCancel()"
+      [disabled]="isProcessing">
+      Cancelar
+    </button>
+    @if (currentStep() === 'current') {
+      <button 
+        class="flex-1 px-4 py-2 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        (click)="currentStep.set('new')"
+        [disabled]="isProcessing || currentPin().length !== PIN_LENGTH">
+        Continuar
+      </button>
+    } @else {
+      <button 
+        class="flex-1 px-4 py-2 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        (click)="onSubmit()"
+        [disabled]="isProcessing || newPin().length !== PIN_LENGTH || confirmPin().length !== PIN_LENGTH">
+        @if (isProcessing) {
+          <span class="material-symbols-outlined animate-spin" translate="no">hourglass_empty</span>
+        }
+        Cambiar
+      </button>
+    }
+  </div>
+</div>
+

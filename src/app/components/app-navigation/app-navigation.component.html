@@ -159,6 +159,11 @@
           <span>Vacaciones</span>
         </a>
 
+        <a routerLink="/settings" routerLinkActive="active" (click)="closeMoreMenu()" class="more-menu-item">
+          <fa-icon [icon]="faCog"></fa-icon>
+          <span>Ajustes</span>
+        </a>
+
         <button class="more-menu-item logout-btn" (click)="logout(); closeMoreMenu()">
           <fa-icon [icon]="faSignOutAlt"></fa-icon>
           <span>Cerrar Sesión</span>

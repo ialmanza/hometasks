@@ -1,9 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { SupabaseService } from '../../../services/Supabase/supabaseservice';
 import { PushSubscriptionService } from '../../../services/push-subscription.service';
+import { SecuritySettingsService } from '../../../services/security-settings.service';
+import { supabase } from '../../../services/Supabase-Client/supabase-client';
 
 @Component({
   selector: 'app-login',
@@ -12,18 +14,67 @@ import { PushSubscriptionService } from '../../../services/push-subscription.ser
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
-export class Login {
+export class Login implements OnInit {
   email: string = '';
   password: string = '';
   isLoading: boolean = false;
+  isCheckingInitialSession: boolean = true; // Estado para verificación inicial
   errorMessage: string = '';
   successMessage: string = '';
 
   constructor(
     private supabaseService: SupabaseService,
     private router: Router,
-    private pushSubscriptionService: PushSubscriptionService
+    private pushSubscriptionService: PushSubscriptionService,
+    private securitySettingsService: SecuritySettingsService
   ) {}
+
+  /**
+   * Verifica si hay sesión válida y PIN configurado al inicializar el componente
+   * Si ambas condiciones se cumplen, redirige automáticamente a /lock
+   */
+  async ngOnInit() {
+    this.isCheckingInitialSession = true;
+    
+    try {
+      // Verificar si hay sesión de Supabase (aunque no haya sesión local)
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        console.error('Error verificando sesión:', sessionError);
+        this.isCheckingInitialSession = false;
+        return; // Mostrar formulario de login
+      }
+
+      // Si hay sesión válida, verificar si el usuario tiene PIN configurado
+      if (session?.user) {
+        try {
+          // Obtener configuración de seguridad
+          const settings = await this.securitySettingsService.getSettings();
+          
+          // Verificar si tiene PIN configurado
+          const hasPinConfigured = settings && settings.pin_hash && settings.pin_salt;
+          
+          if (hasPinConfigured) {
+            // Usuario tiene sesión válida y PIN configurado → redirigir a lock screen
+            console.log('Usuario con sesión y PIN configurado, redirigiendo a lock screen');
+            this.router.navigate(['/lock'], { 
+              queryParams: { returnUrl: '/expenses-dashboard' } 
+            });
+            return;
+          }
+        } catch (settingsError) {
+          console.error('Error verificando configuración de seguridad:', settingsError);
+          // Si falla la verificación de settings, continuar con login normal
+        }
+      }
+    } catch (error) {
+      console.error('Error en verificación inicial:', error);
+      // Si hay cualquier error, mostrar formulario de login normalmente
+    } finally {
+      this.isCheckingInitialSession = false;
+    }
+  }
 
   /**
    * Maneja el envío del formulario de login
@@ -38,20 +89,39 @@ export class Login {
     this.clearMessages();
 
     this.supabaseService.signIn(this.email, this.password).subscribe({
-      next: (response: any) => {
+      next: async (response: any) => {
         if (response.error) {
           this.handleLoginError(response.error);
         } else {
           console.log('Login exitoso:', response);
-          this.showSuccess('¡Inicio de sesión exitoso!');
-          
-          // Navegar inmediatamente al dashboard
-          this.router.navigate(['/expenses-dashboard']);
           
           // Inicializar notificaciones push en background (no bloquea la navegación)
           this.pushSubscriptionService.checkAndSubscribe().catch(error => {
             console.error('Error inicializando notificaciones push:', error);
           });
+          
+          // Verificar si el usuario tiene PIN configurado
+          try {
+            const settings = await this.securitySettingsService.getSettings();
+            const hasPinConfigured = settings && settings.pin_hash && settings.pin_salt;
+            
+            if (hasPinConfigured) {
+              // Usuario tiene PIN configurado → redirigir directamente a lock screen
+              // Esto evita la doble verificación (login + lock)
+              console.log('Usuario con PIN configurado, redirigiendo a lock screen');
+              this.router.navigate(['/lock'], { 
+                queryParams: { returnUrl: '/expenses-dashboard' } 
+              });
+            } else {
+              // Usuario no tiene PIN configurado → redirigir al dashboard
+              // El AuthGuard se encargará de redirigir a settings si es necesario
+              this.router.navigate(['/expenses-dashboard']);
+            }
+          } catch (settingsError) {
+            console.error('Error verificando configuración de seguridad después del login:', settingsError);
+            // Si falla la verificación, redirigir al dashboard (fallback seguro)
+            this.router.navigate(['/expenses-dashboard']);
+          }
         }
       },
       error: (error: any) => {

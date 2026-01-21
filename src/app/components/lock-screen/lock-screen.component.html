@@ -1,0 +1,173 @@
+<div class="bg-[#DEEEE7] dark:bg-[#181b20] text-[#111817] dark:text-white min-h-screen flex items-center justify-center px-4">
+  <div class="w-full max-w-md">
+    
+    <!-- Logo -->
+    <div class="text-center mb-8">
+      <div class="flex justify-center mb-4">
+        <img 
+          src="logo_sin_fondo.png" 
+          alt="My Balance Logo" 
+          class="w-32 h-32 object-contain drop-shadow-lg"
+          style="transform: scale(1.5);"
+          onerror="this.src='icons/icon-192x192.png'"
+        />
+      </div>
+      <!-- <h1 class="text-3xl font-bold text-[#111817] dark:text-white mb-2">My Balance</h1> -->
+      <p class="text-gray-700 dark:text-gray-400">Ingresa tu PIN para continuar</p>
+    </div>
+
+    <!-- Mensaje de Error -->
+    @if (errorMessage() && showError()) {
+      <div class="mb-6 p-4 bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-400 rounded-xl text-sm animate-shake">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <!-- Contador de Intentos -->
+    @if (lockState() && lockState()!.failedAttempts > 0 && lockState()!.canAttempt) {
+      <div class="mb-4 text-center">
+        <p class="text-sm text-gray-600 dark:text-gray-400">
+          Intentos fallidos: <span class="font-semibold">{{ lockState()!.failedAttempts }}/5</span>
+        </p>
+      </div>
+    }
+
+    <!-- Bloqueo Temporal -->
+    @if (lockState() && !lockState()!.canAttempt && lockoutSecondsRemaining() > 0) {
+      <div class="mb-6 p-4 bg-orange-100 dark:bg-orange-900/30 border border-orange-400 dark:border-orange-700 text-orange-700 dark:text-orange-400 rounded-xl text-center">
+        <p class="font-semibold mb-1">Demasiados intentos fallidos</p>
+        <p class="text-sm">Intenta nuevamente en: <span class="font-bold text-lg">{{ formatLockoutTime(lockoutSecondsRemaining()) }}</span></p>
+      </div>
+    }
+
+    <!-- Círculos del PIN (Visual) -->
+    <div class="mb-8">
+      <div class="flex justify-center gap-3" [class.shake]="showError()">
+        @for (isFilled of getPinCircles(); track $index) {
+          <div 
+            class="w-12 h-12 rounded-full border-2 transition-all duration-200 flex items-center justify-center"
+            [class.border-[#638884]]="isFilled"
+            [class.bg-[#638884]]="isFilled"
+            [class.border-gray-300]="!isFilled"
+            [class.dark:border-gray-600]="!isFilled"
+            [class.border-red-500]="showError() && !isFilled"
+            [class.animate-pulse]="isProcessing() && isFilled">
+            @if (isFilled) {
+              <span class="w-3 h-3 rounded-full bg-white"></span>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Input Oculto para Captura del PIN (si se usa teclado físico) -->
+    <input
+      type="text"
+      inputmode="none"
+      pattern="[0-9]*"
+      maxlength="6"
+      [value]="pin()"
+      (input)="onPinInput($event)"
+      (keydown)="onKeyDown($event)"
+      [disabled]="isProcessing() || (lockState() && !lockState()!.canAttempt)"
+      autofocus
+      class="sr-only"
+      autocomplete="off"
+      readonly
+      tabindex="-1"
+      aria-label="Ingresa tu PIN de 6 dígitos"
+    />
+
+    <!-- Teclado Numérico Virtual -->
+    <div class="grid grid-cols-3 gap-3 mb-6">
+      @for (number of ['1', '2', '3', '4', '5', '6', '7', '8', '9']; track number) {
+        <button
+          type="button"
+          (click)="onNumberClick(number)"
+          [disabled]="isProcessing() || (lockState() && !lockState()!.canAttempt) || pin().length >= PIN_LENGTH"
+          class="h-16 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 
+                 rounded-xl text-2xl font-semibold text-[#111817] dark:text-white
+                 hover:bg-gray-50 dark:hover:bg-gray-700 active:bg-gray-100 dark:active:bg-gray-600
+                 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed
+                 focus:outline-none focus:ring-2 focus:ring-[#638884] focus:ring-offset-2 dark:focus:ring-offset-gray-900 shadow-md">
+          {{ number }}
+        </button>
+      }
+      
+      <!-- Botón de Borrar -->
+      <button
+        type="button"
+        (click)="onDelete()"
+        [disabled]="isProcessing() || pin().length === 0"
+        class="h-16 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 
+               rounded-xl text-[#111817] dark:text-white
+               hover:bg-gray-50 dark:hover:bg-gray-700 active:bg-gray-100 dark:active:bg-gray-600
+               transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed
+               focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-gray-900
+               flex items-center justify-center shadow-md">
+        <span class="material-symbols-outlined text-2xl" translate="no">backspace</span>
+      </button>
+
+      <!-- Botón 0 -->
+      <button
+        type="button"
+        (click)="onNumberClick('0')"
+        [disabled]="isProcessing() || (lockState() && !lockState()!.canAttempt) || pin().length >= PIN_LENGTH"
+        class="h-16 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 
+               rounded-xl text-2xl font-semibold text-[#111817] dark:text-white
+               hover:bg-gray-50 dark:hover:bg-gray-700 active:bg-gray-100 dark:active:bg-gray-600
+               transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed
+               focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-gray-900 shadow-md">
+          0
+        </button>
+
+      <!-- Botón de Limpiar Todo -->
+      <button
+        type="button"
+        (click)="onClear()"
+        [disabled]="isProcessing() || pin().length === 0"
+        class="h-16 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 
+               rounded-xl text-xs font-semibold text-[#111817] dark:text-white
+               hover:bg-gray-50 dark:hover:bg-gray-700 active:bg-gray-100 dark:active:bg-gray-600
+               transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed
+               focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-gray-900 shadow-md">
+        CLEAR
+      </button>
+    </div>
+
+    <!-- Indicador de Procesamiento -->
+    @if (isProcessing() || isBiometricProcessing()) {
+      <div class="text-center mb-4">
+        <span class="material-symbols-outlined animate-spin text-[#638884] text-3xl" translate="no">hourglass_empty</span>
+        @if (isBiometricProcessing()) {
+          <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">Verificando biometría...</p>
+        }
+      </div>
+    }
+
+    <!-- Botón de Biometría -->
+    @if (isBiometricAvailable() && isBiometricEnabled() && lockState()?.canAttempt && !isBiometricProcessing()) {
+      <div class="text-center mb-6">
+        <button
+          type="button"
+          (click)="attemptBiometric()"
+          [disabled]="isProcessing() || (lockState() && !lockState()!.canAttempt)"
+          class="inline-flex items-center gap-2 px-6 py-3 bg-[#638884] hover:bg-[#5a7a75] text-white font-semibold rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-[#638884] focus:ring-offset-2 dark:focus:ring-offset-gray-900 shadow-md">
+          <span class="material-symbols-outlined text-xl" translate="no">fingerprint</span>
+          <span>Usar Biometría</span>
+        </button>
+      </div>
+    }
+
+    <!-- Botón de Cerrar Sesión (Opcional) -->
+    <div class="text-center mt-6">
+      <button
+        type="button"
+        (click)="onCancel()"
+        class="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 underline">
+        Cerrar sesión
+      </button>
+    </div>
+  </div>
+</div>
+

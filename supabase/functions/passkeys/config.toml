@@ -1,0 +1,3 @@
+[functions.passkeys]
+verify_jwt = false
+
