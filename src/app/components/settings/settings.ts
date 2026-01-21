@@ -6,6 +6,7 @@ import { SecuritySettingsService, UserSecuritySettings } from '../../services/se
 import { PinService } from '../../services/pin.service';
 import { AuthService } from '../../services/auth.service';
 import { BiometricService } from '../../services/biometric.service';
+import { SessionHelperService } from '../../services/session-helper.service';
 import { PinSetupComponent } from './pin-setup/pin-setup.component';
 import { PinChangeComponent } from './pin-change/pin-change.component';
 import { PinVerifyComponent } from './pin-verify/pin-verify.component';
@@ -61,6 +62,7 @@ export class SettingsComponent implements OnInit {
     private pinService: PinService,
     private authService: AuthService,
     private biometricService: BiometricService,
+    private sessionHelper: SessionHelperService,
     private expensesService: ExpensesService,
     private vacationExpensesService: VacationExpensesService,
     public router: Router,
@@ -450,6 +452,12 @@ export class SettingsComponent implements OnInit {
         lock_enabled: true // Activar bloqueo al configurar PIN
       });
 
+      // Verificar que se guardó correctamente
+      const savedSettings = await this.securitySettingsService.getSettings();
+      if (!savedSettings || !savedSettings.pin_hash || !savedSettings.pin_salt) {
+        throw new Error('El PIN no se guardó correctamente en la base de datos');
+      }
+
       // Guardar información en localStorage para permitir /lock como método de autenticación
       // incluso cuando la sesión de Supabase expire
       const userId = await this.authService.getCurrentUserId();
@@ -461,6 +469,9 @@ export class SettingsComponent implements OnInit {
       await this.loadSecuritySettings();
       this.showSetupPinModal.set(false);
       this.isInitialPinSetup.set(false); // Cerrar vista de configuración inicial
+      
+      // Limpiar cache del servicio helper para que se actualice la información
+      this.sessionHelper.clearPinCache();
       
       // Si llegó aquí desde la configuración inicial, redirigir a la ruta original
       const urlParams = new URLSearchParams(window.location.search);
@@ -475,9 +486,10 @@ export class SettingsComponent implements OnInit {
       }
       
       alert('PIN configurado exitosamente');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error al configurar PIN:', error);
-      alert('Error al configurar el PIN. Por favor, intenta nuevamente.');
+      const errorMessage = error?.message || 'Error desconocido al configurar el PIN';
+      alert(`Error al configurar el PIN: ${errorMessage}. Por favor, intenta nuevamente.`);
     } finally {
       this.isUpdatingSecurity.set(false);
     }
@@ -546,6 +558,10 @@ export class SettingsComponent implements OnInit {
 
       await this.loadSecuritySettings();
       this.showChangePinModal.set(false);
+      
+      // Limpiar cache del servicio helper para que se actualice la información
+      this.sessionHelper.clearPinCache();
+      
       alert('PIN cambiado exitosamente');
       
       // Redirigir de vuelta al dashboard o mantener en settings

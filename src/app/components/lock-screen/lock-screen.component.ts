@@ -7,6 +7,7 @@ import { SecuritySettingsService } from '../../services/security-settings.servic
 import { AuthService } from '../../services/auth.service';
 import { PinLockService } from '../../services/pin-lock.service';
 import { BiometricService } from '../../services/biometric.service';
+import { SessionHelperService } from '../../services/session-helper.service';
 import { supabase } from '../../services/Supabase-Client/supabase-client';
 
 @Component({
@@ -51,6 +52,7 @@ export class LockScreenComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private pinLockService: PinLockService,
     private biometricService: BiometricService,
+    private sessionHelper: SessionHelperService,
     private router: Router,
     private route: ActivatedRoute
   ) {
@@ -66,19 +68,14 @@ export class LockScreenComponent implements OnInit, OnDestroy {
       this.returnUrl = params['returnUrl'] || null;
     });
     
-    // Verificar que haya una sesión válida (local o de Supabase) antes de continuar
-    const hasLocalSession = await this.authService.hasLocalSession();
-    if (!hasLocalSession) {
-      // No hay sesión local - verificar si hay sesión de Supabase
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      
-      if (sessionError || !session?.user) {
-        // No hay sesión válida - redirigir a login
-        console.warn('No hay sesión válida, redirigiendo a login');
-        this.router.navigate(['/login']);
-        return;
-      }
-      // Hay sesión de Supabase válida - continuar
+    // Verificar que haya una sesión válida usando el servicio helper
+    const sessionResult = await this.sessionHelper.checkSession();
+    
+    if (!sessionResult.hasSession) {
+      // No hay sesión válida - redirigir a login
+      console.warn('No hay sesión válida, redirigiendo a login', sessionResult.error);
+      this.router.navigate(['/login']);
+      return;
     }
     
     // Cargar estado del bloqueo
@@ -111,23 +108,21 @@ export class LockScreenComponent implements OnInit, OnDestroy {
         return;
       }
 
-      // Verificar que haya una sesión válida antes de intentar obtener settings
-      const hasLocalSession = await this.authService.hasLocalSession();
-      if (!hasLocalSession) {
-        // Verificar sesión de Supabase
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session?.user) {
-          // No hay sesión válida - no mostrar biometría
-          this.isBiometricAvailable.set(false);
-          return;
-        }
+      // Verificar que haya una sesión válida usando el servicio helper
+      const sessionResult = await this.sessionHelper.checkSession();
+      
+      if (!sessionResult.hasSession) {
+        // No hay sesión válida - no mostrar biometría
+        this.isBiometricAvailable.set(false);
+        return;
       }
 
       // Verificar si está habilitada y obtener credentialId
-      const settings = await this.securitySettingsService.getSettings();
-      if (settings) {
-        this.isBiometricEnabled.set(!!settings.biometric_key_id);
-        this.biometricKeyId.set(settings.biometric_key_id || null);
+      const pinResult = await this.sessionHelper.checkPinConfigured(sessionResult.userId);
+      
+      if (pinResult.settings) {
+        this.isBiometricEnabled.set(!!pinResult.settings.biometric_key_id);
+        this.biometricKeyId.set(pinResult.settings.biometric_key_id || null);
         this.isBiometricAvailable.set(true);
       } else {
         this.isBiometricAvailable.set(false);
@@ -193,17 +188,14 @@ export class LockScreenComponent implements OnInit, OnDestroy {
    */
   async loadLockState() {
     try {
-      // Verificar que haya una sesión válida antes de intentar cargar settings
-      const hasLocalSession = await this.authService.hasLocalSession();
-      if (!hasLocalSession) {
-        // Verificar sesión de Supabase
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session?.user) {
-          // No hay sesión válida - redirigir a login
-          console.warn('No hay sesión válida al cargar estado de bloqueo');
-          this.router.navigate(['/login']);
-          return;
-        }
+      // Verificar que haya una sesión válida usando el servicio helper
+      const sessionResult = await this.sessionHelper.checkSession();
+      
+      if (!sessionResult.hasSession) {
+        // No hay sesión válida - redirigir a login
+        console.warn('No hay sesión válida al cargar estado de bloqueo', sessionResult.error);
+        this.router.navigate(['/login']);
+        return;
       }
       
       const state = await this.securitySettingsService.getLockState();
@@ -347,35 +339,28 @@ export class LockScreenComponent implements OnInit, OnDestroy {
     this.clearError();
 
     try {
-      // Intentar obtener settings
-      // Si no está autenticado, verificar si hay sesión de Supabase que se pueda restaurar
-      let settings;
+      // Verificar sesión usando el servicio helper
+      const sessionResult = await this.sessionHelper.checkSession();
       
-      if (!(await this.authService.hasLocalSession())) {
-        // No hay sesión válida - verificar si hay sesión de Supabase
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (!session?.user) {
-          // No hay sesión válida - redirigir a login
-          this.showErrorMessage('Sesión expirada. Por favor, inicia sesión nuevamente.');
-          setTimeout(() => {
-            this.router.navigate(['/login']);
-          }, 2000);
-          return;
-        }
-        
-        // Hay una sesión válida en Supabase - obtener settings
-        settings = await this.securitySettingsService.getSettings();
-      } else {
-        // Usuario autenticado - obtener settings normalmente
-        settings = await this.securitySettingsService.getSettings();
+      if (!sessionResult.hasSession) {
+        // No hay sesión válida - redirigir a login
+        this.showErrorMessage('Sesión expirada. Por favor, inicia sesión nuevamente.');
+        setTimeout(() => {
+          this.router.navigate(['/login']);
+        }, 2000);
+        return;
       }
       
-      if (!settings || !settings.pin_hash || !settings.pin_salt) {
+      // Obtener settings usando el servicio helper (con cache)
+      const pinResult = await this.sessionHelper.checkPinConfigured(sessionResult.userId);
+      
+      if (!pinResult.hasPinConfigured || !pinResult.settings) {
         // No tiene PIN configurado - esto no debería pasar en lock screen
         this.showErrorMessage('PIN no configurado');
         return;
       }
+      
+      const settings = pinResult.settings;
 
       // Verificar PIN usando PinLockService
       const result = await this.pinLockService.verifyPin(currentPin);

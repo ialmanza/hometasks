@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { SupabaseService } from '../../../services/Supabase/supabaseservice';
 import { PushSubscriptionService } from '../../../services/push-subscription.service';
 import { SecuritySettingsService } from '../../../services/security-settings.service';
-import { supabase } from '../../../services/Supabase-Client/supabase-client';
+import { SessionHelperService } from '../../../services/session-helper.service';
 
 @Component({
   selector: 'app-login',
@@ -26,7 +26,8 @@ export class Login implements OnInit {
     private supabaseService: SupabaseService,
     private router: Router,
     private pushSubscriptionService: PushSubscriptionService,
-    private securitySettingsService: SecuritySettingsService
+    private securitySettingsService: SecuritySettingsService,
+    private sessionHelper: SessionHelperService
   ) {}
 
   /**
@@ -37,36 +38,21 @@ export class Login implements OnInit {
     this.isCheckingInitialSession = true;
     
     try {
-      // Verificar si hay sesión de Supabase (aunque no haya sesión local)
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      // Usar el servicio helper para verificar sesión y PIN
+      const result = await this.sessionHelper.checkSessionAndPin();
       
-      if (sessionError) {
-        console.error('Error verificando sesión:', sessionError);
-        this.isCheckingInitialSession = false;
-        return; // Mostrar formulario de login
+      if (result.shouldShowLock) {
+        // Usuario tiene sesión válida y PIN configurado → redirigir a lock screen
+        console.log('Usuario con sesión y PIN configurado, redirigiendo a lock screen');
+        this.router.navigate(['/lock'], { 
+          queryParams: { returnUrl: '/expenses-dashboard' } 
+        });
+        return;
       }
-
-      // Si hay sesión válida, verificar si el usuario tiene PIN configurado
-      if (session?.user) {
-        try {
-          // Obtener configuración de seguridad
-          const settings = await this.securitySettingsService.getSettings();
-          
-          // Verificar si tiene PIN configurado
-          const hasPinConfigured = settings && settings.pin_hash && settings.pin_salt;
-          
-          if (hasPinConfigured) {
-            // Usuario tiene sesión válida y PIN configurado → redirigir a lock screen
-            console.log('Usuario con sesión y PIN configurado, redirigiendo a lock screen');
-            this.router.navigate(['/lock'], { 
-              queryParams: { returnUrl: '/expenses-dashboard' } 
-            });
-            return;
-          }
-        } catch (settingsError) {
-          console.error('Error verificando configuración de seguridad:', settingsError);
-          // Si falla la verificación de settings, continuar con login normal
-        }
+      
+      // Si hay error pero no es crítico, continuar con login normal
+      if (result.session.error && !result.session.hasSession) {
+        console.warn('Error verificando sesión:', result.session.error);
       }
     } catch (error) {
       console.error('Error en verificación inicial:', error);
@@ -100,12 +86,11 @@ export class Login implements OnInit {
             console.error('Error inicializando notificaciones push:', error);
           });
           
-          // Verificar si el usuario tiene PIN configurado
+          // Verificar si el usuario tiene PIN configurado usando el servicio helper
           try {
-            const settings = await this.securitySettingsService.getSettings();
-            const hasPinConfigured = settings && settings.pin_hash && settings.pin_salt;
+            const pinResult = await this.sessionHelper.checkPinConfigured();
             
-            if (hasPinConfigured) {
+            if (pinResult.hasPinConfigured) {
               // Usuario tiene PIN configurado → redirigir directamente a lock screen
               // Esto evita la doble verificación (login + lock)
               console.log('Usuario con PIN configurado, redirigiendo a lock screen');

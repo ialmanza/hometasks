@@ -19,6 +19,7 @@ export class AppComponent implements OnInit {
   isLoginPage = false;
   isSettingsPage = false;
   isLockPage = false;
+  isPinRelatedPage = false; // Para pantallas relacionadas con PIN
 
   constructor(
     private router: Router,
@@ -114,9 +115,20 @@ export class AppComponent implements OnInit {
     const currentUrl = this.router.url;
     // Verificar si la ruta actual es login (la ruta raíz ahora redirige al dashboard)
     this.isLoginPage = currentUrl === '/login';
-    // Verificar si la ruta actual es settings
-    this.isSettingsPage = currentUrl === '/settings';
+    
     // Verificar si la ruta actual es lock screen
     this.isLockPage = currentUrl === '/lock' || currentUrl.startsWith('/lock?');
+    
+    // Verificar si la ruta actual es settings
+    // Ocultar navegación siempre en settings porque:
+    // 1. Settings tiene su propia UI completa con botón atrás
+    // 2. Cuando está configurando/cambiando PIN, definitivamente no necesita navegación
+    // 3. Settings puede estar en modo de configuración inicial o cambio de PIN
+    const isSettingsRoute = currentUrl === '/settings' || currentUrl.startsWith('/settings');
+    this.isSettingsPage = isSettingsRoute;
+    
+    // Verificar si estamos en una pantalla relacionada con PIN
+    // Esto incluye lock screen y settings (que puede estar en modo PIN)
+    this.isPinRelatedPage = this.isLockPage || this.isSettingsPage;
   }
 }
