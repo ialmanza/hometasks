@@ -36,24 +36,24 @@
           Miembros
         </a>
       </li> -->
-      <li>
+      <!-- <li>
         <a routerLink="/activities" routerLinkActive="active">
           <fa-icon [icon]="faCalendar"></fa-icon>
           Actividades
         </a>
-      </li>
+      </li> -->
       <li>
         <a routerLink="/calendar" routerLinkActive="active">
           <fa-icon [icon]="faCalendarAlt"></fa-icon>
           Calendario
         </a>
       </li>
-      <li>
+      <!-- <li>
         <a routerLink="/weekly-planner" routerLinkActive="active">
           <fa-icon [icon]="faUtensils"></fa-icon>
           Comidas
         </a>
-      </li>
+      </li> -->
       <li>
         <button class="logout-btn" (click)="logout()">
           <fa-icon [icon]="faSignOutAlt"></fa-icon>
@@ -64,36 +64,53 @@
   </div>
 
   <!-- MOBILE NAVIGATION -->
-  <div class="nav-mobile">
-    <!-- Home -->
-    <a routerLink="/expenses-dashboard" routerLinkActive="active" (click)="closeMoreMenu()">
-      <fa-icon [icon]="faHome"></fa-icon>
-      <span>Inicio</span>
-    </a>
+  <div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] px-4 pb-6 pt-2 pointer-events-none">
+    <!-- Bottom Tab Bar with integrated FAB -->
+    <nav class="nav-mobile-new">
+      <a 
+        routerLink="/tasks" 
+        routerLinkActive="active" 
+        (click)="closeMoreMenu()"
+        class="nav-tab">
+        <fa-icon [icon]="faTasks" class="nav-icon"></fa-icon>
+        <span class="nav-label">Tareas</span>
+      </a>
 
-    <!-- Tareas -->
-    <a routerLink="/tasks" routerLinkActive="active" (click)="closeMoreMenu()">
-      <fa-icon [icon]="faTasks"></fa-icon>
-      <span>Tareas</span>
-    </a>
+      <a 
+        routerLink="/shopping-list" 
+        routerLinkActive="active" 
+        (click)="closeMoreMenu()"
+        class="nav-tab">
+        <fa-icon [icon]="faShoppingCart" class="nav-icon"></fa-icon>
+        <span class="nav-label">Compras</span>
+      </a>
 
-    <!-- Compras -->
-    <a routerLink="/shopping-list" routerLinkActive="active" (click)="closeMoreMenu()">
-      <fa-icon [icon]="faShoppingCart"></fa-icon>
-      <span>Compras</span>
-    </a>
+      <!-- Inicio en el centro con estilo especial -->
+      <a 
+        routerLink="/expenses-dashboard" 
+        routerLinkActive="active" 
+        (click)="closeMoreMenu()"
+        class="nav-tab nav-tab-home">
+        <fa-icon [icon]="faHome" class="nav-icon-home"></fa-icon>
+      </a>
 
-    <!-- Gastos - Acceso directo al Dashboard -->
-    <a routerLink="/expenses" routerLinkActive="active" (click)="closeMoreMenu()">
-      <fa-icon [icon]="faDollarSign"></fa-icon>
-      <span>Transacciones</span>
-    </a>
+      <a 
+        routerLink="/expenses" 
+        routerLinkActive="active" 
+        (click)="closeMoreMenu()"
+        class="nav-tab">
+        <fa-icon [icon]="faDollarSign" class="nav-icon"></fa-icon>
+        <span class="nav-label">Transacciones</span>
+      </a>
 
-    <!-- Menú Más -->
-    <button class="more-menu-btn" (click)="toggleMoreMenu()" [class.active]="showMoreMenu">
-      <fa-icon [icon]="faEllipsisV"></fa-icon>
-      <span>Más</span>
-    </button>
+      <button 
+        (click)="toggleMoreMenu()" 
+        [class.active]="showMoreMenu"
+        class="nav-tab">
+        <fa-icon [icon]="faEllipsisV" class="nav-icon"></fa-icon>
+        <span class="nav-label">Más</span>
+      </button>
+    </nav>
   </div>
 
   <!-- MODAL MENÚ MÁS -->
@@ -112,20 +129,20 @@
           <span>Miembros</span>
         </a> -->
 
-        <a routerLink="/activities" routerLinkActive="active" (click)="closeMoreMenu()" class="more-menu-item">
+        <!-- <a routerLink="/activities" routerLinkActive="active" (click)="closeMoreMenu()" class="more-menu-item">
           <fa-icon [icon]="faCalendar"></fa-icon>
           <span>Actividades</span>
-        </a>
+        </a> -->
 
         <a routerLink="/calendar" routerLinkActive="active" (click)="closeMoreMenu()" class="more-menu-item">
           <fa-icon [icon]="faCalendarAlt"></fa-icon>
           <span>Calendario</span>
         </a>
 
-        <a routerLink="/weekly-planner" routerLinkActive="active" (click)="closeMoreMenu()" class="more-menu-item">
+        <!-- <a routerLink="/weekly-planner" routerLinkActive="active" (click)="closeMoreMenu()" class="more-menu-item">
           <fa-icon [icon]="faUtensils"></fa-icon>
           <span>Comidas</span>
-        </a>
+        </a> -->
 
         <!-- <a routerLink="/expenses-dashboard" routerLinkActive="active" (click)="closeMoreMenu()" class="more-menu-item">
           <fa-icon [icon]="faDollarSign"></fa-icon>
