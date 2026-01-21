@@ -11,6 +11,8 @@
     "check-pwa": "node scripts/check-pwa-config.js",
     "setup-dev": "node scripts/set-environment-dev.js",
     "start": "npm run setup-dev && ng serve",
+    "generate-icons": "node scripts/generate-icons.js",
+    "generate-favicon": "node scripts/generate-favicon.js",
     "deploy-push-function": "node scripts/deploy-push-function.js",
     "deploy-all": "npm run deploy-push-function && npm run build"
   },
@@ -48,6 +50,7 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "postcss": "^8.4.49",
+    "sharp": "^0.34.5",
     "tailwindcss": "^3.4.17",
     "typescript": "~5.5.2"
   }
