@@ -77,35 +77,45 @@ export class SettingsComponent implements OnInit {
   ) {}
 
   async ngOnInit() {
-    // Cargar configuración de seguridad primero
-    await this.loadSecuritySettings();
-    // Verificar soporte de biometría
-    await this.checkBiometricSupport();
-    // Inicializar rango de fechas al mes actual
-    this.resetToCurrentMonth();
+    // Mostrar spinner mientras se cargan los datos
+    this.isLoading.set(true);
     
-    // Verificar query params en la carga inicial
-    // Esperar a que los settings se carguen antes de verificar
-    this.route.queryParams.subscribe(async (params) => {
-      if (params['setupPin'] === 'true') {
-        // Asegurar que los settings estén cargados
-        if (!this.securitySettings()) {
-          await this.loadSecuritySettings();
+    try {
+      // Cargar configuración de seguridad primero
+      await this.loadSecuritySettings();
+      // Verificar soporte de biometría
+      await this.checkBiometricSupport();
+      // Inicializar rango de fechas al mes actual
+      this.resetToCurrentMonth();
+      
+      // Verificar query params en la carga inicial
+      // Esperar a que los settings se carguen antes de verificar
+      this.route.queryParams.subscribe(async (params) => {
+        if (params['setupPin'] === 'true') {
+          // Asegurar que los settings estén cargados
+          if (!this.securitySettings()) {
+            await this.loadSecuritySettings();
+          }
+          // Verificar si realmente no tiene PIN configurado
+          if (!this.isPinConfigured()) {
+            // Mostrar PinSetupComponent directamente (no como modal)
+            this.isInitialPinSetup.set(true);
+          }
+          // Limpiar el query param de la URL (mantener returnUrl)
+          this.router.navigate([], { 
+            relativeTo: this.route,
+            queryParams: { setupPin: null },
+            queryParamsHandling: 'merge',
+            replaceUrl: true
+          });
         }
-        // Verificar si realmente no tiene PIN configurado
-        if (!this.isPinConfigured()) {
-          // Mostrar PinSetupComponent directamente (no como modal)
-          this.isInitialPinSetup.set(true);
-        }
-        // Limpiar el query param de la URL (mantener returnUrl)
-        this.router.navigate([], { 
-          relativeTo: this.route,
-          queryParams: { setupPin: null },
-          queryParamsHandling: 'merge',
-          replaceUrl: true
-        });
-      }
-    });
+      });
+    } catch (error) {
+      console.error('Error al inicializar settings:', error);
+    } finally {
+      // Ocultar spinner cuando todos los datos estén cargados
+      this.isLoading.set(false);
+    }
   }
 
   /**
@@ -113,6 +123,13 @@ export class SettingsComponent implements OnInit {
    */
   goBack() {
     this.router.navigate(['/']);
+  }
+
+  /**
+   * Navega a la página de términos y privacidad
+   */
+  navigateToTermsAndPrivacy() {
+    this.router.navigate(['/terms-and-privacy']);
   }
 
   // ==================== SEGURIDAD Y PRIVACIDAD ====================

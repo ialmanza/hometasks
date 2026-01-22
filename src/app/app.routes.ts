@@ -18,6 +18,7 @@ import { AuthorizedUsersComponent } from './components/authorized-users/authoriz
 import { PushDiagnosticComponent } from './components/push-diagnostic/push-diagnostic.component';
 import { LockScreenComponent } from './components/lock-screen/lock-screen.component';
 import { SettingsComponent } from './components/settings/settings';
+import { TermsAndPrivacyComponent } from './components/terms-and-privacy/terms-and-privacy.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/expenses-dashboard', pathMatch: 'full' },
@@ -40,6 +41,7 @@ export const routes: Routes = [
   { path: 'authorized-users', component: AuthorizedUsersComponent, canActivate: [AuthGuard] },
   { path: 'push-diagnostic', component: PushDiagnosticComponent, canActivate: [AuthGuard] },
   { path: 'settings', component: SettingsComponent, canActivate: [AuthGuard] },
+  { path: 'terms-and-privacy', component: TermsAndPrivacyComponent, canActivate: [AuthGuard] },
   { path: 'lock', component: LockScreenComponent },
   { path: 'login', component: Login},
   { path: '**', redirectTo: '/login' }

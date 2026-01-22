@@ -21,6 +21,7 @@ export class AppComponent implements OnInit {
   isSettingsPage = false;
   isLockPage = false;
   isPinRelatedPage = false; // Para pantallas relacionadas con PIN
+  isTermsAndPrivacyPage = false; // Para la página de términos y privacidad
 
   constructor(
     private router: Router,
@@ -128,6 +129,10 @@ export class AppComponent implements OnInit {
     // 3. Settings puede estar en modo de configuración inicial o cambio de PIN
     const isSettingsRoute = currentUrl === '/settings' || currentUrl.startsWith('/settings');
     this.isSettingsPage = isSettingsRoute;
+    
+    // Verificar si la ruta actual es términos y privacidad
+    const isTermsAndPrivacyRoute = currentUrl === '/terms-and-privacy' || currentUrl.startsWith('/terms-and-privacy');
+    this.isTermsAndPrivacyPage = isTermsAndPrivacyRoute;
     
     // Verificar si estamos en una pantalla relacionada con PIN
     // Esto incluye lock screen y settings (que puede estar en modo PIN)

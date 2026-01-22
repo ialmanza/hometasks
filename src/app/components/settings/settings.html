@@ -32,7 +32,7 @@
 
     @if (isLoading()) {
 
-      <div class="flex items-center justify-center py-20">
+      <div class="flex items-center justify-center flex-1 min-h-[calc(100vh-80px)]">
 
         <span class="material-symbols-outlined animate-spin text-primary text-4xl" translate="no">hourglass_empty</span>
 
@@ -558,7 +558,8 @@
 
             </div>
 
-            <div class="flex items-center justify-between px-4 py-4 cursor-pointer active:bg-[#f0f4f4] dark:active:bg-[#2c3238]">
+            <div class="flex items-center justify-between px-4 py-4 cursor-pointer active:bg-[#f0f4f4] dark:active:bg-[#2c3238]"
+                 (click)="navigateToTermsAndPrivacy()">
 
               <span class="text-[#111817] dark:text-white font-medium">Términos y Privacidad</span>
 
@@ -571,114 +572,6 @@
         </section>
 
 
-
-        <!-- Section 5: CRITICAL ACTIONS -->
-
-        <section class="pt-4">
-
-          <div class="bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 rounded-xl p-4 space-y-4">
-
-            <div class="flex gap-3">
-
-              <span class="material-symbols-outlined text-red-500" translate="no">warning</span>
-
-              <div>
-
-                <h4 class="text-red-700 dark:text-red-400 font-bold text-sm uppercase">Zona de Peligro</h4>
-
-                <p class="text-red-600/80 dark:text-red-400/70 text-xs mt-1 leading-relaxed">
-
-                  Esta acción es irreversible. Se eliminarán permanentemente todos los datos registrados en tu dispositivo.
-
-                </p>
-
-              </div>
-
-            </div>
-
-            <button 
-
-              class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg shadow-sm transition-colors text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-
-              (click)="showDeleteExpensesDialog()"
-
-              [disabled]="isDeletingExpenses()">
-
-              @if (isDeletingExpenses()) {
-
-                <span class="material-symbols-outlined animate-spin" translate="no">hourglass_empty</span>
-
-              } @else {
-
-                <span class="material-symbols-outlined text-xl" translate="no">delete_forever</span>
-
-              }
-
-              Eliminar todos los datos
-
-            </button>
-
-          </div>
-
-        </section>
-
-
-
-      </div>
-
-    }
-
-    <!-- Modal de Confirmación - Eliminar Gastos -->
-
-    @if (showDeleteConfirm()) {
-
-      <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" (click)="closeDeleteConfirm()">
-
-        <div class="bg-white dark:bg-[#22262b] rounded-xl p-6 max-w-sm w-full shadow-xl" (click)="$event.stopPropagation()">
-
-          <h3 class="text-[#111817] dark:text-white text-lg font-bold mb-2">Confirmar Eliminación</h3>
-
-          <p class="text-[#638884] dark:text-[#a1b7b5] text-sm mb-6">
-
-            ¿Estás seguro de que deseas eliminar todos los gastos? Esta acción no se puede deshacer.
-
-          </p>
-
-          <div class="flex gap-3">
-
-            <button 
-
-              class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-[#111817] dark:text-white font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-
-              (click)="closeDeleteConfirm()">
-
-              Cancelar
-
-            </button>
-
-            <button 
-
-              class="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition-colors disabled:opacity-50"
-
-              (click)="onDeleteAllExpenses()"
-
-              [disabled]="isDeletingExpenses()">
-
-              @if (isDeletingExpenses()) {
-
-                <span class="material-symbols-outlined animate-spin" translate="no">hourglass_empty</span>
-
-              } @else {
-
-                Eliminar
-
-              }
-
-            </button>
-
-          </div>
-
-        </div>
 
       </div>
 
