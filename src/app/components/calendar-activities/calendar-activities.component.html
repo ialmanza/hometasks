@@ -1,13 +1,13 @@
 <app-app-navigation></app-app-navigation>
 
-<div class="calendar-container">
+<div class="calendar-container bg-background-light dark:bg-background-dark">
   <!-- Header del calendario -->
   <div class="calendar-header">
     <div class="header-content">
       <button class="nav-button" (click)="previousMonth()">
         <fa-icon [icon]="faChevronLeft"></fa-icon>
       </button>
-      <h2 class="month-title">{{ getMonthName() }} {{ currentYear }}</h2>
+      <h2 class="month-title text-[#2c3e50] dark:text-white">{{ getMonthName() }} {{ currentYear }}</h2>
       <button class="nav-button" (click)="nextMonth()">
         <fa-icon [icon]="faChevronRight"></fa-icon>
       </button>

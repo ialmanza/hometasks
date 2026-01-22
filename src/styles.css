@@ -103,3 +103,22 @@ body {
     padding: 0.75rem !important;
   }
 }
+
+/* Transiciones suaves para el cambio de tema */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+/* Excluir transiciones en elementos específicos */
+svg,
+img,
+video,
+iframe,
+canvas,
+input[type="checkbox"],
+input[type="radio"],
+.material-symbols-outlined {
+  transition-property: none;
+}

@@ -2,7 +2,7 @@
   <!-- <div class="saltos">
     <br><br><br><br><br><br>
   </div> -->
-<div class="todo-container">
+<div class="todo-container bg-white dark:bg-gray-800">
 
   <div class="background-image">
     <img src="sin_fondo.png" alt="Logo" onclick="window.location.href='/'">
@@ -45,7 +45,7 @@
       [class.completed]="task.completed"
     >
       <div class="task-header">
-        <h3>{{ task.title }}</h3>
+        <h3 class="text-[#2c3e50] dark:text-gray-200">{{ task.title }}</h3>
         <div class="task-actions">
           <button
             (click)="startEditing(task)"
@@ -62,10 +62,10 @@
         </div>
       </div>
 
-      <p>{{ task.description }}</p>
+      <p class="text-gray-700 dark:text-gray-300">{{ task.description }}</p>
 
       <div class="task-footer">
-        <span class="date">
+        <span class="date text-gray-500 dark:text-gray-400">
           {{ task.created_at | date:'medium' }}
         </span>
         <label class="checkbox-container">

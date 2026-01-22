@@ -1,18 +1,18 @@
 <app-app-navigation></app-app-navigation>
 
-<div class="relative flex size-full min-h-screen flex-col bg-slate-50 justify-between group/design-root overflow-x-hidden">
+<div class="relative flex size-full min-h-screen flex-col bg-slate-50 dark:bg-background-dark justify-between group/design-root overflow-x-hidden">
   <div>
     <!-- Header -->
-    <div class="flex items-center bg-slate-50 p-4 pb-2 justify-between">
+    <div class="flex items-center bg-slate-50 dark:bg-background-dark p-4 pb-2 justify-between">
       <div class="flex items-center gap-3">
         <button
           routerLink="/expenses-dashboard"
-          class="flex cursor-pointer items-center justify-center rounded-full h-10 w-10 bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors"
+          class="flex cursor-pointer items-center justify-center rounded-full h-10 w-10 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
           title="Ver Dashboard"
         >
           <fa-icon [icon]="faChartBar" class="text-sm"></fa-icon>
         </button>
-        <h2 class="text-[#0e141b] text-lg font-bold leading-tight tracking-[-0.015em]">Gastos</h2>
+        <h2 class="text-[#0e141b] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">Gastos</h2>
       </div>
       <div class="flex items-center gap-2">
         <button
@@ -70,23 +70,23 @@
 
     <!-- Lista de gastos -->
     <div *ngIf="!loading; else loadingTemplate">
-      <div *ngFor="let expense of filteredExpenses" class="flex items-center gap-4 bg-slate-50 px-4 min-h-[72px] py-2 justify-between">
+      <div *ngFor="let expense of filteredExpenses" class="flex items-center gap-4 bg-slate-50 dark:bg-background-dark px-4 min-h-[72px] py-2 justify-between">
         <div class="flex items-center gap-4">
           <!-- Icono del gasto -->
-          <div class="text-[#0e141b] flex items-center justify-center rounded-lg bg-[#e7edf3] shrink-0 size-12 text-2xl">
+          <div class="text-[#0e141b] dark:text-white flex items-center justify-center rounded-lg bg-[#e7edf3] dark:bg-gray-700 shrink-0 size-12 text-2xl">
             {{ getExpenseIcon(expense) }}
           </div>
           
           <!-- Información del gasto -->
           <div class="flex flex-col justify-center">
-            <p class="text-[#0e141b] text-base font-medium leading-normal line-clamp-1">{{ expense.title }}</p>
-            <p class="text-[#4e7097] text-sm font-normal leading-normal line-clamp-2">
+            <p class="text-[#0e141b] dark:text-white text-base font-medium leading-normal line-clamp-1">{{ expense.title }}</p>
+            <p class="text-[#4e7097] dark:text-gray-400 text-sm font-normal leading-normal line-clamp-2">
               {{ formatAmount(expense.amount) }} · Vence el {{ formatDate(expense.due_date || '') }}
               <span *ngIf="expense.responsible_member_id" class="ml-2">
                 · {{ getMemberName(expense.responsible_member_id) }}
               </span>
             </p>
-            <p *ngIf="expense.description" class="text-[#4e7097] text-xs font-normal leading-normal line-clamp-1 mt-1">
+            <p *ngIf="expense.description" class="text-[#4e7097] dark:text-gray-400 text-xs font-normal leading-normal line-clamp-1 mt-1">
               {{ expense.description }}
             </p>
           </div>
@@ -116,7 +116,7 @@
             <!-- Editar -->
             <button 
               (click)="editExpense(expense)"
-              class="p-2 text-[#4e7097] hover:text-[#0e141b] transition-colors"
+              class="p-2 text-[#4e7097] dark:text-gray-400 hover:text-[#0e141b] dark:hover:text-white transition-colors"
               title="Editar gasto"
             >
               <fa-icon [icon]="faEdit"></fa-icon>
@@ -125,7 +125,7 @@
             <!-- Eliminar -->
             <button 
               (click)="deleteExpense(expense.id!)"
-              class="p-2 text-[#4e7097] hover:text-red-500 transition-colors"
+              class="p-2 text-[#4e7097] dark:text-gray-400 hover:text-red-500 transition-colors"
               title="Eliminar gasto"
             >
               <fa-icon [icon]="faTrash"></fa-icon>
@@ -136,12 +136,12 @@
 
       <!-- Estado vacío -->
       <div *ngIf="filteredExpenses.length === 0" class="flex flex-col items-center justify-center py-12 px-4">
-        <div class="text-[#4e7097] text-6xl mb-4">💰</div>
-        <h3 class="text-[#0e141b] text-lg font-medium mb-2">
+        <div class="text-[#4e7097] dark:text-gray-400 text-6xl mb-4">💰</div>
+        <h3 class="text-[#0e141b] dark:text-white text-lg font-medium mb-2">
           {{ currentFilter === 'all' ? 'No hay gastos' : 
              currentFilter === 'paid' ? 'No hay gastos pagados' : 'No hay gastos pendientes' }}
         </h3>
-        <p class="text-[#4e7097] text-sm text-center mb-6">
+        <p class="text-[#4e7097] dark:text-gray-400 text-sm text-center mb-6">
           {{ currentFilter === 'all' ? 'Agrega gastos para comenzar a organizar tus finanzas familiares' :
              currentFilter === 'paid' ? 'Todos los gastos están pendientes de pago' : '¡Excelente! Todos los gastos están pagados' }}
         </p>

@@ -5,7 +5,7 @@
   <br><br><br><br><br><br>
 </div> -->
 
-<div class="dashboard-container">
+<div class="dashboard-container bg-background-light dark:bg-background-dark">
   <!-- Banner Section -->
   <section class="banner">
     <div class="banner-content">
@@ -16,7 +16,7 @@
       <div class="quick-stats" routerLink="/activities">
         <div class="stat-card">
           <div class="card-content">
-            <h3>Últimas Actividades</h3>
+            <h3 class="text-gray-800 dark:text-gray-200">Últimas Actividades</h3>
             <ul *ngIf="latestActivities.length; else noActivities">
               <li *ngFor="let activity of latestActivities">
                 <span class="activity-title">{{ activity.title }}</span>
@@ -28,7 +28,7 @@
 
         <div class="stat-card" routerLink="/meals">
           <div class="card-content">
-            <h3>Comidas del Día</h3>
+            <h3 class="text-gray-800 dark:text-gray-200">Comidas del Día</h3>
             <ul *ngIf="latestMeals.length; else noMeals">
               <li *ngFor="let meal of latestMeals">
                 <span class="meal-type">{{ meal.meal_type }}</span>
@@ -40,7 +40,7 @@
 
         <div class="stat-card" routerLink="/shopping-list">
           <div class="card-content">
-            <h3>Lista de Compras</h3>
+            <h3 class="text-gray-800 dark:text-gray-200">Lista de Compras</h3>
             <ul *ngIf="shoppingList.length; else noItems">
               <li *ngFor="let item of shoppingList">
                 <span class="item-name">{{ item.name }}</span>

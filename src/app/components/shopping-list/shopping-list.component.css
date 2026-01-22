@@ -15,14 +15,16 @@
   max-width: 600px;
   margin: 0 auto;
   padding: 1rem;
-  background-color: var(--background-color);
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   margin-bottom: 50px;
 }
 
+.dark .shopping-list-container {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
 h1 {
-  color: var(--primary-color);
   text-align: center;
   margin-bottom: 1.5rem;
 }
@@ -49,6 +51,13 @@ h1 {
     border: 1px solid var(--border-color);
     border-radius: 4px;
     color: var(--text-color);
+    background-color: white;
+  }
+
+  .dark .form-control {
+    background-color: #374151;
+    border-color: #4b5563;
+    color: #f3f4f6;
   }
 
   .btn-primary {
@@ -72,7 +81,6 @@ h1 {
 }
 
 h3 {
-  color: var(--primary-color);
   margin-bottom: 0.75rem;
   text-align: center;
 }
@@ -97,44 +105,52 @@ h3 {
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   transition: transform 0.2s;
+}
 
-  &:hover {
-    transform: translateX(5px);
-  }
+.dark .list-item {
+  background-color: #1f2937;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
 
-  &.purchased {
-    opacity: 0.6;
-    text-decoration: line-through;
-    background-color: var(--completed-color);
-    color: white;
-  }
+.list-item:hover {
+  transform: translateX(5px);
+}
 
-  button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    transition: background-color 0.2s;
+.list-item.purchased {
+  opacity: 0.6;
+  text-decoration: line-through;
+  background-color: var(--completed-color);
+  color: white;
+}
 
-    &.btn-toggle {
-      color: var(--secondary-color);
-    }
+.list-item button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
 
-    &.btn-edit {
-      color: var(--primary-color);
-    }
+.list-item button.btn-toggle {
+  color: var(--secondary-color);
+}
 
-    &.btn-delete {
-      color: red;
-    }
+.list-item button.btn-edit {
+  color: var(--primary-color);
+}
 
-    &:hover {
-      background-color: rgba(0, 0, 0, 0.1);
-    }
-  }
+.list-item button.btn-delete {
+  color: red;
+}
 
+.list-item button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.dark .list-item button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .item-actions {
@@ -153,9 +169,17 @@ h3 {
     color: var(--text-color);
   }
 
+  .dark .item-name {
+    color: #f3f4f6;
+  }
+
   .item-meta {
     font-size: 0.8rem;
     color: darken(#f8f9fa, 40%);
+  }
+
+  .dark .item-meta {
+    color: #9ca3af;
   }
 }
 

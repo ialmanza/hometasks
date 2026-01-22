@@ -2,8 +2,8 @@
 <!-- <div class="saltos">
   <br><br><br><br><br><br><br><br><br><br>
 </div> -->
-<div class="meals-container">
-  <h1>Planificador de actividades</h1>
+<div class="meals-container bg-background-light dark:bg-background-dark">
+  <h1 class="text-primary dark:text-white">Planificador de actividades</h1>
   <div class="days-selector">
     <button
       *ngFor="let day of weekDays"
@@ -15,7 +15,7 @@
   </div>
 
   <div class="activities-section">
-    <h3>Actividades</h3>
+    <h3 class="text-[#2c3e50] dark:text-white">Actividades</h3>
     <form [formGroup]="activityForm" (ngSubmit)="addActivity()">
       <input formControlName="title" placeholder="Título de la Actividad" />
       <input type="time" formControlName="time" />
@@ -27,8 +27,8 @@
       <div *ngFor="let acitvity of activities" class="meal-item">
         <div *ngIf="editingActivity?.id !== acitvity.id" class="meal-display">
           <div class="meal-info">
-            <strong>{{ acitvity.title| titlecase }}<p>{{ acitvity.time }}</p></strong>
-            <p>{{ acitvity.description }}</p>
+            <strong class="text-[#2c3e50] dark:text-white">{{ acitvity.title| titlecase }}<p class="text-gray-600 dark:text-gray-400">{{ acitvity.time }}</p></strong>
+            <p class="text-gray-700 dark:text-gray-300">{{ acitvity.description }}</p>
           </div>
           <div class="meal-actions">
             <button (click)="startEditing(acitvity)" class="edit-btn">

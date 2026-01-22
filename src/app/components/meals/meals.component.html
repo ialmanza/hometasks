@@ -3,8 +3,8 @@
 <div class="saltos">
   <br><br><br><br><br><br><br><br><br><br>
 </div>
-<div class="meals-container">
-  <h1>Planificador de Comidas</h1>
+<div class="meals-container bg-background-light dark:bg-background-dark">
+  <h1 class="text-primary dark:text-white">Planificador de Comidas</h1>
   <div class="days-selector">
     <button
       *ngFor="let day of weekDays"
@@ -19,8 +19,8 @@
     <div *ngFor="let meal of meals" class="meal-item">
       <div *ngIf="editingMeal?.id !== meal.id" class="meal-display">
         <div class="meal-info">
-          <strong>{{ meal.meal_type | titlecase }}</strong>
-          <p>{{ meal.description }}</p>
+          <strong class="text-[#2c3e50] dark:text-white">{{ meal.meal_type | titlecase }}</strong>
+          <p class="text-gray-700 dark:text-gray-300">{{ meal.description }}</p>
         </div>
         <div class="meal-actions">
           <button (click)="startEditing(meal)" class="edit-btn">

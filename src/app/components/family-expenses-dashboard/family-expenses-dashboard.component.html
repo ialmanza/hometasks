@@ -1,11 +1,11 @@
-<div class="relative flex size-full min-h-screen flex-col bg-gray-50 justify-between group/design-root overflow-x-hidden">
+<div class="relative flex size-full min-h-screen flex-col bg-gray-50 dark:bg-background-dark justify-between group/design-root overflow-x-hidden">
   <div class="pb-20">
     <!-- Header -->
-    <div class="flex items-center bg-gray-50 p-4 pb-2 justify-between">
-      <div class="text-[#101418] flex size-12 shrink-0 items-center cursor-pointer" (click)="goBack()">
+    <div class="flex items-center bg-gray-50 dark:bg-background-dark p-4 pb-2 justify-between">
+      <div class="text-[#101418] dark:text-white flex size-12 shrink-0 items-center cursor-pointer" (click)="goBack()">
         <fa-icon [icon]="faArrowLeft" class="text-2xl"></fa-icon>
       </div>
-      <h2 class="text-[#101418] text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-12">
+      <h2 class="text-[#101418] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-12">
         Dashboard de Gastos
       </h2>
       <div class="flex items-center gap-2">
@@ -47,7 +47,7 @@
     <!-- Loading State -->
     <div *ngIf="loading" class="flex items-center justify-center p-8">
       <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      <span class="ml-2 text-gray-600">Cargando estadísticas...</span>
+      <span class="ml-2 text-gray-600 dark:text-gray-400">Cargando estadísticas...</span>
     </div>
 
     <!-- Error State -->
@@ -65,19 +65,19 @@
 
     <!-- Empty State - No hay gastos -->
     <div *ngIf="!loading && !error && stats && stats.totalExpenses === 0" class="p-4">
-      <div class="bg-white rounded-xl p-8 shadow-sm text-center empty-state-container">
+      <div class="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-sm text-center empty-state-container">
         <div class="flex justify-center mb-4">
-          <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center empty-state-icon">
-            <fa-icon [icon]="faReceipt" class="text-gray-400 text-2xl"></fa-icon>
+          <div class="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center empty-state-icon">
+            <fa-icon [icon]="faReceipt" class="text-gray-400 dark:text-gray-500 text-2xl"></fa-icon>
           </div>
         </div>
-        <h3 class="text-lg font-semibold text-gray-900 mb-2">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
           No hay gastos registrados {{ selectedRange === 'week' ? 'esta semana' : 'este mes' }}
         </h3>
-        <p class="text-gray-600 mb-4">
+        <p class="text-gray-600 dark:text-gray-400 mb-4">
           {{ selectedRange === 'week' ? 'No se han registrado gastos en los últimos 7 días.' : 'No se han registrado gastos en el mes actual.' }}
         </p>
-        <div class="text-sm text-gray-500 mb-6">
+        <div class="text-sm text-gray-500 dark:text-gray-400 mb-6">
           <p>Cuando agregues gastos, aparecerán aquí las estadísticas y resúmenes.</p>
         </div>
         
@@ -96,7 +96,7 @@
       <!-- Stats Cards -->
       <div class="p-4">
         <div class="flex items-center justify-between mb-4">
-          <h2 class="text-[#101418] text-[22px] font-bold leading-tight tracking-[-0.015em]">
+          <h2 class="text-[#101418] dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">
             Resumen General
           </h2>
           <button 
@@ -110,13 +110,13 @@
         <div class="grid grid-cols-2 gap-4">
           <!-- Total Spent -->
           <div 
-            class="flex items-stretch justify-between gap-4 rounded-xl bg-white p-4 shadow-sm cursor-pointer hover:shadow-md transition-all duration-200 hover:scale-[1.02]"
+            class="flex items-stretch justify-between gap-4 rounded-xl bg-white dark:bg-gray-800 p-4 shadow-sm cursor-pointer hover:shadow-md transition-all duration-200 hover:scale-[1.02]"
             (click)="goToMonthlyTransactions()"
             title="Ver transacciones mensuales"
           >
             <div class="flex flex-col gap-1 flex-[2_2_0px]">
-              <p class="text-[#101418] text-base font-bold leading-tight">Total Gastado</p>
-              <p class="text-[#5c718a] text-sm font-normal leading-normal">{{ formatCurrency(stats.totalSpent) }}</p>
+              <p class="text-[#101418] dark:text-white text-base font-bold leading-tight">Total Gastado</p>
+              <p class="text-[#5c718a] dark:text-gray-400 text-sm font-normal leading-normal">{{ formatCurrency(stats.totalSpent) }}</p>
             </div>
             <div class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl flex-1 bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center">
               <fa-icon [icon]="faDollarSign" class="text-green-600 text-2xl"></fa-icon>
@@ -124,10 +124,10 @@
           </div>
 
           <!-- Pending Payment -->
-          <div class="flex items-stretch justify-between gap-4 rounded-xl bg-white p-4 shadow-sm">
+          <div class="flex items-stretch justify-between gap-4 rounded-xl bg-white dark:bg-gray-800 p-4 shadow-sm">
             <div class="flex flex-col gap-1 flex-[2_2_0px]">
-              <p class="text-[#101418] text-base font-bold leading-tight">Pendiente de Pago</p>
-              <p class="text-[#5c718a] text-sm font-normal leading-normal">{{ formatCurrency(stats.totalPending) }}</p>
+              <p class="text-[#101418] dark:text-white text-base font-bold leading-tight">Pendiente de Pago</p>
+              <p class="text-[#5c718a] dark:text-gray-400 text-sm font-normal leading-normal">{{ formatCurrency(stats.totalPending) }}</p>
             </div>
             <div class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl flex-1 bg-gradient-to-br from-orange-100 to-orange-200 flex items-center justify-center">
               <fa-icon [icon]="faClock" class="text-orange-600 text-2xl"></fa-icon>
@@ -135,10 +135,10 @@
           </div>
 
           <!-- Total Expenses -->
-          <div class="flex items-stretch justify-between gap-4 rounded-xl bg-white p-4 shadow-sm">
+          <div class="flex items-stretch justify-between gap-4 rounded-xl bg-white dark:bg-gray-800 p-4 shadow-sm">
             <div class="flex flex-col gap-1 flex-[2_2_0px]">
-              <p class="text-[#101418] text-base font-bold leading-tight">Total de Gastos</p>
-              <p class="text-[#5c718a] text-sm font-normal leading-normal">{{ stats.totalExpenses }}</p>
+              <p class="text-[#101418] dark:text-white text-base font-bold leading-tight">Total de Gastos</p>
+              <p class="text-[#5c718a] dark:text-gray-400 text-sm font-normal leading-normal">{{ stats.totalExpenses }}</p>
             </div>
             <div class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl flex-1 bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
               <fa-icon [icon]="faReceipt" class="text-blue-600 text-2xl"></fa-icon>
@@ -146,10 +146,10 @@
           </div>
 
           <!-- Top Spender -->
-          <div class="flex items-stretch justify-between gap-4 rounded-xl bg-white p-4 shadow-sm">
+          <div class="flex items-stretch justify-between gap-4 rounded-xl bg-white dark:bg-gray-800 p-4 shadow-sm">
             <div class="flex flex-col gap-1 flex-[2_2_0px]">
-              <p class="text-[#101418] text-base font-bold leading-tight">Gastador Principal</p>
-              <p class="text-[#5c718a] text-sm font-normal leading-normal">
+              <p class="text-[#101418] dark:text-white text-base font-bold leading-tight">Gastador Principal</p>
+              <p class="text-[#5c718a] dark:text-gray-400 text-sm font-normal leading-normal">
                 {{ stats.topSpender ? stats.topSpender.name + ' (' + formatCurrency(stats.topSpender.amount) + ')' : 'Sin datos' }}
               </p>
             </div>
@@ -162,7 +162,7 @@
 
       <!-- Charts Section -->
       <div class="px-4">
-        <h2 class="text-[#101418] text-[22px] font-bold leading-tight tracking-[-0.015em] pb-3">
+        <h2 class="text-[#101418] dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] pb-3">
           Gastos {{ selectedRange === 'week' ? 'Esta Semana' : 'Este Mes' }}
         </h2>
         
@@ -218,7 +218,7 @@
       <!-- Upcoming Expenses -->
       <div class="px-4" *ngIf="stats.upcomingExpenses.length > 0">
         <div class="flex items-center justify-between mb-3">
-          <h2 class="text-[#101418] text-[22px] font-bold leading-tight tracking-[-0.015em]">
+          <h2 class="text-[#101418] dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">
             Próximos Vencimientos
           </h2>
           <button 
@@ -283,7 +283,7 @@
       <!-- Shopping List Section -->
       <div class="px-4 mt-6">
         <div class="flex items-center justify-between mb-3">
-          <h2 class="text-[#101418] text-[22px] font-bold leading-tight tracking-[-0.015em]">
+          <h2 class="text-[#101418] dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">
             Próximas Compras
           </h2>
           <button 
@@ -312,7 +312,7 @@
               </div>
             </div>
             <h3 class="text-lg font-semibold text-gray-900 mb-2">Lista de Compras Vacía</h3>
-            <p class="text-gray-600 mb-4">No hay elementos pendientes de compra.</p>
+            <p class="text-gray-600 dark:text-gray-400 mb-4">No hay elementos pendientes de compra.</p>
             <button 
               (click)="goToShoppingList()"
               class="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
@@ -366,7 +366,7 @@
       <!-- Upcoming Activities Section -->
       <div class="px-4 mt-6">
         <div class="flex items-center justify-between mb-3">
-          <h2 class="text-[#101418] text-[22px] font-bold leading-tight tracking-[-0.015em]">
+          <h2 class="text-[#101418] dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] pb-3">
             Próximas Citas
           </h2>
           <button 
@@ -395,7 +395,7 @@
               </div>
             </div>
             <h3 class="text-lg font-semibold text-gray-900 mb-2">No Hay Citas Próximas</h3>
-            <p class="text-gray-600 mb-4">No hay citas programadas para los próximos 7 días.</p>
+            <p class="text-gray-600 dark:text-gray-400 mb-4">No hay citas programadas para los próximos 7 días.</p>
             <button 
               (click)="goToCalendar()"
               class="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">

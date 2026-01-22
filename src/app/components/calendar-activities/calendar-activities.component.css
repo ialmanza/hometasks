@@ -27,6 +27,11 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+.dark .calendar-header {
+  background-color: #1f2937;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
 .header-content {
   display: flex;
   align-items: center;
@@ -48,10 +53,17 @@
   background-color: #f0f0f0;
 }
 
+.dark .nav-button {
+  color: #f3f4f6;
+}
+
+.dark .nav-button:hover {
+  background-color: #374151;
+}
+
 .month-title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--text-color);
   margin: 0;
 }
 
@@ -86,6 +98,15 @@
   background-color: #d1d5db;
 }
 
+.dark .filter-btn {
+  background-color: #374151;
+  color: #f3f4f6;
+}
+
+.dark .filter-btn:hover {
+  background-color: #4b5563;
+}
+
 .filter-btn.active {
   background-color: var(--primary-color);
   color: white;
@@ -105,12 +126,23 @@
   font-size: 14px;
 }
 
+.dark .member-select {
+  background-color: #374151;
+  border-color: #4b5563;
+  color: #f3f4f6;
+}
+
 /* Calendario */
 .calendar-grid {
   background-color: white;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dark .calendar-grid {
+  background-color: #1f2937;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .weekdays {
@@ -120,12 +152,21 @@
   border-bottom: 1px solid #e0e4e8;
 }
 
+.dark .weekdays {
+  background-color: #374151;
+  border-bottom-color: #4b5563;
+}
+
 .weekday {
   padding: 12px;
   text-align: center;
   font-weight: 600;
   font-size: 13px;
   color: var(--text-color);
+}
+
+.dark .weekday {
+  color: #f3f4f6;
 }
 
 .calendar-days {
@@ -146,6 +187,15 @@
 
 .calendar-day:hover {
   background-color: #f8f9fa;
+}
+
+.dark .calendar-day {
+  border-right-color: #374151;
+  border-bottom-color: #374151;
+}
+
+.dark .calendar-day:hover {
+  background-color: #374151;
 }
 
 .calendar-day.other-month {

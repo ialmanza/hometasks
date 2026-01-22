@@ -2,8 +2,8 @@
 <!-- <div class="saltos">
   <br><br><br><br><br><br><br><br><br><br>
 </div> -->
-<div class="weekly-planner-container">
-  <h1>Planificador Semanal</h1>
+<div class="weekly-planner-container bg-background-light dark:bg-background-dark">
+  <h1 class="text-primary dark:text-white">Planificador Semanal</h1>
 
   <div class="days-selector">
     <button
@@ -16,10 +16,10 @@
   </div>
 
   <div *ngIf="selectedDay" class="day-details">
-    <h2>{{ selectedDay }}</h2>
+    <h2 class="text-[#2c3e50] dark:text-white">{{ selectedDay }}</h2>
 
     <div class="meals-section">
-      <h3>Comidas</h3>
+      <h3 class="text-[#2c3e50] dark:text-white">Comidas</h3>
       <form [formGroup]="mealForm" (ngSubmit)="addMeal()">
         <select formControlName="mealType">
           <option value="">Seleccionar Tipo de Comida</option>
@@ -41,8 +41,8 @@
         <div *ngFor="let meal of meals" class="meal-item">
           <div *ngIf="editingMeal?.id !== meal.id" class="meal-display">
             <div class="meal-info">
-              <strong>{{ meal.meal_type | titlecase }}</strong>
-              <p>{{ meal.description }}</p>
+              <strong class="text-[#2c3e50] dark:text-white">{{ meal.meal_type | titlecase }}</strong>
+              <p class="text-gray-700 dark:text-gray-300">{{ meal.description }}</p>
             </div>
             <div class="meal-actions">
               <button (click)="startEditing(meal)" class="edit-btn">

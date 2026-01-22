@@ -5,6 +5,7 @@ import { AppNavigationComponent } from './components/app-navigation/app-navigati
 import { AppUpdateComponent } from './components/app-update/app-update.component';
 import { PushSubscriptionService } from './services/push-subscription.service';
 import { PinLockService } from './services/pin-lock.service';
+import { SettingsService } from './services/settings/settings.service';
 import { filter } from 'rxjs';
 
 @Component({
@@ -24,7 +25,8 @@ export class AppComponent implements OnInit {
   constructor(
     private router: Router,
     private pushSubscriptionService: PushSubscriptionService,
-    private pinLockService: PinLockService
+    private pinLockService: PinLockService,
+    private settingsService: SettingsService
   ) {}
 
   ngOnInit() {

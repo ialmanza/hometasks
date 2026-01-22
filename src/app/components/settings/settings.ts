@@ -13,6 +13,7 @@ import { PinVerifyComponent } from './pin-verify/pin-verify.component';
 import { supabase } from '../../services/Supabase-Client/supabase-client';
 import { ExpensesService } from '../../services/expenses.service';
 import { VacationExpensesService } from '../../services/vacation-expenses.service';
+import { SettingsService, Theme } from '../../services/settings/settings.service';
 
 @Component({
   selector: 'app-settings',
@@ -39,7 +40,7 @@ export class SettingsComponent implements OnInit {
   isRegisteringBiometric = signal<boolean>(false);
   
   // Apariencia / Tema
-  selectedTheme = signal<'light' | 'dark' | 'system'>('system');
+  // selectedTheme ahora se obtiene del SettingsService
   
   // Gestión de Datos
   showDateRangeModal = signal<boolean>(false);
@@ -53,9 +54,14 @@ export class SettingsComponent implements OnInit {
   showDeleteConfirm = signal<boolean>(false);
   isDeletingExpenses = signal<boolean>(false);
   
-  // Información
-  appName = 'HomeTasks';
-  appVersion = '1.0.0';
+  // Información - ahora se obtiene del SettingsService
+  get appName(): string {
+    return this.settingsService.getAppName();
+  }
+  
+  get appVersion(): string {
+    return this.settingsService.getAppVersion();
+  }
 
   constructor(
     private securitySettingsService: SecuritySettingsService,
@@ -66,7 +72,8 @@ export class SettingsComponent implements OnInit {
     private expensesService: ExpensesService,
     private vacationExpensesService: VacationExpensesService,
     public router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    public settingsService: SettingsService
   ) {}
 
   async ngOnInit() {
@@ -577,12 +584,17 @@ export class SettingsComponent implements OnInit {
   // ==================== APARIENCIA ====================
   
   /**
+   * Obtiene el signal del tema actual (para usar en el template con selectedTheme())
+   */
+  get selectedTheme() {
+    return this.settingsService.currentTheme;
+  }
+  
+  /**
    * Maneja el cambio de tema
    */
-  onThemeChange(theme: 'light' | 'dark' | 'system') {
-    this.selectedTheme.set(theme);
-    // TODO: Implementar lógica de cambio de tema
-    console.log('Tema cambiado a:', theme);
+  onThemeChange(theme: Theme): void {
+    this.settingsService.setTheme(theme);
   }
   
   // ==================== GESTIÓN DE DATOS ====================

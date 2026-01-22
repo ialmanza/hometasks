@@ -6,7 +6,6 @@
 
 .dashboard-container {
   min-height: 100vh;
-  background-color: #f8f9fa;
 }
 
 /* Banner Styles */
@@ -44,58 +43,80 @@
 }
 
 .stat-card {
-  background: white;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   transition: transform 0.2s;
+  background: white;
+}
 
-  &:hover {
-    transform: translateY(-5px);
-  }
+.dark .stat-card {
+  background: #1f2937;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
 
-  .card-content {
-    padding: 1.5rem;
+.stat-card:hover {
+  transform: translateY(-5px);
+}
 
-    h3 {
-      font-size: 1.2rem;
-      color: #2d3748;
-      margin-bottom: 1rem;
-      font-weight: 600;
-    }
+.stat-card .card-content {
+  padding: 1.5rem;
+}
 
-    ul {
-      list-style: none;
-      padding: 0;
+.stat-card .card-content h3 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
 
-      li {
-        display: flex;
-        justify-content: space-between;
-        padding: 0.5rem 0;
-        border-bottom: 1px solid #edf2f7;
+.stat-card .card-content ul {
+  list-style: none;
+  padding: 0;
+}
 
-        &:last-child {
-          border-bottom: none;
-        }
+.stat-card .card-content li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #edf2f7;
+}
 
-        span {
-          &.activity-title,
-          &.meal-type,
-          &.item-name {
-            font-weight: 500;
-            color: #4a5568;
-          }
+.stat-card .card-content li:last-child {
+  border-bottom: none;
+}
 
-          &.activity-time,
-          &.meal-desc,
-          &.item-quantity {
-            color: #718096;
-            font-size: 0.9rem;
-          }
-        }
-      }
-    }
-  }
+.dark .stat-card .card-content li {
+  border-bottom: 1px solid #374151;
+}
+
+.dark .stat-card .card-content li:last-child {
+  border-bottom: none;
+}
+
+.stat-card .card-content li span.activity-title,
+.stat-card .card-content li span.meal-type,
+.stat-card .card-content li span.item-name {
+  font-weight: 500;
+  color: #4a5568;
+}
+
+.dark .stat-card .card-content li span.activity-title,
+.dark .stat-card .card-content li span.meal-type,
+.dark .stat-card .card-content li span.item-name {
+  color: #d1d5db;
+}
+
+.stat-card .card-content li span.activity-time,
+.stat-card .card-content li span.meal-desc,
+.stat-card .card-content li span.item-quantity {
+  color: #718096;
+  font-size: 0.9rem;
+}
+
+.dark .stat-card .card-content li span.activity-time,
+.dark .stat-card .card-content li span.meal-desc,
+.dark .stat-card .card-content li span.item-quantity {
+  color: #9ca3af;
 }
 
 /* Main Content Sections */
@@ -154,6 +175,10 @@
   color: #a0aec0;
   font-style: italic;
   padding: 1rem 0;
+}
+
+.dark .empty-state {
+  color: #6b7280;
 }
 
 /* Responsive Design */

@@ -1,11 +1,11 @@
-<div class="relative flex size-full min-h-screen flex-col bg-slate-50 justify-between group/design-root overflow-x-hidden">
+<div class="relative flex size-full min-h-screen flex-col bg-slate-50 dark:bg-background-dark justify-between group/design-root overflow-x-hidden">
   <div>
     <!-- Header -->
-    <div class="flex items-center bg-slate-50 p-4 pb-2 justify-between">
-      <div class="text-[#0e141b] flex size-12 shrink-0 items-center cursor-pointer" (click)="goBack()">
+    <div class="flex items-center bg-slate-50 dark:bg-background-dark p-4 pb-2 justify-between">
+      <div class="text-[#0e141b] dark:text-white flex size-12 shrink-0 items-center cursor-pointer" (click)="goBack()">
         <fa-icon [icon]="faArrowLeft" class="text-xl"></fa-icon>
       </div>
-      <h2 class="text-[#0e141b] text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-12">Transacciones Mensuales</h2>
+      <h2 class="text-[#0e141b] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-12">Transacciones Mensuales</h2>
     </div>
 
     <!-- Selector de mes/año -->
@@ -14,14 +14,14 @@
         <select 
           [(ngModel)]="selectedMonth" 
           (change)="onMonthYearChange()"
-          class="flex-1 px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#1978e5]"
+          class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm dark:text-white focus:outline-none focus:ring-2 focus:ring-[#1978e5]"
         >
           <option *ngFor="let month of months" [value]="month.value">{{ month.name }}</option>
         </select>
         <select 
           [(ngModel)]="selectedYear" 
           (change)="onMonthYearChange()"
-          class="flex-1 px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#1978e5]"
+          class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm dark:text-white focus:outline-none focus:ring-2 focus:ring-[#1978e5]"
         >
           <option *ngFor="let year of [2024, 2025, 2026, 2027, 2028]" [value]="year">{{ year }}</option>
         </select>
@@ -29,7 +29,7 @@
     </div>
 
     <!-- Título del mes -->
-    <h3 class="text-[#0e141b] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">
+    <h3 class="text-[#0e141b] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">
       {{ getSelectedMonthName() }} {{ selectedYear }}
     </h3>
 
@@ -69,10 +69,10 @@
     </div>
 
     <!-- Resumen de gastos -->
-    <div class="flex items-center gap-4 bg-slate-50 px-4 min-h-14 justify-between">
-      <p class="text-[#0e141b] text-base font-normal leading-normal flex-1 truncate">Total Gastado</p>
+    <div class="flex items-center gap-4 bg-slate-50 dark:bg-background-dark px-4 min-h-14 justify-between">
+      <p class="text-[#0e141b] dark:text-white text-base font-normal leading-normal flex-1 truncate">Total Gastado</p>
       <div class="shrink-0">
-        <p class="text-[#0e141b] text-base font-normal leading-normal">{{ formatAmount(stats.totalSpent) }}</p>
+        <p class="text-[#0e141b] dark:text-white text-base font-normal leading-normal">{{ formatAmount(stats.totalSpent) }}</p>
       </div>
     </div>
 
@@ -105,20 +105,20 @@
 
     <!-- Lista de transacciones -->
     <div *ngIf="!loading; else loadingTemplate">
-      <div *ngFor="let expense of filteredExpenses; trackBy: trackByExpenseId" class="flex items-center gap-4 bg-slate-50 px-4 min-h-[72px] py-2 justify-between animate-fade-in">
+      <div *ngFor="let expense of filteredExpenses; trackBy: trackByExpenseId" class="flex items-center gap-4 bg-slate-50 dark:bg-background-dark px-4 min-h-[72px] py-2 justify-between animate-fade-in">
         <div class="flex items-center gap-4">
           <!-- Icono del gasto -->
-          <div class="text-[#0e141b] flex items-center justify-center rounded-lg bg-[#e7edf3] shrink-0 size-12 text-2xl">
+          <div class="text-[#0e141b] dark:text-white flex items-center justify-center rounded-lg bg-[#e7edf3] dark:bg-gray-700 shrink-0 size-12 text-2xl">
             {{ getExpenseIcon(expense) }}
           </div>
           
           <!-- Información del gasto -->
           <div class="flex flex-col justify-center">
-            <p class="text-[#0e141b] text-base font-medium leading-normal line-clamp-1">{{ expense.title }}</p>
-            <p class="text-[#4e7097] text-sm font-normal leading-normal line-clamp-2">
+            <p class="text-[#0e141b] dark:text-white text-base font-medium leading-normal line-clamp-1">{{ expense.title }}</p>
+            <p class="text-[#4e7097] dark:text-gray-400 text-sm font-normal leading-normal line-clamp-2">
               {{ formatDate(expense.due_date || '') }} · {{ getMemberName(expense.responsible_member_id || '') }}
             </p>
-            <p *ngIf="expense.description" class="text-[#4e7097] text-xs font-normal leading-normal line-clamp-1 mt-1">
+            <p *ngIf="expense.description" class="text-[#4e7097] dark:text-gray-400 text-xs font-normal leading-normal line-clamp-1 mt-1">
               {{ expense.description }}
             </p>
           </div>
@@ -135,18 +135,18 @@
 
           <!-- Monto -->
           <div class="shrink-0">
-            <p class="text-[#0e141b] text-base font-normal leading-normal">{{ formatAmount(expense.amount) }}</p>
+            <p class="text-[#0e141b] dark:text-white text-base font-normal leading-normal">{{ formatAmount(expense.amount) }}</p>
           </div>
         </div>
       </div>
 
       <!-- Estado vacío -->
       <div *ngIf="filteredExpenses.length === 0" class="flex flex-col items-center justify-center py-12 px-4 animate-fade-in">
-        <div class="text-[#4e7097] text-6xl mb-4">💰</div>
-        <h3 class="text-[#0e141b] text-lg font-medium mb-2 text-center">
+        <div class="text-[#4e7097] dark:text-gray-400 text-6xl mb-4">💰</div>
+        <h3 class="text-[#0e141b] dark:text-white text-lg font-medium mb-2 text-center">
           {{ getEmptyStateTitle() }}
         </h3>
-        <p class="text-[#4e7097] text-sm text-center mb-6 max-w-md">
+        <p class="text-[#4e7097] dark:text-gray-400 text-sm text-center mb-6 max-w-md">
           {{ getEmptyStateDescription() }}
         </p>
         <!-- <p class="text-[#4e7097] text-xs text-center">

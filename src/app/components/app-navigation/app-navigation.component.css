@@ -18,6 +18,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  background-color: #f8f9fa;
+}
+
+.dark .nav-desktop {
+  background-color: #191d1f;
 }
 
 .logo {
@@ -46,6 +51,10 @@
   border-radius: 4px;
   transition: background-color 0.3s;
   font-size: 0.9rem;
+}
+
+.dark .nav-links a {
+  color: #f3f4f6;
 }
 
 .nav-links a:hover, .nav-links a.active {
@@ -100,11 +109,9 @@
 }
 
 /* Modo oscuro */
-@media (prefers-color-scheme: dark) {
-  .nav-mobile-new {
-    background: rgba(17, 24, 39, 0.9);
-    border-color: rgba(31, 41, 55, 0.8);
-  }
+.dark .nav-mobile-new {
+  background: rgba(17, 24, 39, 0.9);
+  border-color: rgba(31, 41, 55, 0.8);
 }
 
 /* Tabs de navegación */
@@ -124,6 +131,10 @@
   position: relative;
   outline: none;
   -webkit-tap-highlight-color: transparent;
+}
+
+.dark .nav-tab {
+  color: #6b7280;
 }
 
 .nav-tab:hover {
@@ -281,31 +292,29 @@
 }
 
 /* Modo oscuro para el modal */
-@media (prefers-color-scheme: dark) {
-  .more-menu-content {
-    background-color: #1f2937;
-    color: #f9fafb;
-  }
-  
-  .more-menu-header h3 {
-    color: #f9fafb;
-  }
-  
-  .more-menu-header {
-    border-bottom-color: #374151;
-  }
-  
-  .more-menu-item {
-    color: #f9fafb;
-  }
-  
-  .more-menu-item:hover {
-    background-color: #374151;
-  }
-  
-  .more-menu-item.active {
-    background-color: #1e3a8a;
-  }
+.dark .more-menu-content {
+  background-color: #1f2937;
+  color: #f9fafb;
+}
+
+.dark .more-menu-header h3 {
+  color: #f9fafb;
+}
+
+.dark .more-menu-header {
+  border-bottom-color: #374151;
+}
+
+.dark .more-menu-item {
+  color: #f9fafb;
+}
+
+.dark .more-menu-item:hover {
+  background-color: #374151;
+}
+
+.dark .more-menu-item.active {
+  background-color: #1e3a8a;
 }
 
 .more-menu-header {
@@ -317,11 +326,19 @@
   border-bottom: 1px solid #e5e7eb;
 }
 
+.dark .more-menu-header {
+  border-bottom-color: #374151;
+}
+
 .more-menu-header h3 {
   margin: 0;
   color: #1f2937;
   font-size: 1.1rem;
   font-weight: 600;
+}
+
+.dark .more-menu-header h3 {
+  color: #f9fafb;
 }
 
 .close-btn {
@@ -340,6 +357,15 @@
 .close-btn:hover {
   background-color: #f3f4f6;
   color: #374151;
+}
+
+.dark .close-btn {
+  color: #9ca3af;
+}
+
+.dark .close-btn:hover {
+  background-color: #374151;
+  color: #f3f4f6;
 }
 
 .close-btn fa-icon {
@@ -364,6 +390,10 @@
   background: transparent;
 }
 
+.dark .more-menu-item {
+  color: #f9fafb;
+}
+
 .more-menu-item:hover {
   background-color: #f9fafb;
   color: #4a90e2;
@@ -380,6 +410,10 @@
   border-top: 1px solid #eee;
   margin-top: 8px;
   padding-top: 14px;
+}
+
+.dark .more-menu-item.logout-btn {
+  border-top-color: #374151;
 }
 
 .more-menu-item.logout-btn:hover {
@@ -473,8 +507,6 @@ button.nav-tab:focus:not(:focus-visible) {
   border-radius: 2px;
 }
 
-@media (prefers-color-scheme: dark) {
-  .more-menu-content::before {
-    background-color: #4b5563;
-  }
+.dark .more-menu-content::before {
+  background-color: #4b5563;
 }

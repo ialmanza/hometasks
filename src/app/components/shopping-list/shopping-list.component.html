@@ -3,8 +3,8 @@
   <br><br><br><br><br><br>
 </div> -->
 
-<div class="shopping-list-container">
-  <h1>Lista de compras</h1>
+<div class="shopping-list-container bg-background-light dark:bg-background-dark">
+  <h1 class="text-primary dark:text-white">Lista de compras</h1>
 
   <!-- Lista de Compras -->
   <div class="list-container">
@@ -47,7 +47,7 @@
   </div>
   <br><br>
 
-  <h3>Añadir Producto</h3>
+  <h3 class="text-primary dark:text-white">Añadir Producto</h3>
   <!-- Formulario Agregar/Editar -->
   <form [formGroup]="itemForm" (ngSubmit)="onSubmit()" class="shopping-form">
     <div class="form-row">
@@ -103,7 +103,7 @@
 
   <!-- Productos Predefinidos -->
   <div class="quick-add-section">
-    <h3>Añadir Rápido</h3>
+    <h3 class="text-primary dark:text-white">Añadir Rápido</h3>
     <div class="quick-add-products">
       <button
         *ngFor="let product of quickAddProducts"

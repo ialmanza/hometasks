@@ -14,7 +14,6 @@
 }
 
 h1 {
-  color: var(--primary-color);
   font-weight: 600;
   margin-top: 15px;
   text-align: center;
@@ -36,6 +35,12 @@ h1 {
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s;
+  color: var(--text-color);
+}
+
+.dark .days-selector button {
+  background-color: #374151;
+  color: #f3f4f6;
 }
 
 .days-selector button.active {
@@ -48,6 +53,11 @@ h1 {
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dark .day-details {
+  background-color: #1f2937;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 .meals-section, .activities-section {
@@ -67,6 +77,16 @@ form textarea {
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
+  background-color: white;
+  color: var(--text-color);
+}
+
+.dark form input,
+.dark form select,
+.dark form textarea {
+  background-color: #374151;
+  border-color: #4b5563;
+  color: #f3f4f6;
 }
 
 form button {
@@ -88,6 +108,11 @@ form button {
   background-color: #f4f4f4;
   padding: 10px;
   border-radius: 4px;
+}
+
+.dark .meal-item,
+.dark .activity-item {
+  background-color: #374151;
 }
 
 @media (max-width: 600px) {
