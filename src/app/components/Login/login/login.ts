@@ -81,14 +81,23 @@ export class Login implements OnInit {
         } else {
           console.log('Login exitoso:', response);
           
+          // Limpiar cache para forzar verificación fresca después del login
+          // Esto asegura que no se use información obsoleta de sesiones anteriores
+          this.sessionHelper.clearCache();
+          
+          // Esperar un momento para que la sesión se propague completamente en localStorage
+          // Esto es necesario porque Supabase puede tardar un poco en almacenar la sesión
+          await new Promise(resolve => setTimeout(resolve, 100));
+          
           // Inicializar notificaciones push en background (no bloquea la navegación)
           this.pushSubscriptionService.checkAndSubscribe().catch(error => {
             console.error('Error inicializando notificaciones push:', error);
           });
           
           // Verificar si el usuario tiene PIN configurado usando el servicio helper
+          // Usar useCache: false para forzar verificación fresca sin usar cache
           try {
-            const pinResult = await this.sessionHelper.checkPinConfigured();
+            const pinResult = await this.sessionHelper.checkPinConfigured(undefined, false);
             
             if (pinResult.hasPinConfigured) {
               // Usuario tiene PIN configurado → redirigir directamente a lock screen

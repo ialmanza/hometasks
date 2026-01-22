@@ -41,16 +41,16 @@ export class AppNavigationComponent {
   }
 
   /**
-   * Cierra sesión temporalmente (solo recarga la página y muestra el lock screen)
-   * No cierra la sesión de Supabase, solo limpia el cache de desbloqueo y recarga
-   * para que se muestre la pantalla de PIN
+   * Cierra sesión temporalmente (solo muestra el lock screen)
+   * No cierra la sesión de Supabase, solo limpia el cache de desbloqueo
+   * y redirige directamente a la pantalla de PIN
    */
   logout() {
     // Limpiar cache de desbloqueo para que se pida el PIN
     this.pinLockService.clearUnlockCache();
     // Limpiar sessionStorage para que se detecte como recarga
     sessionStorage.removeItem('app_session_active');
-    // Recargar la página, lo cual activará el lock screen automáticamente
-    window.location.reload();
+    // Redirigir directamente a lock screen para evitar mostrar expenses primero
+    window.location.href = '/lock';
   }
 }

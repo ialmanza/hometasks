@@ -873,6 +873,9 @@ export class SettingsComponent implements OnInit {
       localStorage.removeItem('has_pin_configured');
       localStorage.removeItem('user_id_for_pin');
       
+      // Limpiar cache de SessionHelperService para que el login funcione correctamente
+      this.sessionHelper.clearCache();
+      
       // Cerrar sesión en Supabase
       await this.authService.logout();
 
@@ -889,6 +892,8 @@ export class SettingsComponent implements OnInit {
         sessionStorage.clear();
         localStorage.removeItem('has_pin_configured');
         localStorage.removeItem('user_id_for_pin');
+        // Limpiar cache de SessionHelperService también en el catch
+        this.sessionHelper.clearCache();
         window.location.replace('/login');
       } catch (navError) {
         console.error('Error al redirigir:', navError);
