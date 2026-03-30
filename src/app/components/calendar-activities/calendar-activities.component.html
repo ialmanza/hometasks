@@ -228,95 +228,148 @@
       </div>
 
       <!-- Formulario agregar / editar -->
-      <form *ngIf="showAddForm" [formGroup]="activityForm" (ngSubmit)="editingActivity ? updateActivity() : addActivity()" class="activity-form day-modal-form">
-        <!-- Mensaje de error -->
-        <div class="error-message" *ngIf="errorMessage">
-          {{ errorMessage }}
+      <form
+        *ngIf="showAddForm"
+        [formGroup]="activityForm"
+        (ngSubmit)="editingActivity ? updateActivity() : addActivity()"
+        class="dh-form">
+        <div class="dh-form-header">
+          <div class="dh-form-heading">
+            <h2 class="dh-form-title">{{ editingActivity ? 'Editar actividad' : 'Nueva actividad' }}</h2>
+            <p class="dh-form-subtitle">
+              {{ editingActivity ? 'Actualiza los datos de este evento.' : 'Programa un nuevo evento para tu hogar.' }}
+            </p>
+          </div>
+          <button type="button" class="dh-icon-btn" (click)="cancelForm()" [disabled]="isSaving" aria-label="Cerrar formulario">
+            <fa-icon [icon]="faTimes"></fa-icon>
+          </button>
         </div>
 
-        <div class="form-group">
-          <label for="title">Título</label>
-          <input 
+        <!-- Error global (duplicados, backend, etc.) -->
+        <div class="dh-alert" *ngIf="errorMessage">
+          <div class="dh-alert-icon" aria-hidden="true">
+            <fa-icon [icon]="faNoteSticky"></fa-icon>
+          </div>
+          <div class="dh-alert-text">{{ errorMessage }}</div>
+        </div>
+
+        <!-- Title -->
+        <div class="dh-field">
+          <label class="dh-label" for="title">Título de la actividad</label>
+          <input
             id="title"
-            type="text" 
-            formControlName="title" 
-            placeholder="Título de la actividad"
-            class="form-input">
+            type="text"
+            formControlName="title"
+            placeholder="ej. Compra semanal"
+            class="dh-input"
+            [class.dh-invalid]="activityForm.get('title')?.invalid && (activityForm.get('title')?.touched || activityForm.get('title')?.dirty)">
+          <p class="dh-error" *ngIf="activityForm.get('title')?.invalid && (activityForm.get('title')?.touched || activityForm.get('title')?.dirty)">
+            <span *ngIf="activityForm.get('title')?.errors?.['required']">El título es obligatorio</span>
+            <span *ngIf="activityForm.get('title')?.errors?.['minlength']">El título debe tener al menos 3 caracteres</span>
+          </p>
         </div>
 
-        <div class="form-group">
-          <label for="description">Descripción</label>
-          <textarea 
-            id="description"
-            formControlName="description" 
-            placeholder="Descripción (opcional)"
-            class="form-textarea">
-          </textarea>
-        </div>
-
-        <div class="form-group">
-          <label for="address">Dirección</label>
-          <input 
-            id="address"
-            type="text" 
-            formControlName="address" 
-            placeholder="Dirección (opcional)"
-            class="form-input">
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="date">Fecha</label>
-            <input 
-              id="date"
-              type="date" 
-              formControlName="date" 
-              class="form-input"
-              (change)="onDateChange($event)">
-            <div class="error-message" *ngIf="dateError">
-              {{ dateError }}
+        <!-- Type & Member -->
+        <div class="dh-grid-2">
+          <div class="dh-field">
+            <label class="dh-label" for="activity_type">Tipo de actividad</label>
+            <div class="dh-select-wrap">
+              <select
+                id="activity_type"
+                formControlName="activity_type"
+                class="dh-select">
+                <option value="medico">Médico</option>
+                <option value="salida">Salida</option>
+                <option value="cumple">Cumpleaños</option>
+                <option value="jardin">Jardín</option>
+                <option value="otro">Otro</option>
+              </select>
+              <span class="dh-select-chevron" aria-hidden="true"></span>
             </div>
           </div>
 
-          <div class="form-group">
-            <label for="time">Hora</label>
-            <input 
+          <div class="dh-field">
+            <label class="dh-label" for="member_id">Asignar miembro</label>
+            <div class="dh-select-wrap">
+              <select
+                id="member_id"
+                formControlName="member_id"
+                class="dh-select"
+                [class.dh-invalid]="activityForm.get('member_id')?.invalid && (activityForm.get('member_id')?.touched || activityForm.get('member_id')?.dirty)">
+                <option value="" disabled>Seleccionar miembro</option>
+                <option *ngFor="let member of availableMembers" [value]="member.id">
+                  {{ member.name }}
+                </option>
+              </select>
+              <span class="dh-select-chevron" aria-hidden="true"></span>
+            </div>
+            <p class="dh-error" *ngIf="activityForm.get('member_id')?.invalid && (activityForm.get('member_id')?.touched || activityForm.get('member_id')?.dirty)">
+              Debes seleccionar un miembro
+            </p>
+          </div>
+        </div>
+
+        <!-- Date & Time -->
+        <div class="dh-grid-2">
+          <div class="dh-field">
+            <label class="dh-label" for="date">Fecha</label>
+            <input
+              id="date"
+              type="date"
+              formControlName="date"
+              class="dh-input"
+              (change)="onDateChange($event)"
+              [class.dh-invalid]="(!!dateError) || (activityForm.get('date')?.invalid && (activityForm.get('date')?.touched || activityForm.get('date')?.dirty))">
+            <p class="dh-error" *ngIf="dateError">{{ dateError }}</p>
+            <p class="dh-error" *ngIf="!dateError && activityForm.get('date')?.invalid && (activityForm.get('date')?.touched || activityForm.get('date')?.dirty)">
+              La fecha es obligatoria
+            </p>
+          </div>
+
+          <div class="dh-field">
+            <label class="dh-label" for="time">Hora</label>
+            <input
               id="time"
-              type="time" 
-              formControlName="time" 
-              class="form-input">
+              type="time"
+              formControlName="time"
+              class="dh-input">
           </div>
         </div>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label for="activity_type">Tipo de Actividad</label>
-            <select id="activity_type" formControlName="activity_type" class="form-select">
-              <option value="medico">Médico</option>
-              <option value="salida">Salida</option>
-              <option value="cumple">Cumpleaños</option>
-              <option value="jardin">Jardín</option>
-              <option value="otro">Otro</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="member_id">Miembro</label>
-            <select id="member_id" formControlName="member_id" class="form-select">
-              <option value="">Seleccionar miembro</option>
-              <option *ngFor="let member of availableMembers" [value]="member.id">
-                {{ member.name }}
-              </option>
-            </select>
+        <!-- Location -->
+        <div class="dh-field">
+          <label class="dh-label" for="address">Ubicación / Dirección</label>
+          <div class="dh-input-icon-wrap">
+            <span class="dh-input-icon" aria-hidden="true">
+              <fa-icon [icon]="faLocationDot"></fa-icon>
+            </span>
+            <input
+              id="address"
+              type="text"
+              formControlName="address"
+              placeholder="¿Dónde ocurre?"
+              class="dh-input dh-input--with-icon">
           </div>
         </div>
 
-        <div class="form-actions">
-          <button type="button" class="btn-secondary" (click)="cancelForm()" [disabled]="isSaving">
+        <!-- Notes -->
+        <div class="dh-field">
+          <label class="dh-label" for="description">Notas adicionales</label>
+          <textarea
+            id="description"
+            formControlName="description"
+            placeholder="Añade detalles o indicaciones especiales..."
+            rows="4"
+            class="dh-textarea"></textarea>
+        </div>
+
+        <!-- Actions -->
+        <div class="dh-actions">
+          <button type="button" class="dh-btn dh-btn-ghost" (click)="cancelForm()" [disabled]="isSaving">
             Cancelar
           </button>
-          <button type="submit" class="btn-primary" [disabled]="!activityForm.valid || isSaving">
-            <span *ngIf="!isSaving">{{ editingActivity ? 'Actualizar' : 'Agregar' }}</span>
+          <button type="submit" class="dh-btn dh-btn-primary" [disabled]="!activityForm.valid || isSaving">
+            <span *ngIf="!isSaving">{{ editingActivity ? 'Guardar cambios' : 'Añadir actividad' }}</span>
             <span *ngIf="isSaving" class="saving-spinner">
               <div class="spinner-small"></div>
               Guardando...
