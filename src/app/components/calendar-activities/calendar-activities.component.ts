@@ -8,7 +8,23 @@ import { MembersService } from '../../services/members.service';
 import { NotificationService } from '../../services/notifications.service';
 import { PushSubscriptionService } from '../../services/push-subscription.service';
 import { AppNavigationComponent } from "../app-navigation/app-navigation.component";
-import { faEdit, faTrash, faPlus, faCalendar, faTimes, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import {
+  faEdit,
+  faTrash,
+  faPlus,
+  faCalendar,
+  faTimes,
+  faChevronLeft,
+  faChevronRight,
+  faStethoscope,
+  faUmbrellaBeach,
+  faCakeCandles,
+  faSeedling,
+  faNoteSticky,
+  faLocationDot,
+  faCirclePlus,
+  IconDefinition
+} from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-calendar-activities',
@@ -53,6 +69,17 @@ export class CalendarActivitiesComponent implements OnInit {
   faTimes = faTimes;
   faChevronLeft = faChevronLeft;
   faChevronRight = faChevronRight;
+  faNoteSticky = faNoteSticky;
+  faLocationDot = faLocationDot;
+  faCirclePlus = faCirclePlus;
+
+  private activityTypeFaIcons: Record<string, IconDefinition> = {
+    medico: faStethoscope,
+    salida: faUmbrellaBeach,
+    cumple: faCakeCandles,
+    jardin: faSeedling,
+    otro: faCalendar
+  };
 
   constructor(
     private calendarService: CalendarActivitiesService,
@@ -435,6 +462,48 @@ export class CalendarActivitiesComponent implements OnInit {
 
   get selectedDateAsDate(): Date | null {
     return this.selectedDate ? new Date(`${this.selectedDate}T00:00:00`) : null;
+  }
+
+  getDayModalSubtitle(): string {
+    const n = this.selectedDayActivities.length;
+    if (n === 0) {
+      return 'No hay eventos programados para tu familia';
+    }
+    if (n === 1) {
+      return '1 actividad programada para tu familia';
+    }
+    return `${n} actividades programadas para tu familia`;
+  }
+
+  formatActivityTime(time?: string): string {
+    if (!time) return '';
+    const parts = time.split(':');
+    const h = parseInt(parts[0], 10);
+    const m = parseInt(parts[1] || '0', 10);
+    if (Number.isNaN(h)) return time;
+    const d = new Date();
+    d.setHours(h, m, 0, 0);
+    return d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+  }
+
+  getActivityPillarColor(activity: CalendarActivityWithMember): string {
+    return activity.member_color || this.getActivityTypeColor(activity.activity_type);
+  }
+
+  getActivityTypeFaIcon(type: string): IconDefinition {
+    return this.activityTypeFaIcons[type] ?? faCalendar;
+  }
+
+  getActivityDetailPrimaryText(activity: CalendarActivityWithMember): string {
+    if (activity.description?.trim()) {
+      return activity.description.trim();
+    }
+    return this.getActivityTypeLabel(activity.activity_type);
+  }
+
+  closeDayModal(): void {
+    this.showModal = false;
+    this.cancelForm();
   }
 
   getMonthName(): string {

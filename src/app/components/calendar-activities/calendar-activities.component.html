@@ -135,66 +135,100 @@
   </button>
 </main>
 
-<!-- Modal para actividades del día -->
-<div class="modal-overlay" *ngIf="showModal" (click)="showModal = false">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3>Actividades del {{ selectedDateAsDate | date:'longDate' }}</h3>
-      <button class="close-btn" (click)="showModal = false">
+<!-- Modal actividades del día (estilo web Digital Hearth) -->
+<div
+  class="day-modal-overlay"
+  *ngIf="showModal"
+  (click)="closeDayModal()"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="day-modal-title">
+  <div class="day-modal-card" (click)="$event.stopPropagation()">
+    <header class="day-modal-header">
+      <div class="day-modal-heading">
+        <h2 id="day-modal-title" class="day-modal-title">
+          Actividades el {{ selectedDateAsDate | date:'longDate' }}
+        </h2>
+        <p class="day-modal-subtitle">{{ getDayModalSubtitle() }}</p>
+      </div>
+      <button type="button" class="day-modal-close" (click)="closeDayModal()" aria-label="Cerrar">
         <fa-icon [icon]="faTimes"></fa-icon>
       </button>
-    </div>
+    </header>
 
-    <div class="modal-body">
-      <!-- Loading spinner -->
-      <div class="loading-spinner" *ngIf="isLoading">
+    <div class="day-modal-body">
+      <div class="loading-spinner day-modal-loading" *ngIf="isLoading">
         <div class="spinner"></div>
         <p>Cargando actividades...</p>
       </div>
 
-      <!-- Lista de actividades -->
-      <div class="activities-list" *ngIf="!showAddForm && !isLoading">
-        <div *ngIf="selectedDayActivities.length === 0" class="no-activities">
+      <div class="day-modal-list" *ngIf="!showAddForm && !isLoading">
+        <div *ngIf="selectedDayActivities.length === 0" class="day-modal-empty">
           <p>No hay actividades programadas para este día</p>
         </div>
-        
-        <div *ngFor="let activity of selectedDayActivities" class="activity-item">
-          <div class="activity-icon" [style.background-color]="getActivityTypeColor(activity.activity_type)">
-            {{ getActivityTypeIcon(activity.activity_type) }}
-          </div>
-          <div class="activity-info">
-            <h4 class="activity-title">{{ activity.title }}</h4>
-            <p class="activity-time" *ngIf="activity.time">{{ activity.time }}</p>
-            <p class="activity-description" *ngIf="activity.description">{{ activity.description }}</p>
-            <p class="activity-address" *ngIf="activity.address">
-              📍 {{ activity.address }}
-            </p>
-            <p class="activity-member" *ngIf="activity.member_name">
-              {{ activity.member_name }}
-            </p>
-          </div>
-          <div class="activity-actions">
-            <button class="action-btn edit" (click)="editActivity(activity)">
-              <fa-icon [icon]="faEdit"></fa-icon>
-            </button>
-            <button class="action-btn delete" (click)="deleteActivity(activity.id!)">
-              <fa-icon [icon]="faTrash"></fa-icon>
-            </button>
-          </div>
-          <!-- Indicador del tipo de actividad -->
-          <div class="activity-type-indicator" [class]="'type-' + activity.activity_type">
-            {{ getActivityTypeLabel(activity.activity_type) }}
+
+        <div
+          *ngFor="let activity of selectedDayActivities"
+          class="day-activity-row">
+          <div
+            class="day-activity-pillar"
+            [style.background-color]="getActivityPillarColor(activity)"></div>
+          <div class="day-activity-main">
+            <div class="day-activity-top">
+              <div class="day-activity-leading">
+                <div
+                  class="day-activity-icon-wrap"
+                  [class]="'type-' + activity.activity_type">
+                  <fa-icon [icon]="getActivityTypeFaIcon(activity.activity_type)"></fa-icon>
+                </div>
+                <div class="day-activity-text">
+                  <h3 class="day-activity-name">{{ activity.title }}</h3>
+                  <div class="day-activity-meta">
+                    <span
+                      class="day-activity-member-tag"
+                      [style.color]="getActivityPillarColor(activity)">
+                      {{ activity.member_name || 'Miembro' }}
+                    </span>
+                    <span class="day-activity-meta-dot" *ngIf="activity.time" aria-hidden="true"></span>
+                    <span class="day-activity-time" *ngIf="activity.time">
+                      {{ formatActivityTime(activity.time) }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="day-activity-actions">
+                <button
+                  type="button"
+                  class="day-activity-action-btn day-activity-action-edit"
+                  (click)="editActivity(activity)"
+                  aria-label="Editar actividad">
+                  <fa-icon [icon]="faEdit"></fa-icon>
+                </button>
+                <button
+                  type="button"
+                  class="day-activity-action-btn day-activity-action-delete"
+                  (click)="deleteActivity(activity.id!)"
+                  aria-label="Eliminar actividad">
+                  <fa-icon [icon]="faTrash"></fa-icon>
+                </button>
+              </div>
+            </div>
+            <div class="day-activity-details">
+              <div class="day-detail-chip">
+                <fa-icon [icon]="faNoteSticky" class="day-detail-icon"></fa-icon>
+                <span>{{ getActivityDetailPrimaryText(activity) }}</span>
+              </div>
+              <div class="day-detail-chip" *ngIf="activity.address">
+                <fa-icon [icon]="faLocationDot" class="day-detail-icon"></fa-icon>
+                <span>{{ activity.address }}</span>
+              </div>
+            </div>
           </div>
         </div>
-
-        <button class="add-activity-btn" (click)="openAddForm()">
-          <fa-icon [icon]="faPlus"></fa-icon>
-          Agregar Actividad
-        </button>
       </div>
 
-      <!-- Formulario para agregar/editar actividad -->
-      <form *ngIf="showAddForm" [formGroup]="activityForm" (ngSubmit)="editingActivity ? updateActivity() : addActivity()" class="activity-form">
+      <!-- Formulario agregar / editar -->
+      <form *ngIf="showAddForm" [formGroup]="activityForm" (ngSubmit)="editingActivity ? updateActivity() : addActivity()" class="activity-form day-modal-form">
         <!-- Mensaje de error -->
         <div class="error-message" *ngIf="errorMessage">
           {{ errorMessage }}
@@ -291,5 +325,12 @@
         </div>
       </form>
     </div>
+
+    <footer class="day-modal-footer" *ngIf="!showAddForm && !isLoading">
+      <button type="button" class="day-modal-add-btn" (click)="openAddForm()">
+        <fa-icon [icon]="faCirclePlus"></fa-icon>
+        Agregar actividad
+      </button>
+    </footer>
   </div>
-</div> 
+</div>
