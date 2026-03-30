@@ -464,6 +464,47 @@ export class CalendarActivitiesComponent implements OnInit {
     return this.selectedDate ? new Date(`${this.selectedDate}T00:00:00`) : null;
   }
 
+  /** Actividades futuras (fecha/hora ≥ ahora), para la lista «Próximas» en móvil. */
+  get upcomingForMobileList(): CalendarActivityWithMember[] {
+    const limit = 8;
+    const now = Date.now();
+    return [...this.activities]
+      .map((a) => {
+        const timePart = a.time?.trim();
+        let ts: number;
+        if (timePart) {
+          const isoTime = timePart.length === 5 ? `${timePart}:00` : timePart;
+          ts = new Date(`${a.date}T${isoTime}`).getTime();
+        } else {
+          ts = new Date(`${a.date}T23:59:59`).getTime();
+        }
+        if (Number.isNaN(ts)) {
+          ts = new Date(`${a.date}T12:00:00`).getTime();
+        }
+        return { a, ts };
+      })
+      .filter(({ ts }) => ts >= now)
+      .sort((x, y) => x.ts - y.ts)
+      .slice(0, limit)
+      .map(({ a }) => a);
+  }
+
+  openDayFromActivity(activity: CalendarActivityWithMember): void {
+    const d = new Date(`${activity.date}T12:00:00`);
+    void this.selectDay(d);
+  }
+
+  getShortWeekdayLabel(dateStr: string): string {
+    const date = new Date(`${dateStr}T12:00:00`);
+    const labels = ['DOM', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB'];
+    return labels[date.getDay()] ?? '';
+  }
+
+  getDayOfMonthFromDateString(dateStr: string): number {
+    const date = new Date(`${dateStr}T12:00:00`);
+    return date.getDate();
+  }
+
   getDayModalSubtitle(): string {
     const n = this.selectedDayActivities.length;
     if (n === 0) {

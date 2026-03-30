@@ -1,16 +1,36 @@
 <app-app-navigation></app-app-navigation>
 
 <main class="calendar-container has-desktop-nav bg-background-light dark:bg-background-dark">
-  <!-- Header + filtros (estilo landing) -->
+  <!-- Header + filtros (estilo landing); en móvil: cabecera sticky compacta (sin avatares) -->
   <div class="calendar-topbar">
-    <div class="calendar-title-block">
+    <header class="calendar-mobile-sticky-header" aria-label="Navegación del mes">
+      <div class="calendar-mobile-month-row">
+        <button
+          type="button"
+          class="calendar-mobile-round-btn"
+          (click)="previousMonth()"
+          aria-label="Mes anterior">
+          <fa-icon [icon]="faChevronLeft"></fa-icon>
+        </button>
+        <h2 class="calendar-title calendar-mobile-month-heading">{{ getMonthName() }} {{ currentYear }}</h2>
+        <button
+          type="button"
+          class="calendar-mobile-round-btn"
+          (click)="nextMonth()"
+          aria-label="Mes siguiente">
+          <fa-icon [icon]="faChevronRight"></fa-icon>
+        </button>
+      </div>
+    </header>
+
+    <div class="calendar-title-block calendar-desktop-title">
       <h2 class="calendar-title" aria-label="Mes actual">{{ getMonthName() }} {{ currentYear }}</h2>
       <p class="calendar-subtitle">{{ activities.length }} actividades programadas este mes</p>
     </div>
 
     <div class="calendar-controls">
-      <!-- Navegación -->
-      <div class="nav-pill">
+      <!-- Navegación (solo tablet / escritorio) -->
+      <div class="nav-pill calendar-desktop-nav">
         <button class="nav-pill-btn" (click)="previousMonth()" aria-label="Mes anterior">
           <fa-icon [icon]="faChevronLeft"></fa-icon>
         </button>
@@ -20,48 +40,50 @@
         </button>
       </div>
 
-      <!-- Filtros por tipo -->
-      <div class="filters-pill" role="group" aria-label="Filtros de actividad">
-        <button
-          class="filter-pill-btn"
-          [class.active]="selectedFilter === 'all'"
-          (click)="applyFilter('all')">
-          Todos
-        </button>
-        <button
-          class="filter-pill-btn"
-          [class.active]="selectedFilter === 'medico'"
-          (click)="applyFilter('medico')">
-          Médico
-        </button>
-        <button
-          class="filter-pill-btn"
-          [class.active]="selectedFilter === 'salida'"
-          (click)="applyFilter('salida')">
-          Salida
-        </button>
-        <button
-          class="filter-pill-btn"
-          [class.active]="selectedFilter === 'cumple'"
-          (click)="applyFilter('cumple')">
-          Cumpleaños
-        </button>
-        <button
-          class="filter-pill-btn"
-          [class.active]="selectedFilter === 'jardin'"
-          (click)="applyFilter('jardin')">
-          Jardín
-        </button>
-        <button
-          class="filter-pill-btn"
-          [class.active]="selectedFilter === 'otro'"
-          (click)="applyFilter('otro')">
-          Otro
-        </button>
+      <!-- Filtros por tipo (scroll horizontal en móvil) -->
+      <div class="calendar-filters-scroll">
+        <div class="filters-pill" role="group" aria-label="Filtros de actividad">
+          <button
+            class="filter-pill-btn"
+            [class.active]="selectedFilter === 'all'"
+            (click)="applyFilter('all')">
+            Todos
+          </button>
+          <button
+            class="filter-pill-btn"
+            [class.active]="selectedFilter === 'medico'"
+            (click)="applyFilter('medico')">
+            Médico
+          </button>
+          <button
+            class="filter-pill-btn"
+            [class.active]="selectedFilter === 'salida'"
+            (click)="applyFilter('salida')">
+            Salida
+          </button>
+          <button
+            class="filter-pill-btn"
+            [class.active]="selectedFilter === 'cumple'"
+            (click)="applyFilter('cumple')">
+            Cumpleaños
+          </button>
+          <button
+            class="filter-pill-btn"
+            [class.active]="selectedFilter === 'jardin'"
+            (click)="applyFilter('jardin')">
+            Jardín
+          </button>
+          <button
+            class="filter-pill-btn"
+            [class.active]="selectedFilter === 'otro'"
+            (click)="applyFilter('otro')">
+            Otro
+          </button>
+        </div>
       </div>
 
-      <!-- Filtro por miembro -->
-      <div class="member-pill">
+      <!-- Filtro por miembro (solo selector; sin imágenes) -->
+      <div class="member-pill calendar-member-pill">
         <select
           class="member-select"
           (change)="onMemberFilterChange($event)"
@@ -80,13 +102,13 @@
   <section class="calendar-surface">
     <!-- Días de la semana -->
     <div class="weekdays">
-      <div class="weekday">Dom</div>
-      <div class="weekday">Lun</div>
-      <div class="weekday">Mar</div>
-      <div class="weekday">Mié</div>
-      <div class="weekday">Jue</div>
-      <div class="weekday">Vie</div>
-      <div class="weekday">Sáb</div>
+      <div class="weekday"><span class="weekday-full">Dom</span><span class="weekday-short" aria-hidden="true">D</span></div>
+      <div class="weekday"><span class="weekday-full">Lun</span><span class="weekday-short" aria-hidden="true">L</span></div>
+      <div class="weekday"><span class="weekday-full">Mar</span><span class="weekday-short" aria-hidden="true">M</span></div>
+      <div class="weekday"><span class="weekday-full">Mié</span><span class="weekday-short" aria-hidden="true">X</span></div>
+      <div class="weekday"><span class="weekday-full">Jue</span><span class="weekday-short" aria-hidden="true">J</span></div>
+      <div class="weekday"><span class="weekday-full">Vie</span><span class="weekday-short" aria-hidden="true">V</span></div>
+      <div class="weekday"><span class="weekday-full">Sáb</span><span class="weekday-short" aria-hidden="true">S</span></div>
     </div>
 
     <!-- Días del mes -->
@@ -122,6 +144,39 @@
             *ngFor="let color of getMemberColors(day)"
             class="activity-dot"
             [style.background-color]="color">
+          </span>
+        </div>
+      </button>
+    </div>
+  </section>
+
+  <!-- Próximas actividades (solo layout móvil) -->
+  <section class="calendar-upcoming calendar-mobile-only-upcoming" *ngIf="upcomingForMobileList.length > 0" aria-label="Próximas actividades">
+    <h2 class="calendar-upcoming-title">Próximas</h2>
+    <div class="calendar-upcoming-list">
+      <button
+        type="button"
+        class="calendar-upcoming-card"
+        *ngFor="let activity of upcomingForMobileList"
+        (click)="openDayFromActivity(activity)">
+        <div class="calendar-upcoming-date">
+          <span class="calendar-upcoming-dow">{{ getShortWeekdayLabel(activity.date) }}</span>
+          <span class="calendar-upcoming-daynum">{{ getDayOfMonthFromDateString(activity.date) }}</span>
+        </div>
+        <div
+          class="calendar-upcoming-body"
+          [style.border-left-color]="getActivityPillarColor(activity)">
+          <div class="calendar-upcoming-text">
+            <h3 class="calendar-upcoming-name">{{ activity.title }}</h3>
+            <p class="calendar-upcoming-meta">
+              <ng-container *ngIf="activity.time">{{ formatActivityTime(activity.time) }}</ng-container>
+              <ng-container *ngIf="activity.time && activity.address"> · </ng-container>
+              <ng-container *ngIf="activity.address">{{ activity.address }}</ng-container>
+              <ng-container *ngIf="!activity.time && !activity.address">{{ getActivityTypeLabel(activity.activity_type) }}</ng-container>
+            </p>
+          </div>
+          <span class="calendar-upcoming-type-icon" aria-hidden="true">
+            <fa-icon [icon]="getActivityTypeFaIcon(activity.activity_type)"></fa-icon>
           </span>
         </div>
       </button>
