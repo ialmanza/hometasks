@@ -1,106 +1,139 @@
 <app-app-navigation></app-app-navigation>
 
-<div class="calendar-container bg-background-light dark:bg-background-dark">
-  <!-- Header del calendario -->
-  <div class="calendar-header">
-    <div class="header-content">
-      <button class="nav-button" (click)="previousMonth()">
-        <fa-icon [icon]="faChevronLeft"></fa-icon>
-      </button>
-      <h2 class="month-title text-[#2c3e50] dark:text-white">{{ getMonthName() }} {{ currentYear }}</h2>
-      <button class="nav-button" (click)="nextMonth()">
-        <fa-icon [icon]="faChevronRight"></fa-icon>
-      </button>
-    </div>
-  </div>
-
-  <!-- Filtros -->
-  <div class="filters-container">
-    <div class="filter-buttons">
-      <button 
-        class="filter-btn" 
-        [class.active]="selectedFilter === 'all'"
-        (click)="applyFilter('all')">
-        Todos
-      </button>
-      <button 
-        class="filter-btn" 
-        [class.active]="selectedFilter === 'medico'"
-        (click)="applyFilter('medico')">
-        Médico
-      </button>
-      <button 
-        class="filter-btn" 
-        [class.active]="selectedFilter === 'salida'"
-        (click)="applyFilter('salida')">
-        Salida
-      </button>
-      <button 
-        class="filter-btn" 
-        [class.active]="selectedFilter === 'cumple'"
-        (click)="applyFilter('cumple')">
-        Cumpleaños
-      </button>
+<main class="calendar-container has-desktop-nav bg-background-light dark:bg-background-dark">
+  <!-- Header + filtros (estilo landing) -->
+  <div class="calendar-topbar">
+    <div class="calendar-title-block">
+      <h2 class="calendar-title" aria-label="Mes actual">{{ getMonthName() }} {{ currentYear }}</h2>
+      <p class="calendar-subtitle">{{ activities.length }} actividades programadas este mes</p>
     </div>
 
-    <!-- Filtro por miembro -->
-    <div class="member-filter">
-      <select 
-        class="member-select" 
-        (change)="onMemberFilterChange($event)"
-        [value]="selectedMemberFilter">
-        <option value="all">Todos los miembros</option>
-        <option *ngFor="let member of availableMembers" [value]="member.id">
-          {{ member.name }}
-        </option>
-      </select>
+    <div class="calendar-controls">
+      <!-- Navegación -->
+      <div class="nav-pill">
+        <button class="nav-pill-btn" (click)="previousMonth()" aria-label="Mes anterior">
+          <fa-icon [icon]="faChevronLeft"></fa-icon>
+        </button>
+        <button class="nav-pill-today" (click)="goToToday()">Hoy</button>
+        <button class="nav-pill-btn" (click)="nextMonth()" aria-label="Mes siguiente">
+          <fa-icon [icon]="faChevronRight"></fa-icon>
+        </button>
+      </div>
+
+      <!-- Filtros por tipo -->
+      <div class="filters-pill" role="group" aria-label="Filtros de actividad">
+        <button
+          class="filter-pill-btn"
+          [class.active]="selectedFilter === 'all'"
+          (click)="applyFilter('all')">
+          Todos
+        </button>
+        <button
+          class="filter-pill-btn"
+          [class.active]="selectedFilter === 'medico'"
+          (click)="applyFilter('medico')">
+          Médico
+        </button>
+        <button
+          class="filter-pill-btn"
+          [class.active]="selectedFilter === 'salida'"
+          (click)="applyFilter('salida')">
+          Salida
+        </button>
+        <button
+          class="filter-pill-btn"
+          [class.active]="selectedFilter === 'cumple'"
+          (click)="applyFilter('cumple')">
+          Cumpleaños
+        </button>
+        <button
+          class="filter-pill-btn"
+          [class.active]="selectedFilter === 'jardin'"
+          (click)="applyFilter('jardin')">
+          Jardín
+        </button>
+        <button
+          class="filter-pill-btn"
+          [class.active]="selectedFilter === 'otro'"
+          (click)="applyFilter('otro')">
+          Otro
+        </button>
+      </div>
+
+      <!-- Filtro por miembro -->
+      <div class="member-pill">
+        <select
+          class="member-select"
+          (change)="onMemberFilterChange($event)"
+          [value]="selectedMemberFilter"
+          aria-label="Filtrar por miembro">
+          <option value="all">Todos los miembros</option>
+          <option *ngFor="let member of availableMembers" [value]="member.id">
+            {{ member.name }}
+          </option>
+        </select>
+      </div>
     </div>
   </div>
 
   <!-- Calendario -->
-  <div class="calendar-grid">
+  <section class="calendar-surface">
     <!-- Días de la semana -->
     <div class="weekdays">
-      <div class="weekday">D</div>
-      <div class="weekday">L</div>
-      <div class="weekday">M</div>
-      <div class="weekday">X</div>
-      <div class="weekday">J</div>
-      <div class="weekday">V</div>
-      <div class="weekday">S</div>
+      <div class="weekday">Dom</div>
+      <div class="weekday">Lun</div>
+      <div class="weekday">Mar</div>
+      <div class="weekday">Mié</div>
+      <div class="weekday">Jue</div>
+      <div class="weekday">Vie</div>
+      <div class="weekday">Sáb</div>
     </div>
 
     <!-- Días del mes -->
     <div class="calendar-days">
-      <button 
-        *ngFor="let day of calendarDays; let i = index"
+      <button
+        *ngFor="let day of calendarDays"
         class="calendar-day"
         [class.other-month]="!day"
         [class.has-activities]="day && hasActivities(day)"
         [class.past-day]="day && isPastDay(day)"
         (click)="day && selectDay(day)"
         [disabled]="!day">
-        
-        <div class="day-number" *ngIf="day">{{ day.getDate() }}</div>
-        
+
+        <span class="day-number" *ngIf="day">{{ day.getDate() }}</span>
+
+        <!-- Preview de actividades (como landing) -->
+        <div class="day-activities" *ngIf="day">
+          <div
+            *ngFor="let activity of (getActivitiesForDay(day) | slice:0:2)"
+            class="day-activity-pill"
+            [style.--activity-color]="getActivityTypeColor(activity.activity_type)">
+            <span class="day-activity-bar" aria-hidden="true"></span>
+            <span class="day-activity-title">{{ activity.title }}</span>
+          </div>
+          <div class="day-activity-more" *ngIf="getActivitiesForDay(day).length > 2">
+            +{{ getActivitiesForDay(day).length - 2 }} más
+          </div>
+        </div>
+
         <!-- Indicadores de actividades -->
         <div class="activity-indicators" *ngIf="day && hasActivities(day)">
-          <div 
-            *ngFor="let color of getMemberColors(day); let colorIndex = index"
+          <span
+            *ngFor="let color of getMemberColors(day)"
             class="activity-dot"
-            [style.background-color]="color"
-            [style.left]="(colorIndex * 4) + 'px'">
-          </div>
+            [style.background-color]="color">
+          </span>
         </div>
       </button>
     </div>
-  </div>
+  </section>
 
-  <!-- Botón flotante para agregar -->
+  <!-- FAB -->
   <button class="floating-add-btn" (click)="showModal = true; openAddForm()">
     <fa-icon [icon]="faPlus"></fa-icon>
+    <span class="floating-add-label">Agregar</span>
   </button>
-</div>
+</main>
 
 <!-- Modal para actividades del día -->
 <div class="modal-overlay" *ngIf="showModal" (click)="showModal = false">

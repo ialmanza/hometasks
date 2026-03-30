@@ -167,6 +167,16 @@ export class CalendarActivitiesComponent implements OnInit {
     this.loadActivities();
   }
 
+  // Ir al mes actual (hoy)
+  goToToday() {
+    const today = new Date();
+    this.currentDate = today;
+    this.currentMonth = today.getMonth() + 1;
+    this.currentYear = today.getFullYear();
+    this.generateCalendar();
+    this.loadActivities();
+  }
+
   // Seleccionar día
   async selectDay(date: Date) {
     this.selectedDate = this.formatDate(date);
