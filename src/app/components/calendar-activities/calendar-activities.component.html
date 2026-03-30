@@ -106,7 +106,7 @@
 <div class="modal-overlay" *ngIf="showModal" (click)="showModal = false">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h3>Actividades del {{ selectedDate | date:'longDate' }}</h3>
+      <h3>Actividades del {{ selectedDateAsDate | date:'longDate' }}</h3>
       <button class="close-btn" (click)="showModal = false">
         <fa-icon [icon]="faTimes"></fa-icon>
       </button>
@@ -228,6 +228,8 @@
               <option value="medico">Médico</option>
               <option value="salida">Salida</option>
               <option value="cumple">Cumpleaños</option>
+              <option value="jardin">Jardín</option>
+              <option value="otro">Otro</option>
             </select>
           </div>
 

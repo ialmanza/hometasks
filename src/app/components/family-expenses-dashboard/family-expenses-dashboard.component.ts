@@ -190,7 +190,9 @@ export class FamilyExpensesDashboardComponent implements OnInit, OnDestroy {
   }
 
   formatDate(dateString: string): string {
-    return new Date(dateString).toLocaleDateString('es-AR', {
+    // `YYYY-MM-DD` desde Postgres (date) se interpreta como UTC en JS si se parsea directo,
+    // lo que puede mostrar un día anterior según zona horaria. Forzamos medianoche local.
+    return new Date(`${dateString}T00:00:00`).toLocaleDateString('es-AR', {
       day: '2-digit',
       month: '2-digit'
     });
@@ -202,11 +204,11 @@ export class FamilyExpensesDashboardComponent implements OnInit, OnDestroy {
   }
 
   getDaysUntilDue(dueDate: string): number {
-    const due = new Date(dueDate);
+    const due = new Date(`${dueDate}T00:00:00`);
     const today = new Date();
+    today.setHours(0, 0, 0, 0);
     const diffTime = due.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   }
 
   getDueStatusClass(dueDate: string): string {

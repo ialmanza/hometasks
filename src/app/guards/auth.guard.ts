@@ -26,6 +26,12 @@ export class AuthGuard implements CanActivate {
         this.router.navigate(['/login']);
         return false;
       }
+      // Verificar lock incluso si hay caché válido (el lock puede cambiar entre requests)
+      const needsLock = await this.pinLockService.isLockRequired();
+      if (needsLock) {
+        this.router.navigate(['/lock'], { queryParams: { returnUrl: state.url } });
+        return false;
+      }
       return true;
     }
 
@@ -40,6 +46,14 @@ export class AuthGuard implements CanActivate {
           timestamp: Date.now()
         };
         this.router.navigate(['/login']);
+        return false;
+      }
+
+      // Verificación de bloqueo por PIN (ANTES de verificar autenticación completa)
+      // Esto evita que se cargue el componente antes de redirigir a lock
+      const needsLock = await this.pinLockService.isLockRequired();
+      if (needsLock) {
+        this.router.navigate(['/lock'], { queryParams: { returnUrl: state.url } });
         return false;
       }
 
@@ -58,13 +72,6 @@ export class AuthGuard implements CanActivate {
       if (!isAuthenticated) {
         // Redirigir al login si no está autenticado
         this.router.navigate(['/login']);
-        return false;
-      }
-
-      // Verificación de bloqueo por PIN (solo si el usuario lo tiene configurado)
-      const needsLock = await this.pinLockService.isLockRequired();
-      if (needsLock) {
-        this.router.navigate(['/lock'], { queryParams: { returnUrl: state.url } });
         return false;
       }
 
@@ -91,7 +98,17 @@ export class AuthGuard implements CanActivate {
       const hasLocalSession = await this.authService.hasLocalSession();
       
       if (hasLocalSession) {
-        // Si hay sesión local, permitir acceso (modo offline)
+        // Si hay sesión local, verificar lock antes de permitir acceso (modo offline)
+        try {
+          const needsLock = await this.pinLockService.isLockRequired();
+          if (needsLock) {
+            this.router.navigate(['/lock'], { queryParams: { returnUrl: state.url } });
+            return false;
+          }
+        } catch (lockError) {
+          // Si hay error verificando lock en modo offline, permitir acceso
+          console.warn('Error verificando lock en modo offline:', lockError);
+        }
         console.warn('Error de red, pero hay sesión local. Permitiendo acceso.');
         this.authCache = {
           isAuthenticated: true,

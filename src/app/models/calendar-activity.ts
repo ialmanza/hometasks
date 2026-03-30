@@ -2,7 +2,7 @@ export interface CalendarActivity {
   id?: number;
   user_id?: string;
   member_id?: string;
-  activity_type: 'medico' | 'salida' | 'cumple';
+  activity_type: 'medico' | 'salida' | 'cumple' | 'jardin' | 'otro';
   title: string;
   description?: string;
   address?: string; // Campo opcional para dirección

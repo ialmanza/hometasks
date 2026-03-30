@@ -411,13 +411,20 @@ export class CalendarActivitiesComponent implements OnInit {
 
   // Utilidades
   formatDate(date: Date): string {
-    return date.toISOString().split('T')[0];
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   getDayOfWeek(dateStr: string): string {
-    const date = new Date(dateStr);
+    const date = new Date(`${dateStr}T00:00:00`);
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     return days[date.getDay()];
+  }
+
+  get selectedDateAsDate(): Date | null {
+    return this.selectedDate ? new Date(`${this.selectedDate}T00:00:00`) : null;
   }
 
   getMonthName(): string {
@@ -433,6 +440,8 @@ export class CalendarActivitiesComponent implements OnInit {
       case 'medico': return '#3b82f6'; // Azul
       case 'salida': return '#10b981'; // Verde
       case 'cumple': return '#f59e0b'; // Naranja
+      case 'jardin': return '#22c55e'; // Verde intenso
+      case 'otro': return '#a855f7'; // Morado
       default: return '#6b7280'; // Gris
     }
   }
@@ -442,6 +451,8 @@ export class CalendarActivitiesComponent implements OnInit {
       case 'medico': return '🩺';
       case 'salida': return '🍻';
       case 'cumple': return '🎉';
+      case 'jardin': return '🌿';
+      case 'otro': return '📌';
       default: return '📅';
     }
   }
@@ -451,6 +462,8 @@ export class CalendarActivitiesComponent implements OnInit {
       case 'medico': return 'Médico';
       case 'salida': return 'Salida';
       case 'cumple': return 'Cumpleaños';
+      case 'jardin': return 'Jardín';
+      case 'otro': return 'Otro';
       default: return 'Actividad';
     }
   }

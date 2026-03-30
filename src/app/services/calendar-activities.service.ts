@@ -84,8 +84,14 @@ export class CalendarActivitiesService {
   async getActivitiesByMonth(month: number, year: number): Promise<CalendarActivityWithMember[]> {
     // Configurar suscripción en tiempo real si no está configurada
     this.setupRealtimeSubscription();
+    const userId = await this.authService.getCurrentUserId();
+    if (!userId) {
+      console.error('No authenticated user found');
+      return [];
+    }
     const startDate = `${year}-${month.toString().padStart(2, '0')}-01`;
-    const endDate = `${year}-${month.toString().padStart(2, '0')}-31`;
+    const endDateObj = new Date(year, month, 0); // último día del mes (month es 1-12)
+    const endDate = `${endDateObj.getFullYear()}-${String(endDateObj.getMonth() + 1).padStart(2, '0')}-${String(endDateObj.getDate()).padStart(2, '0')}`;
 
     const { data, error } = await supabase
       .from('calendar_activities')
@@ -93,6 +99,7 @@ export class CalendarActivitiesService {
         *,
         family_members(name, color)
       `)
+      .eq('user_id', userId)
       .gte('date', startDate)
       .lte('date', endDate)
       .order('date', { ascending: true })
@@ -119,12 +126,18 @@ export class CalendarActivitiesService {
   async getActivitiesByDay(date: string): Promise<CalendarActivityWithMember[]> {
     // Configurar suscripción en tiempo real si no está configurada
     this.setupRealtimeSubscription();
+    const userId = await this.authService.getCurrentUserId();
+    if (!userId) {
+      console.error('No authenticated user found');
+      return [];
+    }
     const { data, error } = await supabase
       .from('calendar_activities')
       .select(`
         *,
         family_members(name, color)
       `)
+      .eq('user_id', userId)
       .eq('date', date)
       .order('time', { ascending: true });
 
@@ -260,8 +273,14 @@ export class CalendarActivitiesService {
 
   // Obtener actividades filtradas por tipo
   async getActivitiesByType(month: number, year: number, type: string): Promise<CalendarActivityWithMember[]> {
+    const userId = await this.authService.getCurrentUserId();
+    if (!userId) {
+      console.error('No authenticated user found');
+      return [];
+    }
     const startDate = `${year}-${month.toString().padStart(2, '0')}-01`;
-    const endDate = `${year}-${month.toString().padStart(2, '0')}-31`;
+    const endDateObj = new Date(year, month, 0);
+    const endDate = `${endDateObj.getFullYear()}-${String(endDateObj.getMonth() + 1).padStart(2, '0')}-${String(endDateObj.getDate()).padStart(2, '0')}`;
 
     const { data, error } = await supabase
       .from('calendar_activities')
@@ -269,6 +288,7 @@ export class CalendarActivitiesService {
         *,
         family_members(name, color)
       `)
+      .eq('user_id', userId)
       .eq('activity_type', type)
       .gte('date', startDate)
       .lte('date', endDate)
@@ -289,8 +309,14 @@ export class CalendarActivitiesService {
 
   // Obtener actividades filtradas por miembro
   async getActivitiesByMember(month: number, year: number, memberId: string): Promise<CalendarActivityWithMember[]> {
+    const userId = await this.authService.getCurrentUserId();
+    if (!userId) {
+      console.error('No authenticated user found');
+      return [];
+    }
     const startDate = `${year}-${month.toString().padStart(2, '0')}-01`;
-    const endDate = `${year}-${month.toString().padStart(2, '0')}-31`;
+    const endDateObj = new Date(year, month, 0);
+    const endDate = `${endDateObj.getFullYear()}-${String(endDateObj.getMonth() + 1).padStart(2, '0')}-${String(endDateObj.getDate()).padStart(2, '0')}`;
 
     const { data, error } = await supabase
       .from('calendar_activities')
@@ -298,6 +324,7 @@ export class CalendarActivitiesService {
         *,
         family_members(name, color)
       `)
+      .eq('user_id', userId)
       .eq('member_id', memberId)
       .gte('date', startDate)
       .lte('date', endDate)
@@ -318,9 +345,15 @@ export class CalendarActivitiesService {
 
   // Verificar si existe una actividad duplicada en la misma fecha y hora
   async checkDuplicateActivity(date: string, time: string, memberId: string, excludeId?: number): Promise<boolean> {
+    const userId = await this.authService.getCurrentUserId();
+    if (!userId) {
+      console.error('No authenticated user found');
+      return false;
+    }
     let query = supabase
       .from('calendar_activities')
       .select('id')
+      .eq('user_id', userId)
       .eq('date', date)
       .eq('time', time)
       .eq('member_id', memberId);
