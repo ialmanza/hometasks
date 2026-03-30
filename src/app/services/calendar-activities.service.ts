@@ -382,11 +382,19 @@ export class CalendarActivitiesService {
       return [];
     }
 
+    const formatLocalDate = (d: Date) => {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
     const today = new Date();
     const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
 
-    const startDate = today.toISOString().split('T')[0];
-    const endDate = nextWeek.toISOString().split('T')[0];
+    // Usar fecha local (no UTC) para evitar off-by-one en móviles según zona horaria
+    const startDate = formatLocalDate(today);
+    const endDate = formatLocalDate(nextWeek);
 
     const { data, error } = await supabase
       .from('calendar_activities')
