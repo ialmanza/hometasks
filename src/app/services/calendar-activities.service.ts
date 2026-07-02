@@ -99,7 +99,6 @@ export class CalendarActivitiesService {
         *,
         family_members(name, color)
       `)
-      .eq('user_id', userId)
       .gte('date', startDate)
       .lte('date', endDate)
       .order('date', { ascending: true })
@@ -137,7 +136,6 @@ export class CalendarActivitiesService {
         *,
         family_members(name, color)
       `)
-      .eq('user_id', userId)
       .eq('date', date)
       .order('time', { ascending: true });
 
@@ -218,12 +216,19 @@ export class CalendarActivitiesService {
     return data;
   }
 
-  // Actualizar actividad
+  // Actualizar actividad (solo el creador puede editar su propia actividad)
   async updateActivity(id: number, activity: Partial<CalendarActivity>): Promise<CalendarActivity | null> {
+    const userId = await this.authService.getCurrentUserId();
+    if (!userId) {
+      console.error('No authenticated user found');
+      return null;
+    }
+
     const { data, error } = await supabase
       .from('calendar_activities')
       .update(activity)
       .eq('id', id)
+      .eq('user_id', userId)
       .select()
       .single();
 
@@ -242,8 +247,14 @@ export class CalendarActivitiesService {
     return data;
   }
 
-  // Eliminar actividad
+  // Eliminar actividad (solo el creador puede borrar su propia actividad)
   async deleteActivity(id: number): Promise<boolean> {
+    const userId = await this.authService.getCurrentUserId();
+    if (!userId) {
+      console.error('No authenticated user found');
+      return false;
+    }
+
     // Obtener la actividad antes de eliminarla para la notificación
     const { data: activityToDelete } = await supabase
       .from('calendar_activities')
@@ -254,7 +265,8 @@ export class CalendarActivitiesService {
     const { error } = await supabase
       .from('calendar_activities')
       .delete()
-      .eq('id', id);
+      .eq('id', id)
+      .eq('user_id', userId);
 
     if (error) {
       console.error('Error deleting activity:', error);
@@ -288,7 +300,6 @@ export class CalendarActivitiesService {
         *,
         family_members(name, color)
       `)
-      .eq('user_id', userId)
       .eq('activity_type', type)
       .gte('date', startDate)
       .lte('date', endDate)
@@ -324,7 +335,6 @@ export class CalendarActivitiesService {
         *,
         family_members(name, color)
       `)
-      .eq('user_id', userId)
       .eq('member_id', memberId)
       .gte('date', startDate)
       .lte('date', endDate)
@@ -353,7 +363,6 @@ export class CalendarActivitiesService {
     let query = supabase
       .from('calendar_activities')
       .select('id')
-      .eq('user_id', userId)
       .eq('date', date)
       .eq('time', time)
       .eq('member_id', memberId);
@@ -402,7 +411,6 @@ export class CalendarActivitiesService {
         *,
         family_members(name, color)
       `)
-      .eq('user_id', userId) // Filtrar por usuario actual
       .gte('date', startDate)
       .lte('date', endDate)
       .order('date', { ascending: true })

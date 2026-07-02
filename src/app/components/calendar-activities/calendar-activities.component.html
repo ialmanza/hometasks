@@ -251,7 +251,7 @@
                   </div>
                 </div>
               </div>
-              <div class="day-activity-actions">
+              <div class="day-activity-actions" *ngIf="canModify(activity)">
                 <button
                   type="button"
                   class="day-activity-action-btn day-activity-action-edit"
@@ -262,7 +262,7 @@
                 <button
                   type="button"
                   class="day-activity-action-btn day-activity-action-delete"
-                  (click)="deleteActivity(activity.id!)"
+                  (click)="deleteActivity(activity)"
                   aria-label="Eliminar actividad">
                   <fa-icon [icon]="faTrash"></fa-icon>
                 </button>

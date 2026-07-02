@@ -7,6 +7,7 @@ import { CalendarActivitiesService } from '../../services/calendar-activities.se
 import { MembersService } from '../../services/members.service';
 import { NotificationService } from '../../services/notifications.service';
 import { PushSubscriptionService } from '../../services/push-subscription.service';
+import { AuthService } from '../../services/auth.service';
 import { AppNavigationComponent } from "../app-navigation/app-navigation.component";
 import {
   faEdit,
@@ -57,6 +58,9 @@ export class CalendarActivitiesComponent implements OnInit {
   selectedFilter = 'all';
   selectedMemberFilter = 'all';
   availableMembers: any[] = [];
+
+  // Usuario actual (para saber qué actividades puede editar/borrar)
+  currentUserId: string | null = null;
   
   // Formulario
   activityForm: FormGroup;
@@ -86,6 +90,7 @@ export class CalendarActivitiesComponent implements OnInit {
     private membersService: MembersService,
     private notificationService: NotificationService,
     private pushSubscriptionService: PushSubscriptionService,
+    private authService: AuthService,
     private fb: FormBuilder
   ) {
     this.activityForm = this.fb.group({
@@ -100,11 +105,17 @@ export class CalendarActivitiesComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.authService.getCurrentUserId().then(userId => this.currentUserId = userId);
     this.loadMembers();
     this.generateCalendar();
     this.loadActivities();
     this.setupNotifications();
     this.setupRealtimeSubscription();
+  }
+
+  // Solo el creador de la actividad puede editarla o borrarla
+  canModify(activity: CalendarActivityWithMember): boolean {
+    return !!this.currentUserId && activity.user_id === this.currentUserId;
   }
 
   ngOnDestroy() {
@@ -320,6 +331,9 @@ export class CalendarActivitiesComponent implements OnInit {
 
   // Editar actividad
   editActivity(activity: CalendarActivityWithMember) {
+    if (!this.canModify(activity)) {
+      return;
+    }
     this.editingActivity = activity;
     this.showAddForm = true;
     this.activityForm.patchValue({
@@ -389,12 +403,15 @@ export class CalendarActivitiesComponent implements OnInit {
   }
 
   // Eliminar actividad
-  async deleteActivity(activityId: number) {
+  async deleteActivity(activity: CalendarActivityWithMember) {
+    if (!this.canModify(activity) || !activity.id) {
+      return;
+    }
     const confirmed = window.confirm('¿Estás seguro de eliminar esta actividad?');
     if (confirmed) {
-      const success = await this.calendarService.deleteActivity(activityId);
+      const success = await this.calendarService.deleteActivity(activity.id);
       if (success) {
-        this.notificationService.cancelScheduledNotification(activityId);
+        this.notificationService.cancelScheduledNotification(activity.id);
         this.selectedDayActivities = await this.calendarService.getActivitiesByDay(this.selectedDate!);
         this.loadActivities();
       }
