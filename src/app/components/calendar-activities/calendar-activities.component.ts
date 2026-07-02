@@ -471,14 +471,25 @@ export class CalendarActivitiesComponent implements OnInit {
     return `${year}-${month}-${day}`;
   }
 
+  /**
+   * Convierte un string 'YYYY-MM-DD' (opcionalmente con hora 'HH:MM') en un Date
+   * a esa hora en horario LOCAL. Evita que `new Date('YYYY-MM-DD')` lo interprete
+   * como medianoche UTC, lo que en Argentina (UTC-3) corre la fecha un día para atrás.
+   */
+  parseLocalDate(dateStr: string, timeStr?: string): Date {
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const [hours, minutes, seconds] = (timeStr ?? '00:00:00').split(':').map(Number);
+    return new Date(year, (month ?? 1) - 1, day ?? 1, hours ?? 0, minutes ?? 0, seconds ?? 0);
+  }
+
   getDayOfWeek(dateStr: string): string {
-    const date = new Date(`${dateStr}T00:00:00`);
+    const date = this.parseLocalDate(dateStr);
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     return days[date.getDay()];
   }
 
   get selectedDateAsDate(): Date | null {
-    return this.selectedDate ? new Date(`${this.selectedDate}T00:00:00`) : null;
+    return this.selectedDate ? this.parseLocalDate(this.selectedDate) : null;
   }
 
   /** Actividades futuras (fecha/hora ≥ ahora), para la lista «Próximas» en móvil. */
@@ -488,16 +499,9 @@ export class CalendarActivitiesComponent implements OnInit {
     return [...this.activities]
       .map((a) => {
         const timePart = a.time?.trim();
-        let ts: number;
-        if (timePart) {
-          const isoTime = timePart.length === 5 ? `${timePart}:00` : timePart;
-          ts = new Date(`${a.date}T${isoTime}`).getTime();
-        } else {
-          ts = new Date(`${a.date}T23:59:59`).getTime();
-        }
-        if (Number.isNaN(ts)) {
-          ts = new Date(`${a.date}T12:00:00`).getTime();
-        }
+        const ts = timePart
+          ? this.parseLocalDate(a.date, timePart).getTime()
+          : this.parseLocalDate(a.date, '23:59:59').getTime();
         return { a, ts };
       })
       .filter(({ ts }) => ts >= now)
@@ -507,18 +511,18 @@ export class CalendarActivitiesComponent implements OnInit {
   }
 
   openDayFromActivity(activity: CalendarActivityWithMember): void {
-    const d = new Date(`${activity.date}T12:00:00`);
+    const d = this.parseLocalDate(activity.date, '12:00:00');
     void this.selectDay(d);
   }
 
   getShortWeekdayLabel(dateStr: string): string {
-    const date = new Date(`${dateStr}T12:00:00`);
+    const date = this.parseLocalDate(dateStr, '12:00:00');
     const labels = ['DOM', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB'];
     return labels[date.getDay()] ?? '';
   }
 
   getDayOfMonthFromDateString(dateStr: string): number {
-    const date = new Date(`${dateStr}T12:00:00`);
+    const date = this.parseLocalDate(dateStr, '12:00:00');
     return date.getDate();
   }
 
@@ -618,8 +622,7 @@ export class CalendarActivitiesComponent implements OnInit {
   isDateInPast(dateString: string): boolean {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const selectedDate = new Date(dateString);
-    selectedDate.setHours(0, 0, 0, 0);
+    const selectedDate = this.parseLocalDate(dateString);
     return selectedDate < today;
   }
 
