@@ -6,6 +6,7 @@ export interface ShoppingListItem {
   unit: string;
   is_purchased: boolean;
   created_at?: string;
+  user_id?: string;
 }
 
 export interface SupabaseResponse<T> {

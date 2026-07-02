@@ -8,5 +8,6 @@ export interface VacationExpense {
   responsible_member_id?: string;
   icon?: string;
   created_at?: string;
+  user_id?: string;
 }
 

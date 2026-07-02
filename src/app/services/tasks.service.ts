@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable, from } from 'rxjs';
 import { environment } from '../../environments/environments';
 import { GuestNotificationService } from './guest-notification.service';
 import { NotificationService } from './notifications.service';
+import { AuthService } from './auth.service';
 
 export interface Task {
   id?: number;
@@ -11,6 +12,7 @@ export interface Task {
   description: string;
   completed: boolean;
   created_at?: Date;
+  user_id?: string;
 }
 
 @Injectable({
@@ -23,7 +25,8 @@ export class TasksService {
 
   constructor(
     private guestNotificationService: GuestNotificationService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private authService: AuthService
   ) {
     this.supabase = createClient(
       environment.supabaseUrl,
@@ -35,10 +38,18 @@ export class TasksService {
   async loadTasks() {
     try {
       console.log('Cargando tareas desde Supabase...');
-      
+
+      const userId = await this.authService.getCurrentUserId();
+      if (!userId) {
+        console.error('No authenticated user found');
+        this._tasks.next([]);
+        return;
+      }
+
       const { data, error } = await this.supabase
         .from('task_notifications')
         .select('*')
+        .eq('user_id', userId)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -54,14 +65,21 @@ export class TasksService {
     }
   }
 
-  async addTask(task: Omit<Task, 'id' | 'created_at'>) {
+  async addTask(task: Omit<Task, 'id' | 'created_at' | 'user_id'>) {
     try {
       console.log('Intentando agregar tarea:', task);
-      
+
+      const userId = await this.authService.getCurrentUserId();
+      if (!userId) {
+        console.error('No authenticated user found');
+        return;
+      }
+
       const newTask: Task = {
         ...task,
         created_at: new Date(),
-        completed: false
+        completed: false,
+        user_id: userId
       };
 
       console.log('Tarea a insertar:', newTask);
@@ -112,6 +130,12 @@ export class TasksService {
 
   async updateTask(updatedTask: Task) {
     try {
+      const userId = await this.authService.getCurrentUserId();
+      if (!userId) {
+        console.error('No authenticated user found');
+        return;
+      }
+
       const { data, error } = await this.supabase
         .from('task_notifications')
         .update({
@@ -120,6 +144,7 @@ export class TasksService {
           completed: updatedTask.completed
         })
         .eq('id', updatedTask.id)
+        .eq('user_id', userId)
         .select();
 
       if (error) throw error;
@@ -137,10 +162,17 @@ export class TasksService {
 
   async deleteTask(taskId: number) {
     try {
+      const userId = await this.authService.getCurrentUserId();
+      if (!userId) {
+        console.error('No authenticated user found');
+        return;
+      }
+
       const { error } = await this.supabase
         .from('task_notifications')
         .delete()
-        .eq('id', taskId);
+        .eq('id', taskId)
+        .eq('user_id', userId);
 
       if (error) throw error;
 
@@ -155,6 +187,12 @@ export class TasksService {
 
   async toggleTaskCompletion(taskId: number) {
     try {
+      const userId = await this.authService.getCurrentUserId();
+      if (!userId) {
+        console.error('No authenticated user found');
+        return;
+      }
+
       const currentTasks = this._tasks.value;
       const task = currentTasks.find(t => t.id === taskId);
 
@@ -164,6 +202,7 @@ export class TasksService {
         .from('task_notifications')
         .update({ completed: !task.completed })
         .eq('id', taskId)
+        .eq('user_id', userId)
         .select();
 
       if (error) throw error;
